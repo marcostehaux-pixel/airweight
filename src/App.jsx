@@ -419,6 +419,7 @@ const totalMoment =
 
 </div>
       </div>
+
       <button
 
         onClick={generateLoadsheet}
@@ -469,8 +470,6 @@ const totalMoment =
         />
 
       </div>
-
-<h1>BOTON TEST</h1>
 
    <button
       onClick={generateLoadsheet}
