@@ -451,21 +451,19 @@ onMouseLeave={(e) => {
     }}
 
   >
+<div
 
-    <div
+  style={{
 
-      style={{
+    display: 'flex',
 
-        display: 'flex',
+    justifyContent: 'space-between',
 
-        justifyContent: 'space-between',
+    alignItems: 'center'
 
-        alignItems: 'center'
+  }}
 
-      }}
-
-    >
-
+>
       <div>
 
         <p
@@ -613,12 +611,382 @@ onMouseLeave={(e) => {
       forwardCargo={forwardCargo}
       aftCargo={aftCargo}
     />
+  </div>
+
+)}
+
+{activeMenu === 'Loadsheet' && (
+
+  <div
+
+    style={{
+
+      flex: 1,
+
+      padding: '40px'
+
+    }}
+
+  >
+
+    <h1
+
+      style={{
+
+        fontSize: '42px',
+
+        marginBottom: '20px'
+
+      }}
+
+    >
+
+      LOADSHEET CENTER
+
+    </h1>
+
+    <p
+
+      style={{
+
+        color: '#b8c0cc',
+
+        marginBottom: '30px'
+
+      }}
+
+    >
+
+      Generate operational loadsheet PDF.
+
+    </p>
+
+    <div
+
+      style={{
+
+        padding: '14px',
+
+        borderRadius: '12px',
+
+        background:
+          'rgba(255,255,255,0.05)',
+
+        border:
+          '1px solid rgba(255,255,255,0.08)',
+
+        marginBottom: '12px'
+
+      }}
+
+    >
+
+      Aircraft:
+      <strong>
+        {' '}
+        {selectedAircraft.registration}
+      </strong>
+
+    </div>
+
+    <div
+
+      style={{
+
+        padding: '14px',
+
+        borderRadius: '12px',
+
+        background:
+          'rgba(255,255,255,0.05)',
+
+        border:
+          '1px solid rgba(255,255,255,0.08)',
+
+        marginBottom: '12px'
+
+      }}
+
+    >
+
+      Passengers:
+      <strong>
+        {' '}
+        {selectedSeats.length}
+      </strong>
+
+    </div>
+
+    <div
+
+      style={{
+
+        padding: '14px',
+
+        borderRadius: '12px',
+
+        background:
+          'rgba(255,255,255,0.05)',
+
+        border:
+          '1px solid rgba(255,255,255,0.08)',
+
+        marginBottom: '12px'
+
+      }}
+
+    >
+
+      Fuel:
+      <strong>
+        {' '}
+        {fuel} KG
+      </strong>
+
+    </div>
+
+    <div
+
+      style={{
+
+        padding: '14px',
+
+        borderRadius: '12px',
+
+        background:
+          'rgba(255,255,255,0.05)',
+
+        border:
+          '1px solid rgba(255,255,255,0.08)',
+
+        marginBottom: '30px'
+
+      }}
+
+    >
+
+   CG Status:
+
+<strong
+
+  style={{
+
+    color:
+      cgStatus
+        ? '#00ff88'
+        : '#ff4444',
+
+    marginLeft: '8px'
+
+  }}
+
+>
+
+  {cgStatus
+    ? 'VALID'
+    : 'INVALID'}
+
+</strong>
+
+    </div>
+<div style={{ marginBottom: '20px' }}>
+
+  <label>Fuel (kg)</label>
+
+  <input
+
+    type="number"
+
+    value={fuel}
+
+    onChange={(e) =>
+      setFuel(parseInt(e.target.value) || 0)
+    }
+
+    style={{
+
+      width: '100%',
+
+      padding: '12px',
+
+      marginTop: '8px',
+
+      borderRadius: '10px',
+
+      border:
+        '1px solid rgba(255,255,255,0.08)',
+
+      background:
+        'rgba(255,255,255,0.05)',
+
+      color: 'white'
+
+    }}
+
+  />
+
+</div>
+
+<div style={{ marginBottom: '20px' }}>
+
+  <label>Forward Cargo (kg)</label>
+
+  <input
+
+    type="number"
+
+    value={forwardCargo}
+
+    onChange={(e) =>
+      setForwardCargo(
+        parseInt(e.target.value) || 0
+      )
+    }
+
+    style={{
+
+      width: '100%',
+
+      padding: '12px',
+
+      marginTop: '8px',
+
+      borderRadius: '10px',
+
+      border:
+        '1px solid rgba(255,255,255,0.08)',
+
+      background:
+        'rgba(255,255,255,0.05)',
+
+      color: 'white'
+
+    }}
+
+  />
+
+</div>
+
+<div style={{ marginBottom: '30px' }}>
+
+  <label>Aft Cargo (kg)</label>
+
+  <input
+
+    type="number"
+
+    value={aftCargo}
+
+    onChange={(e) =>
+      setAftCargo(
+        parseInt(e.target.value) || 0
+      )
+    }
+
+    style={{
+
+      width: '100%',
+
+      padding: '12px',
+
+      marginTop: '8px',
+
+      borderRadius: '10px',
+
+      border:
+        '1px solid rgba(255,255,255,0.08)',
+
+      background:
+        'rgba(255,255,255,0.05)',
+
+      color: 'white'
+
+    }}
+
+  />
+
+</div>
+    <button
+ onMouseEnter={(e) => {
+
+    e.target.style.transform =
+      'translateY(-3px)'
+
+    e.target.style.boxShadow =
+      '0 0 35px rgba(0,255,140,0.35)'
+
+  }}
+
+  onMouseLeave={(e) => {
+
+    e.target.style.transform =
+      'translateY(0px)'
+
+    e.target.style.boxShadow =
+      '0 0 25px rgba(0,255,140,0.20)'
+
+  }}
+      onClick={() =>
+        
+
+        generateLoadsheet({
+
+          selectedAircraft,
+
+          selectedSeats,
+
+          forwardCargo,
+
+          aftCargo,
+
+          fuel,
+
+          zfw,
+
+          tow,
+
+          cg,
+
+          cgStatus
+
+        })
+
+      }
+
+      style={{
+
+        padding: '16px 32px',
+
+        background:
+          '#00aa66',
+
+        color: 'white',
+
+        border:
+          '1px solid rgba(255,255,255,0.08)',
+
+        borderRadius: '12px',
+
+        fontSize: '16px',
+
+        cursor: 'pointer',
+
+        boxShadow:
+          '0 0 25px rgba(0,255,140,0.20)'
+
+      }}
+
+    >
+
+      Generate Loadsheet PDF
+
+    </button>
 
   </div>
 
 )}
 
-  </div>
+</div>
 
 )
 
