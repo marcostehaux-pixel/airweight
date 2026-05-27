@@ -5,7 +5,7 @@ import aircraftDatabase from './data/aircraftDatabase'
 import SeatMap from './components/SeatMap'
 import CargoPanel from './components/CargoPanel'
 import generateLoadsheet from './utils/generateLoadsheet'
-
+import logo from './assets/logo.png'
 function App() {
 
 
@@ -117,16 +117,31 @@ const totalMoment =
   }
 
 }
- return (
+
+return (
 
   <div
+
     style={{
-      display: 'flex',
-      backgroundColor: '#121212',
+
       minHeight: '100vh',
-      color: 'white',
-      fontFamily: 'Arial'
+
+      display: 'flex',
+     background:
+`
+linear-gradient(
+rgba(10,10,15,0.88),
+rgba(20,20,30,0.92)
+),
+url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05')
+`,
+
+backgroundSize: 'cover',
+
+backgroundPosition: 'center', 
+
     }}
+
   >
 
     {/* SIDEBAR */}
@@ -134,7 +149,15 @@ const totalMoment =
     <div
       style={{
         width: '250px',
-        backgroundColor: '#1b1b1b',
+        background:'rgba(255,255,255,0.04)',
+boxShadow:
+'0 0 40px rgba(0,0,0,0.35)',
+
+backdropFilter:
+'blur(14px)',
+
+borderRight:
+'1px solid rgba(255,255,255,0.08)',
         padding: '30px',
         borderRight: '1px solid #333'
       }}
@@ -145,15 +168,40 @@ const totalMoment =
           fontSize: '28px',
           marginBottom: '40px'
         }}
-      >
+      ><img
+  src={logo}
+  alt="AIRWEIGHT Logo"
+  style={{
+    width: '180px',
+    marginBottom: '20px'
+  }}
+/>
         AIRWEIGHT
       </h1>
 
       <div style={{ marginBottom: '20px' }}>
         Dashboard
-      </div>
+      <div
 
-      <div style={{ marginBottom: '20px' }}>
+  style={{
+
+    marginBottom: '20px',
+
+    padding: '12px 16px',
+
+    borderRadius: '12px',
+
+    background:
+      'rgba(255,255,255,0.03)',
+
+    transition:
+      'all 0.3s ease',
+
+    cursor: 'pointer'
+
+  }}
+
+></div>
         Loadsheet
       </div>
 
@@ -215,9 +263,9 @@ const totalMoment =
           style={{
             padding: '10px',
             borderRadius: '8px',
-            backgroundColor: '#2b2b2b',
+            background:'rgba(255,255,255,0.05)',
             color: 'white',
-            border: 'none'
+            border: '1px solid rgba(255,255,255,0.08)'
           }}
         >
 
@@ -242,7 +290,14 @@ const totalMoment =
 
       <div
         style={{
-          backgroundColor: '#1f1f1f',
+          background:
+'rgba(255,255,255,0.05)',
+
+backdropFilter:
+'blur(12px)',
+
+border:
+'1px solid rgba(255,255,255,0.08)',
           padding: '30px',
           borderRadius: '15px',
           marginTop: '40px',
@@ -267,8 +322,8 @@ const totalMoment =
               padding: '12px',
               marginTop: '8px',
               borderRadius: '8px',
-              border: 'none',
-              backgroundColor: '#2b2b2b',
+              border: '1px solid rgba(255,255,255,0.08)',
+              background:'rgba(255,255,255,0.05)',
               color: 'white'
             }}
           />
@@ -288,8 +343,8 @@ const totalMoment =
               padding: '12px',
               marginTop: '8px',
               borderRadius: '8px',
-              border: 'none',
-              backgroundColor: '#2b2b2b',
+              border: '1px solid rgba(255,255,255,0.08)',
+              background:'rgba(255,255,255,0.05)',
               color: 'white'
             }}
           />
@@ -313,8 +368,8 @@ const totalMoment =
       padding: '12px',
       marginTop: '8px',
       borderRadius: '8px',
-      border: 'none',
-      backgroundColor: '#2b2b2b',
+      border: '1px solid rgba(255,255,255,0.08)',
+      background:'rgba(255,255,255,0.05)',
       color: 'white'
     }}
   />
@@ -339,8 +394,8 @@ const totalMoment =
       padding: '12px',
       marginTop: '8px',
       borderRadius: '8px',
-      border: 'none',
-      backgroundColor: '#2b2b2b',
+      border: '1px solid rgba(255,255,255,0.08)',
+      background:'rgba(255,255,255,0.05)',
       color: 'white'
     }}
   />
@@ -369,7 +424,7 @@ const totalMoment =
           padding: '15px 30px',
           backgroundColor: '#00aa66',
           color: 'white',
-          border: 'none',
+          border: '1px solid rgba(255,255,255,0.08)',
           borderRadius: '10px',
           fontSize: '16px',
           cursor: 'pointer'
