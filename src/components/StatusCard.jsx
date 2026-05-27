@@ -1,102 +1,192 @@
+import { useState } from 'react'
+
 function StatusCard(props) {
-const [hovered, setHovered] =
-  useState(false)
-  import { useState } from 'react'
+
+  const [hovered, setHovered] =
+    useState(false)
+
+  const styles = `
+
+    @keyframes pulseGreen {
+
+      0% {
+        box-shadow:
+          0 0 20px rgba(0,255,140,0.10);
+      }
+
+      50% {
+        box-shadow:
+          0 0 35px rgba(0,255,140,0.22);
+      }
+
+      100% {
+        box-shadow:
+          0 0 20px rgba(0,255,140,0.10);
+      }
+
+    }
+
+    @keyframes pulseRed {
+
+      0% {
+        box-shadow:
+          0 0 20px rgba(255,70,70,0.10);
+      }
+
+      50% {
+        box-shadow:
+          0 0 35px rgba(255,70,70,0.22);
+      }
+
+      100% {
+        box-shadow:
+          0 0 20px rgba(255,70,70,0.10);
+      }
+
+    }
+
+  `
+
   return (
 
-    <div
-    onMouseEnter={() =>
-  setHovered(true)
-}
+    <>
 
-onMouseLeave={() =>
-  setHovered(false)
-}
-     style={{
+      <style>{styles}</style>
 
-  minWidth: '180px',
+      <div
 
-  padding: '28px',
+        onMouseEnter={() =>
+          setHovered(true)
+        }
 
-  borderRadius: '22px',
+        onMouseLeave={() =>
+          setHovered(false)
+        }
 
-  background:
-    'rgba(255,255,255,0.06)',
+        style={{
 
-  backdropFilter:
-    'blur(18px)',
+          minWidth: '180px',
 
-  border:
-    status
-      ? '1px solid rgba(0,255,140,0.25)'
-      : '1px solid rgba(255,70,70,0.25)',
+          padding: '28px',
 
-  boxShadow:
-    status
-      ? '0 0 35px rgba(0,255,140,0.10)'
-      : '0 0 35px rgba(255,70,70,0.12)',
+          borderRadius: '22px',
 
-  transition:
-    'all 0.35s ease',
+          background:
+            'rgba(255,255,255,0.06)',
 
-  transform:
-  hovered
-    ? 'translateY(-6px)'
-    : 'translateY(0px)',
+          backdropFilter:
+            'blur(18px)',
 
-  cursor:
-    'pointer'
+          border:
+            props.status
+              ? '1px solid rgba(0,255,140,0.25)'
+              : '1px solid rgba(255,70,70,0.25)',
 
-}} 
-    >
+          boxShadow:
+            hovered
 
-      <h3
+              ? (
+                  props.status
+                    ? '0 0 45px rgba(0,255,140,0.22)'
+                    : '0 0 45px rgba(255,70,70,0.22)'
+                )
 
-  style={{
+              : (
+                  props.status
+                    ? '0 0 25px rgba(0,255,140,0.10)'
+                    : '0 0 25px rgba(255,70,70,0.10)'
+                ),
 
-    fontSize: '14px',
+          transition:
+            'all 0.35s ease',
 
-    letterSpacing: '2px',
+          animation:
+            props.status
+              ? 'pulseGreen 2.5s infinite'
+              : 'pulseRed 2.5s infinite',
 
-    color: '#b8c0cc',
+          transform:
 
-    marginBottom: '12px'
+            hovered
 
-  }}
+              ? 'translateY(-6px) scale(1.02)'
 
->
+              : 'translateY(0px) scale(1)',
 
-  {props.title}
+          cursor:
+            'pointer'
 
-</h3>
+        }}
 
-  
+      >
 
-      <h2
+        <h3
 
-  style={{
+          style={{
 
-    fontSize: '34px',
+            fontSize: '14px',
 
-    fontWeight: '700',
+            letterSpacing: '2px',
 
-    marginBottom: '10px'
+            color: '#b8c0cc',
 
-  }}
+            marginBottom: '12px'
 
->
+          }}
 
-  {props.value} kg
+        >
 
-</h2>
+          {props.title}
 
-      <p>
-        {props.status ? 'OK' : 'OVERLIMIT'}
-      </p>
+        </h3>
 
-    </div>
+        <h2
+
+          style={{
+
+            fontSize: '34px',
+
+            fontWeight: '700',
+
+            marginBottom: '10px'
+
+          }}
+
+        >
+
+          {props.value} kg
+
+        </h2>
+
+        <p
+
+          style={{
+
+            color:
+              props.status
+                ? '#00ff99'
+                : '#ff5c5c',
+
+            fontSize: '13px',
+
+            letterSpacing: '1px'
+
+          }}
+
+        >
+
+          {props.status
+            ? 'NORMAL'
+            : 'LIMIT EXCEEDED'}
+
+        </p>
+
+      </div>
+
+    </>
 
   )
+
 }
 
 export default StatusCard

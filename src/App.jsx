@@ -20,6 +20,8 @@ const [aftCargo, setAftCargo] =
   useState([])
   const [selectedAircraft, setSelectedAircraft] =
     useState(aircraftDatabase[0])
+   const [activeMenu, setActiveMenu] =
+  useState('Dashboard') 
  const passengerWeight =
   selectedSeats.length * 84
 
@@ -179,9 +181,11 @@ borderRight:
         AIRWEIGHT
       </h1>
 
-      <div style={{ marginBottom: '20px' }}>
-        Dashboard
-      <div
+    
+<div
+  onClick={() =>
+    setActiveMenu('Dashboard')
+  }
 
   style={{
 
@@ -192,7 +196,164 @@ borderRight:
     borderRadius: '12px',
 
     background:
-      'rgba(255,255,255,0.03)',
+      activeMenu === 'Dashboard'
+        ? 'rgba(0,255,140,0.12)'
+        : 'rgba(255,255,255,0.03)',
+
+    border:
+      activeMenu === 'Dashboard'
+        ? '1px solid rgba(0,255,140,0.25)'
+        : '1px solid transparent',
+
+    boxShadow:
+      activeMenu === 'Dashboard'
+        ? '0 0 25px rgba(0,255,140,0.15)'
+        : 'none',
+
+    transition:
+      'all 0.3s ease',
+transform:
+  activeMenu === 'Dashboard'
+    ? 'translateX(6px)'
+    : 'translateX(0px)',
+    cursor: 'pointer',
+
+    transition:
+     'all 0.3s ease',
+
+    boxShadow:
+    '0 0 25px rgba(0,255,140,0.20)',
+  }}
+
+>
+
+  Dashboard
+
+</div>
+<div
+
+  onClick={() =>
+    setActiveMenu('Loadsheet')
+  }
+onMouseEnter={(e) => {
+
+  if (activeMenu !== 'Dashboard') {
+
+    e.currentTarget.style.transform =
+      'translateX(4px)'
+
+    e.currentTarget.style.boxShadow =
+      '0 0 18px rgba(255,255,255,0.08)'
+
+  }
+
+}}
+
+onMouseLeave={(e) => {
+
+  if (activeMenu !== 'Dashboard') {
+
+    e.currentTarget.style.transform =
+      'translateX(0px)'
+
+    e.currentTarget.style.boxShadow =
+      'none'
+
+  }
+
+}}
+  style={{
+
+    marginBottom: '20px',
+
+    padding: '12px 16px',
+
+    borderRadius: '12px',
+
+    background:
+      activeMenu === 'Loadsheet'
+        ? 'rgba(0,255,140,0.12)'
+        : 'rgba(255,255,255,0.03)',
+
+    border:
+      activeMenu === 'Loadsheet'
+        ? '1px solid rgba(0,255,140,0.25)'
+        : '1px solid transparent',
+
+    boxShadow:
+      activeMenu === 'Loadsheet'
+        ? '0 0 25px rgba(0,255,140,0.15)'
+        : 'none',
+
+    transition:
+      'all 0.3s ease',
+transform:
+  activeMenu === 'Dashboard'
+    ? 'translateX(6px)'
+    : 'translateX(0px)',
+    cursor: 'pointer'
+
+  }}
+
+>
+
+  Loadsheet
+
+</div>
+<div
+
+  onClick={() =>
+    setActiveMenu('Aircraft')
+  }
+onMouseEnter={(e) => {
+
+  if (activeMenu !== 'Dashboard') {
+
+    e.currentTarget.style.transform =
+      'translateX(4px)'
+
+    e.currentTarget.style.boxShadow =
+      '0 0 18px rgba(255,255,255,0.08)'
+
+  }
+
+}}
+
+onMouseLeave={(e) => {
+
+  if (activeMenu !== 'Dashboard') {
+
+    e.currentTarget.style.transform =
+      'translateX(0px)'
+
+    e.currentTarget.style.boxShadow =
+      'none'
+
+  }
+
+}}
+  style={{
+
+    marginBottom: '20px',
+
+    padding: '12px 16px',
+
+    borderRadius: '12px',
+
+    background:
+      activeMenu === 'Aircraft'
+        ? 'rgba(0,255,140,0.12)'
+        : 'rgba(255,255,255,0.03)',
+
+    border:
+      activeMenu === 'Aircraft'
+        ? '1px solid rgba(0,255,140,0.25)'
+        : '1px solid transparent',
+
+    boxShadow:
+      activeMenu === 'Aircraft'
+        ? '0 0 25px rgba(0,255,140,0.15)'
+        : 'none',
 
     transition:
       'all 0.3s ease',
@@ -201,289 +362,266 @@ borderRight:
 
   }}
 
-></div>
-        Loadsheet
-      </div>
+>
 
-      <div style={{ marginBottom: '20px' }}>
-        Aircraft
-      </div>
+  Aircraft
 
-      <div style={{ marginBottom: '20px' }}>
-        Settings
-      </div>
+</div>
+<div
 
-    </div>
+  onClick={() =>
+    setActiveMenu('Settings')
+  }
+onMouseEnter={(e) => {
 
-    {/* MAIN CONTENT */}
+  if (activeMenu !== 'Dashboard') {
+
+    e.currentTarget.style.transform =
+      'translateX(4px)'
+
+    e.currentTarget.style.boxShadow =
+      '0 0 18px rgba(255,255,255,0.08)'
+
+  }
+
+}}
+
+onMouseLeave={(e) => {
+
+  if (activeMenu !== 'Dashboard') {
+
+    e.currentTarget.style.transform =
+      'translateX(0px)'
+
+    e.currentTarget.style.boxShadow =
+      'none'
+
+  }
+
+}}
+  style={{
+
+    marginBottom: '20px',
+
+    padding: '12px 16px',
+
+    borderRadius: '12px',
+
+    background:
+      activeMenu === 'Settings'
+        ? 'rgba(0,255,140,0.12)'
+        : 'rgba(255,255,255,0.03)',
+
+    border:
+      activeMenu === 'Settings'
+        ? '1px solid rgba(0,255,140,0.25)'
+        : '1px solid transparent',
+
+    boxShadow:
+      activeMenu === 'Settings'
+        ? '0 0 25px rgba(0,255,140,0.15)'
+        : 'none',
+
+    transition:
+      'all 0.3s ease',
+
+    cursor: 'pointer'
+
+  }}
+
+>
+
+  Settings
+
+</div>
+
+</div>
+{/* MAIN CONTENT */}
+
+{activeMenu === 'Dashboard' && (
+
+  <div
+
+    style={{
+
+      flex: 1,
+
+      padding: '40px'
+
+    }}
+
+  >
 
     <div
+
       style={{
-        flex: 1,
-        padding: '40px'
+
+        display: 'flex',
+
+        justifyContent: 'space-between',
+
+        alignItems: 'center'
+
       }}
+
     >
 
-      {/* TOP BAR */}
+      <div>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}
-      >
-
-        <div>
-
-          <h2>
-            {selectedAircraft.registration}
-          </h2>
-
-          <p style={{ color: '#888' }}>
-            {selectedAircraft.type}
-          </p>
-
-        </div>
-
-        <select
-          value={selectedAircraft.registration}
-
-          onChange={(e) => {
-
-            const aircraft =
-              aircraftDatabase.find(
-                acft => acft.registration === e.target.value
-              )
-
-            setSelectedAircraft(aircraft)
-
-          }}
+        <p
 
           style={{
-            padding: '10px',
-            borderRadius: '8px',
-            background:'rgba(255,255,255,0.05)',
-            color: 'white',
-            border: '1px solid rgba(255,255,255,0.08)'
+
+            color: '#00ff99',
+
+            letterSpacing: '3px',
+
+            fontSize: '13px',
+
+            marginBottom: '8px'
+
           }}
+
         >
 
-          {aircraftDatabase.map((aircraft) => (
+          AIRWEIGHT FLIGHT OPERATIONS
 
-            <option
-              key={aircraft.registration}
-              value={aircraft.registration}
-            >
+        </p>
 
-              {aircraft.registration}
+        <h1
 
-            </option>
+          style={{
 
-          ))}
+            fontSize: '42px',
 
-        </select>
+            margin: 0,
+
+            fontWeight: '700'
+
+          }}
+
+        >
+
+          {selectedAircraft.registration}
+
+        </h1>
+
+        <p
+
+          style={{
+
+            color: '#b8c0cc',
+
+            marginTop: '10px'
+
+          }}
+
+        >
+
+          {selectedAircraft.type}
+
+        </p>
 
       </div>
 
-      {/* INPUT PANEL */}
+      <select
 
-      <div
-        style={{
-          background:
-'rgba(255,255,255,0.05)',
+        value={selectedAircraft.registration}
 
-backdropFilter:
-'blur(12px)',
+        onChange={(e) => {
 
-border:
-'1px solid rgba(255,255,255,0.08)',
-          padding: '30px',
-          borderRadius: '15px',
-          marginTop: '40px',
-          width: '350px'
+          const aircraft =
+            aircraftDatabase.find(
+              acft =>
+                acft.registration === e.target.value
+            )
+
+          setSelectedAircraft(aircraft)
+
         }}
+
       >
 
-        <h3 style={{ marginBottom: '20px' }}>
-          Flight Inputs
-        </h3>
+        {aircraftDatabase.map((aircraft) => (
 
-        <div style={{ marginBottom: '20px' }}>
+          <option
 
-          <label>Passengers</label>
+            key={aircraft.registration}
 
-          <input
-            type="number"
-            value={selectedSeats.length}
-        
-            style={{
-              width: '100%',
-              padding: '12px',
-              marginTop: '8px',
-              borderRadius: '8px',
-              border: '1px solid rgba(255,255,255,0.08)',
-              background:'rgba(255,255,255,0.05)',
-              color: 'white'
-            }}
-          />
+            value={aircraft.registration}
 
-        </div>
+          >
 
-        <div>
+            {aircraft.registration}
 
-          <label>Fuel (kg)</label>
+          </option>
 
-          <input
-            type="number"
-            value={fuel}
-            onChange={(e) => setFuel(parseInt(e.target.value) || 0)}
-            style={{
-              width: '100%',
-              padding: '12px',
-              marginTop: '8px',
-              borderRadius: '8px',
-              border: '1px solid rgba(255,255,255,0.08)',
-              background:'rgba(255,255,255,0.05)',
-              color: 'white'
-            }}
-          />
+        ))}
 
-        </div>
-<div style={{ marginTop: '20px' }}>
+      </select>
 
-  <label>Forward Cargo (kg)</label>
-
-  <input
-    type="number"
-    value={forwardCargo}
-    onChange={(e) =>
-      setForwardCargo(
-        parseInt(e.target.value) || 0
-      )
-    }
-
-    style={{
-      width: '100%',
-      padding: '12px',
-      marginTop: '8px',
-      borderRadius: '8px',
-      border: '1px solid rgba(255,255,255,0.08)',
-      background:'rgba(255,255,255,0.05)',
-      color: 'white'
-    }}
-  />
-
-</div>
-
-<div style={{ marginTop: '20px' }}>
-
-  <label>Aft Cargo (kg)</label>
-
-  <input
-    type="number"
-    value={aftCargo}
-    onChange={(e) =>
-      setAftCargo(
-        parseInt(e.target.value) || 0
-      )
-    }
-
-    style={{
-      width: '100%',
-      padding: '12px',
-      marginTop: '8px',
-      borderRadius: '8px',
-      border: '1px solid rgba(255,255,255,0.08)',
-      background:'rgba(255,255,255,0.05)',
-      color: 'white'
-    }}
-  />
-
-</div>
-      </div>
-
-      <button
-
-        onClick={() =>
-  generateLoadsheet({
-    selectedAircraft,
-    selectedSeats,
-    forwardCargo,
-    aftCargo,
-    fuel,
-    zfw,
-    tow,
-    cg,
-    cgStatus
-  })
-}
-
-        style={{
-          marginTop: '40px',
-          padding: '15px 30px',
-          backgroundColor: '#00aa66',
-          color: 'white',
-          border: '1px solid rgba(255,255,255,0.08)',
-          borderRadius: '10px',
-          fontSize: '16px',
-          cursor: 'pointer'
-        }}
-      >
-
-        Generate Loadsheet PDF
-
-      </button>
-
-      {/* STATUS CARDS */}
-
-      <div
-        style={{
-          display: 'flex',
-          gap: '20px',
-          marginTop: '40px',
-          flexWrap: 'wrap'
-        }}
-      >
-
-        <StatusCard
-          title="ZFW"
-          value={zfw}
-          status={zfwStatus}
-        />
-
-        <StatusCard
-          title="TOW"
-          value={tow}
-          status={towStatus}
-        />
-
-        <StatusCard
-          title="CG"
-          value={cg}
-          status={cgStatus}
-        />
-      </div>
-<EnvelopeChart
-  cg={cg}
-  weight={tow}
-  status={cgStatus}
-/>
-
-<SeatMap
-  selectedSeats={selectedSeats}
-  toggleSeat={toggleSeat}
-/>
-
-<CargoPanel
-  forwardCargo={forwardCargo}
-  aftCargo={aftCargo}
-/>
     </div>
+
+    <div
+
+      style={{
+
+        display: 'flex',
+
+        gap: '20px',
+
+        marginTop: '40px',
+
+        flexWrap: 'wrap'
+
+      }}
+
+    >
+
+      <StatusCard
+        title="ZFW"
+        value={zfw}
+        status={zfwStatus}
+      />
+
+      <StatusCard
+        title="TOW"
+        value={tow}
+        status={towStatus}
+      />
+
+      <StatusCard
+        title="CG"
+        value={cg}
+        status={cgStatus}
+      />
+
+    </div>
+
+    <EnvelopeChart
+      cg={cg}
+      weight={tow}
+      status={cgStatus}
+    />
+
+    <SeatMap
+      selectedSeats={selectedSeats}
+      toggleSeat={toggleSeat}
+    />
+
+    <CargoPanel
+      forwardCargo={forwardCargo}
+      aftCargo={aftCargo}
+    />
 
   </div>
 
-  )
+)}
+
+  </div>
+
+)
+
 }
 
 export default App
