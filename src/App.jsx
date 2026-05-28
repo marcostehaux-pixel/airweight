@@ -2,10 +2,13 @@ import { useState } from 'react'
 import StatusCard from './components/StatusCard'
 import EnvelopeChart from './components/EnvelopeChart'
 import aircraftDatabase from './data/aircraftDatabase'
+import { calculateMoment
+} from './utilit/calculations'
 import SeatMap from './components/SeatMap'
 import CargoPanel from './components/CargoPanel'
 import generateLoadsheet from './utils/generateLoadsheet'
 import logo from './assets/logo.png'
+import aircraftImage from './assets/a320.png'
 function App() {
 
 
@@ -24,7 +27,16 @@ const [aftCargo, setAftCargo] =
   useState('Dashboard') 
  const passengerWeight =
   selectedSeats.length * 84
+const paxMoment =
 
+  calculateMoment(
+
+    passengerWeight,
+
+    selectedAircraft.seatArmMid
+
+  )
+  
  const zfw =
 
   selectedAircraft.basicWeight +
@@ -34,7 +46,6 @@ const [aftCargo, setAftCargo] =
   forwardCargo +
 
   aftCargo 
- 
 
 const fuelWeight =
   fuel
@@ -44,28 +55,23 @@ const basicMoment =
 
 const passengerMoment =
 
-  selectedSeats.reduce((total, seat) => {
+  calculateMoment(
 
-    let arm = 0
+    passengerWeight,
 
-    if (seat < 10) {
-      arm = selectedAircraft.seatArmFwd
-    }
+    selectedAircraft.seatArmMid
 
-    else if (seat < 20) {
-      arm = selectedAircraft.seatArmMid
-    }
-
-    else {
-      arm = selectedAircraft.seatArmAft
-    }
-
-    return total + (84 * arm)
-
-  }, 0)
+  )
 
  const fuelMoment =
-  fuelWeight * selectedAircraft.fuelArm 
+
+  calculateMoment(
+
+    fuel,
+
+    selectedAircraft.fuelArm
+
+  )
 
 
 const forwardCargoMoment =
@@ -521,7 +527,24 @@ onMouseLeave={(e) => {
         </p>
 
       </div>
+<img
 
+  src={aircraftImage}
+
+  alt="aircraft"
+
+  style={{
+
+    width: '120px',
+
+    objectFit: 'contain',
+
+    filter:
+      'drop-shadow(0 0 18px rgba(0,255,140,0.18))'
+
+  }}
+
+/>
       <select
 
         value={selectedAircraft.registration}
@@ -629,21 +652,58 @@ onMouseLeave={(e) => {
 
   >
 
-    <h1
+    <div
 
-      style={{
+  style={{
 
-        fontSize: '42px',
+    display: 'flex',
 
-        marginBottom: '20px'
+    gap: '20px',
 
-      }}
+    alignItems: 'center',
 
-    >
+    marginBottom: '20px'
 
-      LOADSHEET CENTER
+  }}
 
-    </h1>
+>
+
+  <h1
+
+    style={{
+
+      fontSize: '42px',
+
+      margin: 0
+
+    }}
+
+  >
+
+    LOADSHEET CENTER
+
+  </h1>
+
+  <img
+
+    src={aircraftImage}
+
+    alt="aircraft"
+
+    style={{
+
+      width: '180px',
+
+      objectFit: 'contain',
+
+      filter:
+        'drop-shadow(0 0 18px rgba(0,255,140,0.18))'
+
+    }}
+
+  />
+
+</div>
 
     <p
 
@@ -924,6 +984,7 @@ onMouseLeave={(e) => {
 
     e.target.style.boxShadow =
       '0 0 25px rgba(0,255,140,0.20)'
+      
 
   }}
       onClick={() =>
@@ -972,7 +1033,9 @@ onMouseLeave={(e) => {
         cursor: 'pointer',
 
         boxShadow:
+        
           '0 0 25px rgba(0,255,140,0.20)'
+          
 
       }}
 

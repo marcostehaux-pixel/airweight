@@ -3,7 +3,11 @@ const aircraftDatabase = [
   {
     registration: 'LV-KGN',
     type: 'B737-800',
-    basicWeight: 42675,
+   datum: 0,
+mac: 134.5,
+
+lemac: 625,
+   basicWeight: 42675,
     maxZFW: 61688,
     maxTOW: 79015,
 
@@ -20,6 +24,11 @@ const aircraftDatabase = [
   {
     registration: 'LV-FQZ',
     type: 'B737-700',
+    datum: 0,
+
+mac: 124.5,
+
+lemac: 590,
     basicWeight: 38500,
     maxZFW: 56000,
     maxTOW: 70000,
@@ -37,6 +46,11 @@ const aircraftDatabase = [
    {
     registration: 'LV-GOO',
     type: 'A320',
+    datum: 0,
+
+mac: 124.5,
+
+lemac: 590,
     basicWeight: 42000,
     maxZFW: 62500,
     maxTOW: 77000,
