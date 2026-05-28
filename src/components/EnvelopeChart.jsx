@@ -313,25 +313,40 @@ return (
   MZFW
 
 </text>
-  <polygon
+ <path
 
-    points="
-      120,180
-      320,180
-      360,80
-      160,80
-    "
+ d="
 
-    fill="transparent"
+  M 110 190
 
-    stroke="transparent"
+  L 120 90
 
-    strokeWidth="0"
+  Q 200 60 420 60
 
-    filter=
-      "drop-shadow(0 0 10px #00ff88)"
+  Q 700 90 600 180
 
-  />
+  Q 560 260 420 320
+
+  L 300 180
+
+  Q 110 300 110 190
+
+"
+
+  fill="transparent"
+
+  stroke="#00ff88"
+
+  strokeWidth="2"
+
+  style={{
+
+    filter:
+      'drop-shadow(0 0 8px rgba(0,255,140,0.25))'
+
+  }}
+
+/>
 <circle
 
    cx={cgX}
@@ -339,6 +354,9 @@ return (
     cy={weightY}
 
     r="6"
+    stroke="white"
+
+strokeWidth="2"
 style={{
 
   transition:
