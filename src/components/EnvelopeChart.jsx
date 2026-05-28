@@ -1,12 +1,16 @@
 function EnvelopeChart(props) {
 
  const cgX =
-  (props.cg - 10) * 25
+
+  80 +
+
+  ((props.cg - 15) * 28)
 
 const weightY =
-  180 - (
-    (props.weight - 40000) / 350
-  )
+
+  230 -
+
+  ((props.weight - 40000) / 180)
 
 return (
 
@@ -150,7 +154,165 @@ return (
   />
 
   {/* SAFE ENVELOPE */}
+{/* %MAC LINES */}
 
+{[15,18,20,22,24,26,28,30].map((value, index) => (
+
+  <line
+
+    key={index}
+
+    x1={80 + index * 60}
+
+    y1={40}
+
+    x2={120 + index * 40}
+
+    y2={320}
+
+    stroke="rgba(255,255,255,0.25)"
+
+    strokeWidth="1"
+
+  />
+
+))}
+{/* %MAC LABELS */}
+
+{[15,18,20,22,24,26,28,30].map((value, index) => (
+
+  <text
+
+    key={`label-${index}`}
+
+    x={70 + index * 60}
+
+    y={30}
+
+    fill="rgba(255,255,255,0.75)"
+
+    fontSize="12"
+
+  >
+
+    {value}%
+
+  </text>
+
+))}
+{/* MTOW LINE */}
+
+<line
+
+  x1="60"
+
+  y1="120"
+
+  x2="760"
+
+  y2="120"
+
+  stroke="#00c8ff"
+
+  strokeWidth="2"
+
+  strokeDasharray="6 4"
+
+/>
+
+<text
+
+  x="210"
+
+  y="114"
+
+  fill="#00c8ff"
+
+  fontSize="12"
+
+  fontWeight="700"
+
+>
+
+  MTOW
+
+</text>
+
+{/* MLW LINE */}
+
+<line
+
+  x1="60"
+
+  y1="170"
+
+  x2="760"
+
+  y2="170"
+
+  stroke="#00ff88"
+
+  strokeWidth="2"
+
+  strokeDasharray="6 4"
+
+/>
+
+<text
+
+  x="250"
+
+  y="164"
+
+  fill="#00ff88"
+
+  fontSize="12"
+
+  fontWeight="700"
+
+>
+
+  MLW
+
+</text>
+
+{/* MZFW LINE */}
+
+<line
+
+  x1="60"
+
+  y1="210"
+
+  x2="760"
+
+  y2="210"
+
+  stroke="#ffff00"
+
+  strokeWidth="2"
+
+  strokeDasharray="6 4"
+
+/>
+
+<text
+
+  x="320"
+
+  y="204"
+
+  fill="#ffff00"
+
+  fontSize="12"
+
+  fontWeight="700"
+
+>
+
+  MZFW
+
+</text>
   <polygon
 
     points="
@@ -160,26 +322,23 @@ return (
       160,80
     "
 
-    fill="#163524"
+    fill="transparent"
 
-    stroke="#00ff88"
+    stroke="transparent"
 
-    strokeWidth="3"
+    strokeWidth="0"
 
     filter=
       "drop-shadow(0 0 10px #00ff88)"
 
   />
+<circle
 
-  {/* CG POINT */}
-
-  <circle
-
-    cx={120 + cgX}
+   cx={cgX}
 
     cy={weightY}
 
-    r="12"
+    r="6"
 style={{
 
   transition:
@@ -196,6 +355,27 @@ style={{
       "drop-shadow(0 0 10px currentColor)"
 
   />
+  <circle
+
+  cx={cgX}
+
+  cy={weightY + 35}
+
+  r="6"
+
+  fill="#00c8ff"
+
+  style={{
+
+    transition:
+      'all 0.5s ease'
+
+  }}
+
+/>
+  {/* CG POINT */}
+
+  
 
   {/* LABELS */}
 

@@ -154,7 +154,15 @@ function StatusCard(props) {
 
         >
 
-          {props.value} kg
+          {props.value}
+
+{props.title === 'CG %'
+
+  ? ' %MAC'
+
+  : ' kg'
+
+}
 
         </h2>
 

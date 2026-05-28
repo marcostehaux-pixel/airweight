@@ -2,7 +2,8 @@ import { useState } from 'react'
 import StatusCard from './components/StatusCard'
 import EnvelopeChart from './components/EnvelopeChart'
 import aircraftDatabase from './data/aircraftDatabase'
-import { calculateMoment
+import {calculateMoment,
+  calculateCG
 } from './utilit/calculations'
 import SeatMap from './components/SeatMap'
 import CargoPanel from './components/CargoPanel'
@@ -95,7 +96,14 @@ const totalMoment =
     zfw + fuel
 
   const cg =
-  (totalMoment / tow).toFixed(2)
+
+  calculateCG(
+
+    totalMoment,
+
+    tow
+
+  )
 
   const cgStatus =
   cg >= 15 && cg <= 25
@@ -612,10 +620,10 @@ onMouseLeave={(e) => {
       />
 
       <StatusCard
-        title="CG"
-        value={cg}
-        status={cgStatus}
-      />
+  title="CG %"
+  value={cg.toFixed(2)}
+  status={cgStatus}
+/>
 
     </div>
 

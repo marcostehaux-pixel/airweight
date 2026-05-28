@@ -8,3 +8,14 @@ export function calculateMoment(
   return weight * arm
 
 }
+
+export function calculateCG(
+
+  totalMoment,
+  totalWeight
+
+) {
+
+  return totalMoment / totalWeight
+
+}
