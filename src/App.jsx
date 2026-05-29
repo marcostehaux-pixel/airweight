@@ -12,7 +12,7 @@ import logo from './assets/logo.png'
 import aircraftImage from './assets/a320.png'
 function App() {
 
-
+const [tripFuel, setTripFuel] = useState(3000)
 
   const [fuel, setFuel] = useState(0)
   const [forwardCargo, setForwardCargo] =
@@ -94,7 +94,7 @@ const totalMoment =
 
  const tow =
     zfw + fuel
-
+const ldw = tow - tripFuel
   const cg =
 
   calculateCG(
@@ -618,7 +618,15 @@ onMouseLeave={(e) => {
         value={tow}
         status={towStatus}
       />
+<StatusCard
 
+  title="LDW"
+
+  value={ldw.toFixed(0)}
+
+  status={cgStatus}
+
+/>
       <StatusCard
   title="CG %"
   value={cg.toFixed(2)}
@@ -892,7 +900,43 @@ onMouseLeave={(e) => {
     }}
 
   />
+<div style={{ marginTop: '15px' }}>
 
+  <label>Trip Fuel (KG)</label>
+
+  <input
+
+    type="number"
+
+    value={tripFuel}
+
+    onChange={(e) =>
+      setTripFuel(parseInt(e.target.value) || 0)
+    }
+
+    style={{
+
+      width: '100%',
+
+      padding: '12px',
+
+      marginTop: '8px',
+
+      borderRadius: '10px',
+
+      border:
+        '1px solid rgba(255,255,255,0.08)',
+
+      background:
+        'rgba(255,255,255,0.05)',
+
+      color: 'white'
+
+    }}
+
+  />
+
+</div>
 </div>
 
 <div style={{ marginBottom: '20px' }}>

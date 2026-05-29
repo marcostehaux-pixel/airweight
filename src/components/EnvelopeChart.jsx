@@ -11,7 +11,9 @@ const weightY =
   230 -
 
   ((props.weight - 40000) / 180)
+const ldwY =
 
+  weightY + 15
 return (
 
   <div
@@ -315,21 +317,22 @@ return (
 </text>
  <path
 
- d="
+d="
 
-  M 110 190
+M 140 200
 
-  L 120 90
+L 100 60
 
-  Q 200 60 420 60
+Q 200 60 420 60
 
-  Q 700 90 600 180
+Q 490 60 400 180
 
-  Q 560 260 420 320
+L 200 200
 
-  L 300 180
+Q 140 200 140 200
 
-  Q 110 300 110 190
+Z
+
 
 "
 
@@ -373,6 +376,23 @@ style={{
       "drop-shadow(0 0 10px currentColor)"
 
   />
+  <text
+
+  x={cgX + 12}
+
+  y={weightY + 4}
+
+  fill="#00ff88"
+
+  fontSize="11"
+
+  fontWeight="700"
+
+>
+
+  TOW
+
+</text>
   <circle
 
   cx={cgX}
@@ -391,6 +411,58 @@ style={{
   }}
 
 />
+<text
+
+  x={cgX + 12}
+
+  y={ldwY + 4}
+
+  fill="#ff9900"
+
+  fontSize="11"
+
+  fontWeight="700"
+
+>
+
+  LDW
+
+</text>
+<circle
+
+  cx={cgX}
+
+  cy={ldwY}
+
+  r="6"
+
+  fill="#ff9900"
+
+  style={{
+
+    transition:
+      'all 0.5s ease'
+
+  }}
+
+/>
+<text
+
+  x={cgX + 12}
+
+  y={(weightY + 35) + 4}
+
+  fill="#00c8ff"
+
+  fontSize="11"
+
+  fontWeight="700"
+
+>
+
+  ZFW
+
+</text>
   {/* CG POINT */}
 
   
