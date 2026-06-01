@@ -21,6 +21,7 @@ function SeatMap(props) {
     <div
       style={{
         backgroundColor: '#1f1f1f',
+        position:'relative',
         padding: '20px',
         borderRadius: '15px',
         marginTop: '40px',
@@ -29,6 +30,59 @@ function SeatMap(props) {
     >
 
       <h3>Seat Map</h3>
+<div
+
+style={{
+
+textAlign:'center',
+
+marginBottom:'20px',
+
+opacity:0.5
+
+}}
+
+>
+
+L1 ◀── ENTRY ──▶ R1
+<div
+
+style={{
+
+textAlign:'center',
+
+fontSize:'12px',
+
+opacity:0.45,
+
+marginBottom:'15px'
+
+}}
+
+>
+
+◼ GALLEY FWD
+<div
+
+style={{
+
+textAlign:'center',
+
+fontSize:'11px',
+
+opacity:0.35,
+
+marginBottom:'20px'
+
+}}
+
+>
+
+LAV ◻ ◻
+
+</div>
+</div>
+</div>
 
       <div
         style={{
@@ -79,10 +133,27 @@ function SeatMap(props) {
                 justifyContent: 'center',
                 marginRight:
                 seat % 6 === 2
-
+                
 ? '30px'
 
+: '0px',
+marginBottom:
+
+seat === 23 ||
+
+seat === 35
+
+? '18px'
+:
+
+seat === 29 ||
+
+seat === 30
+
+? '45px'
+
 : '0px'
+
               }}
             >
 
@@ -133,7 +204,86 @@ seat % 6
         })}
 
       </div>
+<div
 
+style={{
+
+textAlign:'center',
+
+marginTop:'20px',
+
+opacity:0.5
+
+}}
+
+>
+<div
+
+style={{
+
+position:'absolute',
+
+left:'50%',
+
+transform:'translateX(-50%)',
+
+top:'550px',
+
+fontSize:'13px',
+
+opacity:'0.5',
+
+letterSpacing:'2px'
+
+}}
+
+>
+
+← OVERWING EXIT →
+
+</div>
+<div
+
+style={{
+
+textAlign:'center',
+
+fontSize:'12px',
+
+opacity:0.45,
+
+marginBottom:'15px',
+
+marginTop:'20px'
+
+}}
+
+>
+
+◼ GALLEY AFT
+<div
+
+style={{
+
+textAlign:'center',
+
+fontSize:'11px',
+
+opacity:0.35,
+
+marginBottom:'20px'
+
+}}
+
+>
+
+◻ LAV LAV ◻
+
+</div>
+</div>
+L2 ◀── AFT ENTRY ──▶ R2
+
+</div>
     </div>
 
   )
