@@ -84,11 +84,37 @@ const paxMoment =
 const fuelWeight =
   fuel
 
+const basicArm =
+
+selectedAircraft.lemac +
+
+(
+
+selectedAircraft.mac *
+
+(
+
+selectedAircraft.basicIndex || 16
+
+)
+
+/
+
+100
+
+)
+
 const basicMoment =
 
-selectedAircraft.basicWeight *
+(
 
-655
+selectedAircraft.basicWeight || 0
+
+)
+
+*
+
+basicArm
 
 const passengerMoment =
 
@@ -161,36 +187,92 @@ const totalMoment =
   forwardCargoMoment +
 
   aftCargoMoment
-const index =
 
-  calculateIndex(
-
-    totalMoment
-
-  )
   
  const tow =
     zfw + fuel
 const ldw = tow - tripFuel
 const arm =
 
-  calculateCG(
+tow > 0
 
-    totalMoment,
+?
 
-    tow
+(
 
-  )
+totalMoment /
 
-const cg = arm
+tow
 
+)
+
+:
+
+0
+
+const cg =
+
+arm > 0
+
+?
+
+(
+
+(
+
+arm -
+
+selectedAircraft.lemac
+
+)
+
+/
+
+selectedAircraft.mac
+
+)
+
+*
+
+100
+
+:
+
+0
+const index =
+
+Number.isFinite(
+
+totalMoment
+
+)
+
+?
+
+calculateIndex(
+
+totalMoment
+
+)
+
+:
+
+0
 const trim =
 
-  calculateTrim(
+5.5 -
 
-    arm
+(
 
-  )
+cg -
+
+15
+
+)
+
+*
+
+0.12
 const trimLabel =
 
   trim < 4
@@ -948,16 +1030,16 @@ unit="kg"
 
 />
       <StatusCard
-  title={`ARM · ${cgLabel}`}
-  value={cg.toFixed(2)}
-  unit="in"
+  title={`CG · %MAC  ${cgLabel}`}
+  value={cg.toFixed(1)}
+  unit="%"
   status={cgStatus}
 />
 <StatusCard
 
   title="INDEX"
 
-  value={index.toFixed(1)}
+  value={cg.toFixed(1)}
 
   status={true}
   unit="IU"

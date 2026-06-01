@@ -1,69 +1,97 @@
 const aircraftDatabase = [
 
-  {
-    registration: 'LV-KGN',
-    type: 'B737-800',
-   datum: 0,
-mac: 134.5,
+{
 
-lemac: 625,
-   basicWeight: 42675,
-    maxZFW: 61688,
-    maxTOW: 79015,
+registration:'LV-KGN',
 
-    seatArmFwd: 360,
-    seatArmMid: 620,
-    seatArmAft: 930,
+type:'B737-800',
 
-    fuelArm: 650,
+datum:0,
 
-   forwardCargoArm: 320,
-   aftCargoArm: 900
-  },
+mac:155.8,
 
-  {
-    registration: 'LV-FQZ',
-    type: 'B737-700',
-    datum: 0,
+lemac:627.1,
 
-mac: 124.5,
+basicWeight:42675,
 
-lemac: 590,
-    basicWeight: 38500,
-    maxZFW: 56000,
-    maxTOW: 70000,
+basicIndex:16.8,
 
-   seatArmFwd: 14,
-   seatArmMid: 21,
-   seatArmAft: 29,
+maxZFW:61688,
+maxTOW:79015,
+maxLW:65317,
 
-   fuelArm: 17,
+seatArmFwd:360,
+seatArmMid:620,
+seatArmAft:930,
 
-   forwardCargoArm: 9,
-   aftCargoArm: 33
-   },
+fuelArm:650,
 
-   {
-    registration: 'LV-GOO',
-    type: 'A320',
-    datum: 0,
+forwardCargoArm:320,
+aftCargoArm:900
 
-mac: 124.5,
+},
 
-lemac: 590,
-    basicWeight: 42000,
-    maxZFW: 62500,
-    maxTOW: 77000,
+{
 
-   seatArmFwd: 16,
-   seatArmMid: 24,
-   seatArmAft: 32,
+registration:'LV-FQZ',
 
-   fuelArm: 19,
+type:'B737-700',
 
-   forwardCargoArm: 11,
-   aftCargoArm: 37
-   }
+datum:0,
+
+mac:155.8,
+
+lemac:627.1,
+
+basicWeight:38500,
+
+basicIndex:17.5,
+
+maxZFW:56000,
+maxTOW:70000,
+maxLW:59000,
+
+seatArmFwd:360,
+seatArmMid:620,
+seatArmAft:930,
+
+fuelArm:650,
+
+forwardCargoArm:320,
+aftCargoArm:900
+
+},
+
+{
+
+registration:'LV-GOO',
+
+type:'A320',
+
+datum:0,
+
+mac:134.5,
+
+lemac:625,
+
+basicWeight:42000,
+
+basicIndex:22,
+
+maxZFW:62500,
+maxTOW:77000,
+maxLW:66000,
+
+seatArmFwd:380,
+seatArmMid:640,
+seatArmAft:910,
+
+fuelArm:660,
+
+forwardCargoArm:350,
+aftCargoArm:920
+
+}
 
 ]
 
