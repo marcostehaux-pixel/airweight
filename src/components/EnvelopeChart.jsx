@@ -1,19 +1,68 @@
 function EnvelopeChart(props) {
 
- const cgX =
+const cgX =
 
-  80 +
+80 +
 
-  ((props.cg - 15) * 28)
+(
 
-const weightY =
+(
 
-  230 -
+props.cg -
 
-  ((props.weight - 40000) / 180)
+627.1
+
+)
+
+/
+
+155.8
+
+)
+
+*
+
+400
+
+const mapWeight =
+
+(weight) =>
+
+200 -
+
+(
+
+(weight - 35000)
+
+/
+
+250
+
+)
+
+const zfwY =
+
+mapWeight(
+
+props.zfw
+
+)
+
+const towY =
+
+mapWeight(
+
+props.weight
+
+)
+
 const ldwY =
 
-  weightY + 15
+mapWeight(
+
+props.ldw
+
+)
 return (
 
   <div
@@ -354,7 +403,7 @@ Z
 
    cx={cgX}
 
-    cy={weightY}
+    cy={towY}
 
     r="6"
     stroke="white"
@@ -380,7 +429,7 @@ style={{
 
   x={cgX + 12}
 
-  y={weightY + 4}
+  y={towY + 4}
 
   fill="#00ff88"
 
@@ -397,7 +446,7 @@ style={{
 
   cx={cgX}
 
-  cy={weightY + 35}
+  cy={zfwY}
 
   r="6"
 
@@ -450,7 +499,7 @@ style={{
 
   x={cgX + 12}
 
-  y={(weightY + 35) + 4}
+  y={zfwY + 4}
 
   fill="#00c8ff"
 

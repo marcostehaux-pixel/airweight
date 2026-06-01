@@ -11,14 +11,14 @@ lemac: 625,
     maxZFW: 61688,
     maxTOW: 79015,
 
-    seatArmFwd: 15,
-    seatArmMid: 22,
-    seatArmAft: 30,
+    seatArmFwd: 360,
+    seatArmMid: 620,
+    seatArmAft: 930,
 
-    fuelArm: 18,
+    fuelArm: 650,
 
-   forwardCargoArm: 10,
-   aftCargoArm: 35
+   forwardCargoArm: 320,
+   aftCargoArm: 900
   },
 
   {

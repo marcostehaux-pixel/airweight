@@ -85,37 +85,54 @@ const fuelWeight =
   fuel
 
 const basicMoment =
-  selectedAircraft.basicWeight * 15
+
+selectedAircraft.basicWeight *
+
+655
 
 const passengerMoment =
 
-  calculateMoment(
+selectedSeats.reduce(
 
-    forwardSeats * 84,
+(total, seat) => {
 
-    selectedAircraft.seatArmFwd
+const row =
 
-  )
+Math.floor(
 
-+
+seat / 6
 
-  calculateMoment(
-
-    midSeats * 84,
-
-    selectedAircraft.seatArmMid
-
-  )
+)
 
 +
 
-  calculateMoment(
+1
 
-    aftSeats * 84,
+const rowArm =
 
-    selectedAircraft.seatArmAft
+12 +
 
-  )
+(row * 1.5)
+
+return (
+
+total +
+
+calculateMoment(
+
+84,
+
+rowArm
+
+)
+
+)
+
+},
+
+0
+
+)
 
  const fuelMoment =
 
