@@ -166,27 +166,85 @@ function StatusCard(props) {
 
         </h2>
 
-        <p
+        <div>
 
-          style={{
+<p
 
-            color:
-              props.status
-                ? '#00ff99'
-                : '#ff5c5c',
+style={{
 
-            fontSize: '13px',
+color:
 
-            letterSpacing: '1px'
+props.status
 
-          }}
+?
 
-        >
+'#00ff99'
 
-          {props.status
-            ? 'NORMAL'
-            : 'LIMIT EXCEEDED'}
-        </p>
+:
+
+'#ff5c5c',
+
+fontSize:'13px',
+
+letterSpacing:'1px',
+
+marginBottom:'6px'
+
+}}
+
+>
+
+{
+
+props.status
+
+?
+
+'NORMAL'
+
+:
+
+'LIMIT EXCEEDED'
+
+}
+
+</p>
+
+{
+
+props.limit && (
+
+<p
+
+style={{
+
+fontSize:'11px',
+
+color:'#9aa6b2',
+
+margin:0
+
+}}
+
+>
+
+MAX
+
+{
+
+props.limit
+
+}
+
+kg
+
+</p>
+
+)
+
+}
+
+</div>
       </div>
     </>
   )

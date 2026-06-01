@@ -239,6 +239,14 @@ selectedAircraft.mac
 :
 
 0
+const dow =
+
+selectedAircraft.basicWeight
+
+
+const doi =
+
+selectedAircraft.basicIndex
 const index =
 
 Number.isFinite(
@@ -298,6 +306,7 @@ const trimLabel =
       : 'READY FOR DISPATCH'
 const cgStatus =
   cg >= 15 && cg <= 25
+  
  const cgLabel =
 
   cg < 16
@@ -1006,35 +1015,55 @@ toggleSeat
       }}
 
     >
+<StatusCard
 
+title="DOW"
+
+value={dow}
+
+unit="kg"
+
+status={true}
+
+/>
+
+
+<StatusCard
+
+title="DOI"
+
+value={doi.toFixed(1)}
+
+unit="IU"
+
+status={true}
+
+/>
+<StatusCard
+        title="TOW"
+        value={tow}
+        unit="kg"
+        status={towStatus}
+       limit={selectedAircraft.maxTOW} 
+      />
+      
       <StatusCard
         title="ZFW"
         value={zfw}
         unit="kg"
         status={zfwStatus}
+        limit={selectedAircraft.maxZFW}
       />
 
-      <StatusCard
-        title="TOW"
-        value={tow}
-        unit="kg"
-        status={towStatus}
-      />
-<StatusCard
+      
 
-  title="LDW"
-unit="kg"
-  value={ldw.toFixed(0)}
-
-  status={cgStatus}
-
-/>
       <StatusCard
   title={`CG · %MAC  ${cgLabel}`}
   value={cg.toFixed(1)}
   unit="%"
   status={cgStatus}
 />
+
 <StatusCard
 
   title="INDEX"
