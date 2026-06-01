@@ -19,3 +19,45 @@ export function calculateCG(
   return totalMoment / totalWeight
 
 }
+
+export function calculateMAC(
+
+  arm,
+  lemac,
+  mac
+
+) {
+
+  return (
+
+    ((arm - lemac) / mac) * 100
+
+  )
+
+}
+
+export function calculateIndex(
+
+  moment
+
+) {
+
+  return moment / 1000
+
+}
+
+export function calculateTrim(
+
+  arm
+
+) {
+
+  return (
+
+    18 -
+
+    ((arm - 15) * 0.45)
+
+  )
+
+}

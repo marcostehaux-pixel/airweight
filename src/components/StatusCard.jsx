@@ -156,11 +156,11 @@ function StatusCard(props) {
 
           {props.value}
 
-{props.title === 'CG %'
+{
 
-  ? ' %MAC'
+  props.unit &&
 
-  : ' kg'
+  ` ${props.unit}`
 
 }
 
@@ -186,15 +186,10 @@ function StatusCard(props) {
           {props.status
             ? 'NORMAL'
             : 'LIMIT EXCEEDED'}
-
         </p>
-
       </div>
-
     </>
-
   )
-
 }
 
 export default StatusCard

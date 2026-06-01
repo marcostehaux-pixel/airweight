@@ -2,9 +2,15 @@ import { useState } from 'react'
 import StatusCard from './components/StatusCard'
 import EnvelopeChart from './components/EnvelopeChart'
 import aircraftDatabase from './data/aircraftDatabase'
-import {calculateMoment,
-  calculateCG
-} from './utilit/calculations'
+import {
+
+  calculateMoment,
+  calculateCG,
+  calculateIndex,
+  calculateMAC,
+  calculateTrim
+
+} from './utilit/calculations.js'
 import SeatMap from './components/SeatMap'
 import CargoPanel from './components/CargoPanel'
 import generateLoadsheet from './utils/generateLoadsheet'
@@ -28,6 +34,33 @@ const [aftCargo, setAftCargo] =
   useState('Dashboard') 
  const passengerWeight =
   selectedSeats.length * 84
+  const forwardSeats =
+
+selectedSeats.filter(
+
+seat => seat <= 24
+
+).length
+
+const midSeats =
+
+selectedSeats.filter(
+
+seat =>
+
+seat > 24 &&
+
+seat <= 36
+
+).length
+
+const aftSeats =
+
+selectedSeats.filter(
+
+seat => seat > 36
+
+).length
 const paxMoment =
 
   calculateMoment(
@@ -58,9 +91,29 @@ const passengerMoment =
 
   calculateMoment(
 
-    passengerWeight,
+    forwardSeats * 84,
+
+    selectedAircraft.seatArmFwd
+
+  )
+
++
+
+  calculateMoment(
+
+    midSeats * 84,
 
     selectedAircraft.seatArmMid
+
+  )
+
++
+
+  calculateMoment(
+
+    aftSeats * 84,
+
+    selectedAircraft.seatArmAft
 
   )
 
@@ -91,11 +144,18 @@ const totalMoment =
   forwardCargoMoment +
 
   aftCargoMoment
+const index =
 
+  calculateIndex(
+
+    totalMoment
+
+  )
+  
  const tow =
     zfw + fuel
 const ldw = tow - tripFuel
-  const cg =
+const arm =
 
   calculateCG(
 
@@ -105,9 +165,52 @@ const ldw = tow - tripFuel
 
   )
 
-  const cgStatus =
+const cg = arm
+
+const trim =
+
+  calculateTrim(
+
+    arm
+
+  )
+const trimLabel =
+
+  trim < 4
+
+    ? 'NOSE UP'
+
+    : trim > 7
+
+      ? 'NOSE DOWN'
+
+      : 'SET'
+      
+      const loadStatus =
+
+  tow > selectedAircraft.maxTOW
+
+    ? 'OUT OF LIMITS'
+
+    : trim < 4 || trim > 7
+
+      ? 'REVIEW LOAD'
+
+      : 'READY FOR DISPATCH'
+const cgStatus =
   cg >= 15 && cg <= 25
- 
+ const cgLabel =
+
+  cg < 16
+
+    ? 'FORWARD'
+
+    : cg > 22
+
+      ? 'AFT'
+
+      : 'NORMAL'
+      
 
   const zfwStatus =
     zfw <= selectedAircraft.maxZFW
@@ -384,6 +487,73 @@ onMouseLeave={(e) => {
 <div
 
   onClick={() =>
+    setActiveMenu('Seat Map')
+  }
+onMouseEnter={(e) => {
+
+  if (activeMenu !== 'Dashboard') {
+
+    e.currentTarget.style.transform =
+      'translateX(4px)'
+
+    e.currentTarget.style.boxShadow =
+      '0 0 18px rgba(255,255,255,0.08)'
+
+  }
+
+}}
+
+onMouseLeave={(e) => {
+
+  if (activeMenu !== 'Dashboard') {
+
+    e.currentTarget.style.transform =
+      'translateX(0px)'
+
+    e.currentTarget.style.boxShadow =
+      'none'
+
+  }
+
+}}
+  style={{
+
+    marginBottom: '20px',
+
+    padding: '12px 16px',
+
+    borderRadius: '12px',
+
+    background:
+      activeMenu === 'Seat Map'
+        ? 'rgba(0,255,140,0.12)'
+        : 'rgba(255,255,255,0.03)',
+
+    border:
+      activeMenu === 'Seat Map'
+        ? '1px solid rgba(0,255,140,0.25)'
+        : '1px solid transparent',
+
+    boxShadow:
+      activeMenu === 'Seat Map'
+        ? '0 0 25px rgba(0,255,140,0.15)'
+        : 'none',
+
+    transition:
+      'all 0.3s ease',
+
+    cursor: 'pointer'
+
+  }}
+
+>
+
+  Seat Map
+
+</div>
+<div
+
+  onClick={() =>
     setActiveMenu('Settings')
   }
 onMouseEnter={(e) => {
@@ -451,7 +621,138 @@ onMouseLeave={(e) => {
 
 </div>
 {/* MAIN CONTENT */}
+{
 
+activeMenu ===
+
+'Seat Map'
+
+&& (
+
+<div
+
+style={{
+
+padding:'30px',
+
+width:'100%',
+
+display:'flex',
+
+flexDirection:'column',
+
+alignItems:'center'
+
+}}
+
+>
+
+<h1
+
+style={{
+
+marginBottom:'25px'
+
+}}
+
+>
+
+SEAT MAP
+
+</h1>
+<div
+
+style={{
+
+marginBottom:'25px',
+
+padding:'15px',
+
+borderRadius:'12px',
+
+background:
+'rgba(255,255,255,0.04)',
+
+display:'flex',
+
+gap:'30px'
+
+}}
+
+>
+
+<div>
+
+PAX:
+{' '}
+
+{selectedSeats.length}
+
+</div>
+
+<div>
+
+FWD:
+{' '}
+
+{forwardSeats}
+
+</div>
+
+<div>
+
+MID:
+{' '}
+
+{midSeats}
+
+</div>
+
+<div>
+
+AFT:
+{' '}
+
+{aftSeats}
+
+</div>
+
+</div>
+<div
+
+style={{
+
+width:'100%',
+
+maxWidth:'900px'
+
+}}
+
+>
+
+<SeatMap
+
+selectedSeats={
+
+selectedSeats
+
+}
+
+toggleSeat={
+
+toggleSeat
+
+}
+
+/>
+
+</div>
+
+</div>
+
+)
+
+}
 {activeMenu === 'Dashboard' && (
 
   <div
@@ -610,40 +911,106 @@ onMouseLeave={(e) => {
       <StatusCard
         title="ZFW"
         value={zfw}
+        unit="kg"
         status={zfwStatus}
       />
 
       <StatusCard
         title="TOW"
         value={tow}
+        unit="kg"
         status={towStatus}
       />
 <StatusCard
 
   title="LDW"
-
+unit="kg"
   value={ldw.toFixed(0)}
 
   status={cgStatus}
 
 />
       <StatusCard
-  title="CG %"
+  title={`ARM · ${cgLabel}`}
   value={cg.toFixed(2)}
+  unit="in"
   status={cgStatus}
 />
+<StatusCard
 
+  title="INDEX"
+
+  value={index.toFixed(1)}
+
+  status={true}
+  unit="IU"
+
+/>
+<StatusCard
+
+  title={`TRIM · ${trimLabel}`}
+
+  value={trim.toFixed(1)}
+
+  unit="U"
+
+  status={true}
+
+/>
+<div
+
+  style={{
+
+    marginTop: '25px',
+
+    padding: '18px',
+
+    borderRadius: '14px',
+
+    textAlign: 'center',
+
+    background:
+
+      loadStatus ===
+      'READY FOR DISPATCH'
+
+        ? 'rgba(0,255,120,0.10)'
+
+        : loadStatus ===
+          'REVIEW LOAD'
+
+          ? 'rgba(255,180,0,0.10)'
+
+          : 'rgba(255,60,60,0.10)',
+
+    border:
+
+      '1px solid rgba(255,255,255,0.08)'
+
+  }}
+
+>
+
+  <h3>
+
+    LOAD STATUS
+
+  </h3>
+
+  <h2>
+
+    {loadStatus}
+
+  </h2>
+
+</div>
     </div>
 
     <EnvelopeChart
       cg={cg}
       weight={tow}
+      ldw={ldw}
       status={cgStatus}
-    />
-
-    <SeatMap
-      selectedSeats={selectedSeats}
-      toggleSeat={toggleSeat}
     />
 
     <CargoPanel
@@ -653,7 +1020,148 @@ onMouseLeave={(e) => {
   </div>
 
 )}
+<div
 
+  style={{
+
+    marginTop: '20px',
+
+    padding: '18px',
+
+    borderRadius: '14px',
+
+    background:
+      'rgba(255,255,255,0.04)',
+
+    border:
+      '1px solid rgba(255,255,255,0.08)'
+
+  }}
+
+>
+
+  <h3>
+
+    FUEL PREDICTION
+
+  </h3>
+
+  <div>
+
+    TOW:
+    {tow.toFixed(0)}
+    KG
+
+  </div>
+
+  <div>
+
+    TRIP:
+    -
+    {tripFuel.toFixed(0)}
+    KG
+
+  </div>
+
+  <div
+
+    style={{
+
+      marginTop:
+        '10px',
+
+      fontWeight:
+        '700'
+
+    }}
+
+  >
+
+    EST LDW:
+    {ldw.toFixed(0)}
+    KG
+
+  </div>
+<div
+
+  style={{
+
+    marginTop: '20px',
+
+    padding: '18px',
+
+    borderRadius: '14px',
+
+    background:
+      'rgba(255,255,255,0.04)',
+
+    border:
+      '1px solid rgba(255,255,255,0.08)'
+
+  }}
+
+>
+
+  <h3>
+
+    LOAD SUMMARY
+
+  </h3>
+
+  <div>
+
+    PAX:
+    {selectedSeats.length}
+
+  </div>
+
+  <div>
+
+    CARGO:
+
+    {(
+      forwardCargo +
+
+      aftCargo
+
+    ).toFixed(0)}
+
+    KG
+
+  </div>
+
+
+  <div
+
+    style={{
+
+      marginTop:
+        '12px',
+
+      fontWeight:
+        '700'
+
+    }}
+
+  >
+
+    PAYLOAD:
+
+    {(
+      passengerWeight +
+
+      forwardCargo +
+
+      aftCargo
+
+    ).toFixed(0)}
+
+    KG
+
+  </div>
+
+</div>
+</div>
 {activeMenu === 'Loadsheet' && (
 
   <div

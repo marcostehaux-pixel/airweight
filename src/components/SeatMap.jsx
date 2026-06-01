@@ -1,7 +1,7 @@
 function SeatMap(props) {
 
   const seats =
-    Array.from({ length: 30 }, (_, index) => index)
+    Array.from({ length: 60 }, (_, index) => index)
     function getSeatZone(seat) {
 
   if (seat < 10) {
@@ -33,8 +33,11 @@ function SeatMap(props) {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(6, 1fr)',
-          gap: '10px',
+          gridTemplateColumns: 'repeat(6, 55px)',
+          justifyContent:
+
+'center',
+          gap: '25px',
           marginTop: '20px'
         }}
       >
@@ -73,11 +76,55 @@ function SeatMap(props) {
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                marginRight:
+                seat % 6 === 2
+
+? '30px'
+
+: '0px'
               }}
             >
 
-              {seat + 1}
+            {
+
+Math.floor(
+
+seat / 6
+
+)
+
++
+
+1
+
+}
+
+{
+
+[
+
+'A',
+
+'B',
+
+'C',
+
+'D',
+
+'E',
+
+'F'
+
+]
+
+[
+
+seat % 6
+
+]
+
+}
 
             </div>
 
