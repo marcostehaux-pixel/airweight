@@ -256,7 +256,10 @@ useState(
 )
 const dow =
 
-selectedAircraft.basicWeight +
+selectedAircraft.basicWeight
+const effectiveBasicWeight =
+
+dow +
 
 (
 
@@ -265,7 +268,6 @@ extraCrew *
 85
 
 )
-
 const doi =
 
 selectedAircraft.basicIndex +
@@ -1050,7 +1052,7 @@ toggleSeat
 
 title="Basic WT"
 
-value={dow}
+value={effectiveBasicWeight}
 
 unit="kg"
 
@@ -1061,11 +1063,11 @@ extraCrew > 0
 
 ?
 
-`CREW ${selectedAircraft.basicConfig} (+${extraCrew})`
+`BASE ${dow} + CREW ${extraCrew*85}`
 
 :
 
-`CREW ${selectedAircraft.basicConfig}`
+`BASE ${dow}`
 
 }
 />
@@ -1096,7 +1098,19 @@ selectedAircraft.basicCrew
 />
 <StatusCard
         title="TOW"
-        value={tow}
+        value={
+
+tow +
+
+(
+
+extraCrew *
+
+85
+
+)
+
+}
         unit="kg"
         status={towStatus}
        limit={selectedAircraft.maxTOW} 
@@ -1104,7 +1118,19 @@ selectedAircraft.basicCrew
       
       <StatusCard
         title="ZFW"
-        value={zfw}
+        value={
+
+zfw +
+
+(
+
+extraCrew *
+
+85
+
+)
+
+}
         unit="kg"
         status={zfwStatus}
         limit={selectedAircraft.maxZFW}
