@@ -239,14 +239,44 @@ selectedAircraft.mac
 :
 
 0
+const [
+
+extraCrew,
+
+setExtraCrew
+
+]
+
+=
+
+useState(
+
+0
+
+)
 const dow =
 
-selectedAircraft.basicWeight
+selectedAircraft.basicWeight +
 
+(
+
+extraCrew *
+
+85
+
+)
 
 const doi =
 
-selectedAircraft.basicIndex
+selectedAircraft.basicIndex +
+
+(
+
+extraCrew *
+
+0.1
+
+)
 const index =
 
 Number.isFinite(
@@ -325,6 +355,7 @@ const cgStatus =
 
   const towStatus =
     tow <= selectedAircraft.maxTOW
+    
   function toggleSeat(seat) {
 
   if (selectedSeats.includes(seat)) {
@@ -1017,27 +1048,51 @@ toggleSeat
     >
 <StatusCard
 
-title="DOW"
+title="Basic WT"
 
 value={dow}
 
 unit="kg"
 
 status={true}
+subtitle={
 
+extraCrew > 0
+
+?
+
+`CREW ${selectedAircraft.basicConfig} (+${extraCrew})`
+
+:
+
+`CREW ${selectedAircraft.basicConfig}`
+
+}
 />
 
 
 <StatusCard
 
-title="DOI"
+title="BASIC INDEX"
 
 value={doi.toFixed(1)}
 
 unit="IU"
 
 status={true}
+subtitle={
 
+extraCrew > 0
+
+?
+
+`${selectedAircraft.basicCrew} + EXTRA`
+
+:
+
+selectedAircraft.basicCrew
+
+}
 />
 <StatusCard
         title="TOW"
@@ -1055,8 +1110,7 @@ status={true}
         limit={selectedAircraft.maxZFW}
       />
 
-      
-
+    
       <StatusCard
   title={`CG · %MAC  ${cgLabel}`}
   value={cg.toFixed(1)}
@@ -1428,7 +1482,97 @@ status={true}
       </strong>
 
     </div>
+<div
 
+style={{
+
+marginBottom:'20px'
+
+}}
+
+>
+
+<h3>
+
+EXTRA CREW
+
+</h3>
+
+<div
+
+style={{
+
+display:'flex',
+
+alignItems:'center',
+
+gap:'12px'
+
+}}
+
+>
+
+<button
+
+onClick={()=>
+
+setExtraCrew(
+
+Math.max(
+
+0,
+
+extraCrew-1
+
+)
+
+)
+
+}
+
+>
+
+−
+
+</button>
+
+<span>
+
+{
+
+extraCrew
+
+}
+
+</span>
+
+<button
+
+onClick={()=>
+
+setExtraCrew(
+
+Math.min(
+
+4,
+
+extraCrew+1
+
+)
+
+)
+
+}
+
+>
+
++
+
+</button>
+
+</div>
+
+</div>
     <div
 
       style={{

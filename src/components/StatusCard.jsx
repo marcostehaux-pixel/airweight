@@ -168,6 +168,8 @@ function StatusCard(props) {
 
         <div>
 
+<div>
+
 <p
 
 style={{
@@ -209,6 +211,40 @@ props.status
 }
 
 </p>
+
+{
+
+props.subtitle && (
+
+<p
+
+style={{
+
+fontSize:'11px',
+
+color:'#94a3b8',
+
+margin:0,
+
+letterSpacing:'1px'
+
+}}
+
+>
+
+{
+
+props.subtitle
+
+}
+
+</p>
+
+)
+
+}
+
+</div>
 
 {
 
