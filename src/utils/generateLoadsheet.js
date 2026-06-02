@@ -1,16 +1,36 @@
 import jsPDF from 'jspdf'
 import logo from '../assets/logo.png'
-export default function generateLoadsheet({
-  selectedAircraft,
-  selectedSeats,
-  forwardCargo,
-  aftCargo,
-  fuel,
-  zfw,
-  tow,
-  cg,
-  cgStatus
-}) {
+ export default function generateLoadsheet({
+
+selectedAircraft,
+
+selectedSeats,
+
+forwardCargo,
+
+aftCargo,
+
+fuel,
+
+zfw,
+
+tow,
+
+cg,
+
+cgStatus,
+
+extraCrew,
+
+catering,
+
+effectiveBasicWeight,
+
+effectiveBasicIndex,
+
+crewConfiguration
+
+}){
 
  const doc = new jsPDF()
 const currentDate = new Date()
@@ -181,22 +201,96 @@ doc.text('ITEM', 25, 155)
 doc.text('VALUE', 90, 155)
 
 doc.line(20, 178, 110, 178)
+,drawRow(
+
+'CREW CONFIG',
+
+crewConfiguration ||
+
+'-',
+
+162
+
+)
+
+168
+
+
+drawRow(
+
+'CATERING',
+
+catering
+
+?
+
+'YES'
+
+:
+
+'NO',
+
+174
+
+)
+
+drawRow(
+
+'BASIC WT',
+
+`${
+
+effectiveBasicWeight ||
+
+0
+
+} kg`,
+
+180
+
+)
+
+drawRow(
+
+'BASIC INDEX',
+
+effectiveBasicIndex
+
+?
+
+effectiveBasicIndex.toFixed(
+
+1
+
+)
+
+:
+
+'-',
+
+186
+
+)
+
+150
+
+
 drawRow(
   'ZFW',
   `${zfw.toFixed(0)} kg`,
-  162
+  188
 )
 
 drawRow(
   'TOW',
   `${tow.toFixed(0)} kg`,
-  169
+  194
 )
 
 drawRow(
   'CG',
   `${cg}`,
-  176
+  200
 )
 doc.line(20, 170, 110, 170)
 doc.roundedRect(

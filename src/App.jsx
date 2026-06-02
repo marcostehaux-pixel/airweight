@@ -120,13 +120,21 @@ const passengerMoment =
 
 selectedSeats.reduce(
 
-(total, seat) => {
+(
+
+total,
+
+seat
+
+)=>{
 
 const row =
 
 Math.floor(
 
-seat / 6
+seat /
+
+6
 
 )
 
@@ -134,11 +142,50 @@ seat / 6
 
 1
 
-const rowArm =
 
-12 +
+let rowArm =
 
-(row * 1.5)
+selectedAircraft.seatArmMid
+
+
+if (
+
+row <= 4
+
+)
+
+{
+
+rowArm =
+
+selectedAircraft.seatArmFwd
+
+}
+
+else if (
+
+row <= 6
+
+)
+
+{
+
+rowArm =
+
+selectedAircraft.seatArmMid
+
+}
+
+else
+
+{
+
+rowArm =
+
+selectedAircraft.seatArmAft
+
+}
+
 
 return (
 
@@ -176,6 +223,7 @@ const forwardCargoMoment =
 
 const aftCargoMoment =
   aftCargo * selectedAircraft.aftCargoArm
+  
 const totalMoment =
 
   basicMoment +
@@ -239,6 +287,7 @@ selectedAircraft.mac
 :
 
 0
+
 const [
 
 extraCrew,
@@ -300,7 +349,49 @@ extraCrew *
 +
 
 cateringWeight
+const crewConfiguration =
 
+extraCrew > 0
+
+?
+
+`2/${4 + extraCrew}`
+
+:
+
+selectedAircraft.basicConfig
+const basicWeightDelta =
+
+effectiveBasicWeight -
+
+selectedAircraft.basicWeight
+const effectiveBasicMoment =
+
+(
+
+extraCrew *
+
+85 *
+
+360
+
+)
+
++
+
+(
+
+catering
+
+?
+
+250 * 420
+
+:
+
+0
+
+)
 const doi =
 
 selectedAircraft.basicIndex +
@@ -1119,15 +1210,9 @@ unit="kg"
 status={true}
 subtitle={
 
-`BASE ${dow}
+`${crewConfiguration}
 
-+
-
-CREW ${extraCrew*85}
-
-+
-
-CAT ${cateringWeight}`
+· Δ ${basicWeightDelta} kg`
 
 }
 />
@@ -1142,19 +1227,7 @@ value={effectiveBasicIndex.toFixed(1)}
 unit="IU"
 
 status={true}
-subtitle={
 
-extraCrew > 0
-
-?
-
-`${selectedAircraft.basicCrew} + EXTRA`
-
-:
-
-selectedAircraft.basicCrew
-
-}
 />
 <StatusCard
         title="TOW"
