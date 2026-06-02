@@ -254,9 +254,37 @@ useState(
 0
 
 )
+const [
+
+catering,
+
+setCatering
+
+]
+
+=
+
+useState(
+
+0
+
+)
 const dow =
 
 selectedAircraft.basicWeight
+const cateringWeight =
+
+catering
+
+?
+
+250
+
+:
+
+0
+
+
 const effectiveBasicWeight =
 
 dow +
@@ -268,6 +296,11 @@ extraCrew *
 85
 
 )
+
++
+
+cateringWeight
+
 const doi =
 
 selectedAircraft.basicIndex +
@@ -298,6 +331,33 @@ totalMoment
 :
 
 0
+const effectiveBasicIndex =
+
+doi +
+
+(
+
+extraCrew *
+
+0.1
+
+)
+
++
+
+(
+
+catering
+
+?
+
+0.2
+
+:
+
+0
+
+)
 const trim =
 
 5.5 -
@@ -1059,15 +1119,15 @@ unit="kg"
 status={true}
 subtitle={
 
-extraCrew > 0
+`BASE ${dow}
 
-?
++
 
-`BASE ${dow} + CREW ${extraCrew*85}`
+CREW ${extraCrew*85}
 
-:
++
 
-`BASE ${dow}`
+CAT ${cateringWeight}`
 
 }
 />
@@ -1077,7 +1137,7 @@ extraCrew > 0
 
 title="BASIC INDEX"
 
-value={doi.toFixed(1)}
+value={effectiveBasicIndex.toFixed(1)}
 
 unit="IU"
 
@@ -1597,7 +1657,49 @@ extraCrew+1
 </button>
 
 </div>
+<div
 
+style={{
+
+marginTop:'15px'
+
+}}
+
+>
+
+<label>
+
+<input
+
+type="checkbox"
+
+checked={catering}
+
+onChange={(e)=>
+
+setCatering(
+
+e.target.checked
+
+?
+
+1
+
+:
+
+0
+
+)
+
+}
+
+/>
+
+CATERING
+
+</label>
+
+</div>
 </div>
     <div
 
