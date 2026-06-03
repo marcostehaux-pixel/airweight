@@ -317,7 +317,109 @@ y2={mapWeight(weight)}
 stroke="rgba(255,255,255,0.08)"
 
 />
+{/* INDEX SCALE */}
 
+{
+
+[
+
+35,
+
+40,
+
+45,
+
+50,
+
+55,
+
+60,
+
+65,
+
+70
+
+]
+
+.map(
+
+(
+
+idx,
+
+i
+
+)=>(
+
+<g key={idx}>
+
+<line
+
+x1={
+
+80 +
+
+(
+
+i * 45
+
+)
+
+}
+
+y1="200"
+
+x2={
+
+80 +
+
+(
+
+i * 45
+
+)
+
+}
+
+y2="206"
+
+stroke="#7b8794"
+
+/>
+
+<text
+
+x={
+
+75 +
+
+(
+
+i * 45
+
+)
+
+}
+
+y="222"
+
+fill="#b8c0cc"
+
+fontSize="10"
+
+>
+
+{idx}
+
+</text>
+
+</g>
+
+)
+
+)
+
+}
 <text
 
 x="8"
@@ -361,7 +463,7 @@ fontSize="10"
   {/* SAFE ENVELOPE */}
 {/* %MAC LINES */}
 
-{[15,18,20,22,24,26,28,30].map((value, index) => (
+{[18,19,20,21,22,23,24,25,].map((value, index) => (
 
   <line
 
@@ -384,7 +486,7 @@ fontSize="10"
 ))}
 {/* %MAC LABELS */}
 
-{[15,18,20,22,24,26,28,30].map((value, index) => (
+{[18,19,20,21,22,23,24,25,].map((value, index) => (
 
   <text
 
@@ -409,7 +511,7 @@ fontSize="10"
 
 <line
 
-x1="150"
+x1="110"
 
 y1={mapWeight(props.mtow || 79015)}
 
@@ -444,7 +546,7 @@ MTOW
 
 <line
 
-x1="150"
+x1="120"
 
 y1={mapWeight(props.mlw || 65317)}
 
@@ -479,7 +581,7 @@ MLW
 
 <line
 
-x1="150"
+x1="122"
 
 y1={mapWeight(props.mzfw || 61688)}
 
@@ -515,7 +617,7 @@ points="
 
 140,200
 
-150,55
+110,55
 
 340,55
 
@@ -676,8 +778,8 @@ filter=
   {/* LABELS */}
 
   <text
-    x="20"
-    y="210"
+    x="10"
+    y="25"
     fill="white"
     fontSize="12"
   >
@@ -686,7 +788,7 @@ filter=
 
   <text
     x="440"
-    y="220"
+    y="230"
     fill="white"
     fontSize="12"
   >
