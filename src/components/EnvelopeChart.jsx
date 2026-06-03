@@ -10,33 +10,164 @@ const cgX =
 
 props.cg -
 
-627.1
+15
 
 )
 
 /
 
-155.8
+17
 
 )
 
 *
 
-400
+320
+const zfwX =
 
-const mapWeight =
+props.zfCg
 
-(weight) =>
+?
 
-200 -
+80 +
 
 (
 
-(weight - 35000)
+(
+
+props.zfCg -
+
+15
+
+)
 
 /
 
-250
+17
+
+)
+
+*
+
+320
+
+:
+
+cgX
+
+
+const towX =
+
+props.toCg
+
+?
+
+80 +
+
+(
+
+(
+
+props.toCg -
+
+15
+
+)
+
+/
+
+17
+
+)
+
+*
+
+320
+
+:
+
+cgX
+
+
+const ldwX =
+
+props.lwCg
+
+?
+
+80 +
+
+(
+
+(
+
+props.lwCg -
+
+15
+
+)
+
+/
+
+17
+
+)
+
+*
+
+320
+
+:
+
+cgX
+const mapCg = (
+
+cg
+
+)=>
+
+80 +
+
+(
+
+(
+
+cg -
+
+15
+
+)
+
+/
+
+17
+
+)
+
+*
+
+320
+const mapWeight = (
+
+weight
+
+)=>
+
+210 -
+
+(
+
+(
+
+weight -
+
+40000
+
+)
+
+/
+
+180
 
 )
 
@@ -52,7 +183,7 @@ const towY =
 
 mapWeight(
 
-props.weight
+props.tow
 
 )
 
@@ -401,33 +532,46 @@ Z
 />
 <circle
 
-   cx={cgX}
+cx={towX}
 
-    cy={towY}
+cy={towY}
 
-    r="6"
-    stroke="white"
+r="6"
+
+stroke="white"
 
 strokeWidth="2"
+
 style={{
 
-  transition:
-    'all 0.5s ease'
+transition:
+
+'all 0.5s ease'
 
 }}
-    fill={
-      props.status
-        ? '#00ff88'
-        : '#ff4444'
-    }
 
-    filter=
-      "drop-shadow(0 0 10px currentColor)"
+fill={
 
-  />
+props.status
+
+?
+
+'#00ff88'
+
+:
+
+'#ff4444'
+
+}
+
+filter=
+
+"drop-shadow(0 0 10px currentColor)"
+
+/>
   <text
 
-  x={cgX + 12}
+  x={towX + 12}
 
   y={towY + 4}
 
@@ -444,7 +588,7 @@ style={{
 </text>
   <circle
 
-  cx={cgX}
+  cx={zfwX}
 
   cy={zfwY}
 
@@ -462,7 +606,7 @@ style={{
 />
 <text
 
-  x={cgX + 12}
+  x={ldwX + 12}
 
   y={ldwY + 4}
 
@@ -479,7 +623,7 @@ style={{
 </text>
 <circle
 
-  cx={cgX}
+  cx={ldwX}
 
   cy={ldwY}
 
@@ -497,7 +641,7 @@ style={{
 />
 <text
 
-  x={cgX + 12}
+  x={zfwX + 12}
 
   y={zfwY + 4}
 

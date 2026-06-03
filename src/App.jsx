@@ -674,9 +674,86 @@ return 28
 
 }
 
+function getCgFromIndex(
+
+index
+
+){
+
+const minIndex = 10
+
+const maxIndex = 30
+
+const minCg = 18
+
+const maxCg = 32
 
 
+return (
 
+minCg +
+
+(
+
+(
+
+index -
+
+minIndex
+
+)
+
+/
+
+(
+
+maxIndex -
+
+minIndex
+
+)
+
+)
+
+*
+
+(
+
+maxCg -
+
+minCg
+
+)
+
+)
+
+}
+
+const zfCg =
+
+getCgFromIndex(
+
+zfi
+
+)
+
+
+const toCg =
+
+getCgFromIndex(
+
+toi
+
+)
+
+
+const lwCg =
+
+getCgFromIndex(
+
+li
+
+)
 const trimLabel =
 
   trim < 4
@@ -1412,6 +1489,23 @@ toggleSeat
       }}
 
     >
+      <StatusCard
+title="ZF CG"
+value={zfCg.toFixed(1)}
+unit="%"
+/>
+
+<StatusCard
+title="TO CG"
+value={toCg.toFixed(1)}
+unit="%"
+/>
+
+<StatusCard
+title="LW CG"
+value={lwCg.toFixed(1)}
+unit="%"
+/>
 <StatusCard
 
 title="Basic WT"
@@ -1667,11 +1761,22 @@ status={true}
     </div>
 
     <EnvelopeChart
-      cg={cg}
-      weight={tow}
-      ldw={ldw}
-      status={cgStatus}
-    />
+
+zfCg={zfCg}
+
+toCg={toCg}
+
+lwCg={lwCg}
+
+zfw={zfw}
+
+tow={tow}
+
+ldw={ldw}
+
+status={cgStatus}
+
+/>
 
     <CargoPanel
       forwardCargo={forwardCargo}
