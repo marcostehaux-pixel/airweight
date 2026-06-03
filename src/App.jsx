@@ -544,6 +544,31 @@ effectiveBasicIndex +
 paxIndex +
 
 cargoIndex
+const fuelIndex =
+
+getFuelIndex(
+
+fuel
+)
+const toi =
+
+zfi +
+
+fuelIndex
+const tripFuelIndex =
+
+getFuelIndex(
+
+tripFuel
+
+)
+
+
+const li =
+
+toi -
+
+tripFuelIndex
 const trim =
 
 5.5 -
@@ -559,6 +584,99 @@ cg -
 *
 
 0.12
+function getFuelIndex(
+
+fuel
+
+){
+
+const table = [
+
+[4000,1],
+
+[4900,2],
+
+[5500,3],
+
+[6000,4],
+
+[6500,5],
+
+[6800,6],
+
+[7200,7],
+
+[7500,8],
+
+[8300,9],
+
+[8700,10],
+
+[9200,11],
+
+[9700,12],
+
+[10800,14],
+
+[11400,15],
+
+[12800,16],
+
+[13600,17],
+
+[14200,18],
+
+[15000,19],
+
+[15700,20],
+
+[17250,22],
+
+[18000,23],
+
+[18600,24],
+
+[19250,25],
+
+[19900,26],
+
+[20400,28]
+
+]
+
+for (
+
+const [
+
+limit,
+
+index
+
+]
+
+of table
+
+){
+
+if (
+
+fuel <= limit
+
+){
+
+return index
+
+}
+
+}
+
+return 28
+
+}
+
+
+
+
 const trimLabel =
 
   trim < 4
@@ -1343,7 +1461,25 @@ extraCrew *
         status={towStatus}
        limit={selectedAircraft.maxTOW} 
       />
-      
+      <StatusCard
+
+title="TOI"
+
+value={
+
+toi.toFixed(
+
+1
+
+)
+
+}
+
+unit="IU"
+
+status={true}
+
+/>
       <StatusCard
         title="ZFW"
         value={
@@ -1383,6 +1519,57 @@ unit="IU"
 status={true}
 
 />
+<StatusCard
+
+title="TRIP FI"
+
+value={
+
+tripFuelIndex
+
+}
+
+unit="IU"
+
+status={true}
+
+/>
+
+<StatusCard
+
+title="LI"
+
+value={
+
+li.toFixed(
+
+1
+
+)
+
+}
+
+unit="IU"
+
+status={true}
+
+/>
+<StatusCard
+
+title="FUEL INDEX"
+
+value={
+
+fuelIndex
+
+}
+
+unit="IU"
+
+status={true}
+
+/>
+
       <StatusCard
   title={`CG · %MAC  ${cgLabel}`}
   value={cg.toFixed(1)}
