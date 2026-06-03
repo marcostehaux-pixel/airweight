@@ -206,7 +206,58 @@ rowArm
 0
 
 )
+const fwdPax =
 
+selectedSeats.filter(
+
+seat =>
+
+seat < 24
+
+).length
+
+
+const midPax =
+
+selectedSeats.filter(
+
+seat =>
+
+seat >= 24 && seat < 36
+
+).length
+
+
+const aftPax =
+
+selectedSeats.filter(
+
+seat =>
+
+seat >= 36
+
+).length
+
+
+const paxIndex =
+
+(
+
+fwdPax *
+
+-0.7
+
+)
+
++
+
+(
+
+aftPax *
+
+0.7
+
+)
  const fuelMoment =
 
   calculateMoment(
@@ -449,6 +500,50 @@ catering
 0
 
 )
+const cargoIndex =
+
+(
+
+forwardCargo /
+
+1000
+
+)
+
+*
+
+(
+
+-0.3
+
+)
+
++
+
+(
+
+aftCargo /
+
+1000
+
+)
+
+*
+
+(
+
+0.8
+
+)
+
+
+const zfi =
+
+effectiveBasicIndex +
+
+paxIndex +
+
+cargoIndex
 const trim =
 
 5.5 -
@@ -1269,7 +1364,25 @@ extraCrew *
         limit={selectedAircraft.maxZFW}
       />
 
-    
+    <StatusCard
+
+title="ZFI"
+
+value={
+
+zfi.toFixed(
+
+1
+
+)
+
+}
+
+unit="IU"
+
+status={true}
+
+/>
       <StatusCard
   title={`CG · %MAC  ${cgLabel}`}
   value={cg.toFixed(1)}
@@ -1285,6 +1398,25 @@ extraCrew *
 
   status={true}
   unit="IU"
+
+/>
+<StatusCard
+
+title="PAX INDEX"
+
+value={
+
+paxIndex.toFixed(
+
+1
+
+)
+
+}
+
+unit="IU"
+
+status={true}
 
 />
 <StatusCard
