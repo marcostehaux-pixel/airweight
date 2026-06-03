@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import StatusCard from './components/StatusCard'
+
 import EnvelopeChart from './components/EnvelopeChart'
+
 import aircraftDatabase from './data/aircraftDatabase'
 import {
 
@@ -1760,7 +1762,9 @@ status={true}
 </div>
     </div>
 
-    <EnvelopeChart
+   <EnvelopeChart
+
+cg={cg}
 
 zfCg={zfCg}
 
@@ -1776,7 +1780,26 @@ ldw={ldw}
 
 status={cgStatus}
 
+mtow={
+
+selectedAircraft.maxTakeoffWeight
+
+}
+
+mlw={
+
+selectedAircraft.maxLandingWeight
+
+}
+
+mzfw={
+
+selectedAircraft.maxZeroFuel
+
+}
+
 />
+
 
     <CargoPanel
       forwardCargo={forwardCargo}

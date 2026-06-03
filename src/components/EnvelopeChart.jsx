@@ -23,6 +23,8 @@ props.cg -
 *
 
 320
+
+
 const zfwX =
 
 props.zfCg
@@ -120,40 +122,24 @@ props.lwCg -
 :
 
 cgX
-const mapCg = (
-
-cg
-
-)=>
-
-80 +
-
-(
-
-(
-
-cg -
-
-15
-
-)
-
-/
-
-17
-
-)
-
-*
-
-320
 const mapWeight = (
 
 weight
 
-)=>
+)=>{
 
-210 -
+const minWeight = 40000
+
+const maxWeight = 85000
+
+const top = 40
+
+const bottom = 200
+
+
+return (
+
+bottom -
 
 (
 
@@ -161,15 +147,35 @@ weight
 
 weight -
 
-40000
+minWeight
 
 )
 
 /
 
-180
+(
+
+maxWeight -
+
+minWeight
 
 )
+
+)
+
+*
+
+(
+
+bottom -
+
+top
+
+)
+
+)
+
+}
 
 const zfwY =
 
@@ -260,65 +266,82 @@ return (
       }}
 
 >
-  {/* GRID */}
-<text
-  x="10"
-  y="195"
-  fill="#b8c0cc"
-  fontSize="11"
->
-  40T
-</text>
+ {/* GRID */}
 
-<text
-  x="10"
-  y="150"
-  fill="#b8c0cc"
-  fontSize="11"
->
-  55T
-</text>
+{
 
-<text
-  x="10"
-  y="100"
-  fill="#b8c0cc"
-  fontSize="11"
->
-  70T
-</text>
+[
 
-<text
-  x="10"
-  y="50"
-  fill="#b8c0cc"
-  fontSize="11"
->
-  85T
-</text>
-  <line
-  x1="50"
-  y1="150"
-  x2="450"
-  y2="150"
-  stroke="rgba(255,255,255,0.08)"
-/>
+40000,
+
+45000,
+
+50000,
+
+55000,
+
+60000,
+
+65000,
+
+70000,
+
+75000,
+
+80000,
+
+85000
+
+]
+
+.map(
+
+(
+
+weight
+
+)=>(
+
+<g key={weight}>
 
 <line
-  x1="50"
-  y1="100"
-  x2="450"
-  y2="100"
-  stroke="rgba(255,255,255,0.08)"
+
+x1="50"
+
+y1={mapWeight(weight)}
+
+x2="450"
+
+y2={mapWeight(weight)}
+
+stroke="rgba(255,255,255,0.08)"
+
 />
 
-<line
-  x1="50"
-  y1="50"
-  x2="450"
-  y2="50"
-  stroke="rgba(255,255,255,0.08)"
-/>
+<text
+
+x="8"
+
+y={mapWeight(weight)+4}
+
+fill="#b8c0cc"
+
+fontSize="10"
+
+>
+
+{weight}
+
+</text>
+
+</g>
+
+)
+
+)
+
+}
+
   <line
     x1="50"
     y1="200"
@@ -382,154 +405,144 @@ return (
   </text>
 
 ))}
-{/* MTOW LINE */}
+{/* MTOW */}
 
 <line
 
-  x1="60"
+x1="150"
 
-  y1="120"
+y1={mapWeight(props.mtow || 79015)}
 
-  x2="760"
+x2="350"
 
-  y2="120"
+y2={mapWeight(props.mtow || 79015)}
 
-  stroke="#00c8ff"
+stroke="#00c8ff"
 
-  strokeWidth="2"
-
-  strokeDasharray="6 4"
+strokeWidth="2"
 
 />
 
 <text
 
-  x="210"
+x="370"
 
-  y="114"
+y={mapWeight(props.mtow || 79015)+4}
 
-  fill="#00c8ff"
+fill="#00c8ff"
 
-  fontSize="12"
-
-  fontWeight="700"
+fontSize="11"
 
 >
 
-  MTOW
+MTOW
 
 </text>
 
-{/* MLW LINE */}
+
+{/* MLW */}
 
 <line
 
-  x1="60"
+x1="150"
 
-  y1="170"
+y1={mapWeight(props.mlw || 65317)}
 
-  x2="760"
+x2="380"
 
-  y2="170"
+y2={mapWeight(props.mlw || 65317)}
 
-  stroke="#00ff88"
+stroke="#00ff88"
 
-  strokeWidth="2"
-
-  strokeDasharray="6 4"
+strokeWidth="2"
 
 />
 
 <text
 
-  x="250"
+x="395"
 
-  y="164"
+y={mapWeight(props.mlw || 65317)+4}
 
-  fill="#00ff88"
+fill="#00ff88"
 
-  fontSize="12"
-
-  fontWeight="700"
+fontSize="11"
 
 >
 
-  MLW
+MLW
 
 </text>
 
-{/* MZFW LINE */}
+
+{/* MZFW */}
 
 <line
 
-  x1="60"
+x1="150"
 
-  y1="210"
+y1={mapWeight(props.mzfw || 61688)}
 
-  x2="760"
+x2="380"
 
-  y2="210"
+y2={mapWeight(props.mzfw || 61688)}
 
-  stroke="#ffff00"
+stroke="#ffff00"
 
-  strokeWidth="2"
-
-  strokeDasharray="6 4"
+strokeWidth="2"
 
 />
 
 <text
 
-  x="320"
+x="390"
 
-  y="204"
+y={mapWeight(props.mzfw || 61688)+4}
 
-  fill="#ffff00"
+fill="#ffff00"
 
-  fontSize="12"
-
-  fontWeight="700"
+fontSize="11"
 
 >
 
-  MZFW
+MZFW
 
 </text>
- <path
 
-d="
+<polygon
 
-M 140 200
+points="
 
-L 100 60
+140,200
 
-Q 200 60 420 60
+150,55
 
-Q 490 60 400 180
+340,55
 
-L 200 200
+390,85
 
-Q 140 200 140 200
+370,150
 
-Z
-
+210,200
 
 "
 
-  fill="transparent"
+fill="transparent"
 
-  stroke="#00ff88"
+stroke="#00ff88"
 
-  strokeWidth="2"
+strokeWidth="2"
 
-  style={{
+style={{
 
-    filter:
-      'drop-shadow(0 0 8px rgba(0,255,140,0.25))'
+filter:
 
-  }}
+'drop-shadow(0 0 6px rgba(0,255,140,.25))'
+
+}}
 
 />
+
 <circle
 
 cx={towX}
@@ -677,14 +690,14 @@ filter=
     fill="white"
     fontSize="12"
   >
-    CG
+    INDEX
     <text
   x="100"
   y="225"
   fill="#b8c0cc"
   fontSize="11"
 >
-  15
+  35
 </text>
 
 <text
@@ -693,7 +706,7 @@ filter=
   fill="#b8c0cc"
   fontSize="11"
 >
-  20
+  45
 </text>
 
 <text
@@ -702,7 +715,7 @@ filter=
   fill="#b8c0cc"
   fontSize="11"
 >
-  25
+  55
 </text>
 
 <text
@@ -711,7 +724,7 @@ filter=
   fill="#b8c0cc"
   fontSize="11"
 >
-  30
+  65
 </text>
 </text>
 </svg>
