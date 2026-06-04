@@ -1682,12 +1682,6 @@ status={true}
 
 />
 
-      <StatusCard
-  title={`CG · %MAC  ${cgLabel}`}
-  value={cg.toFixed(1)}
-  unit="%"
-  status={cgStatus}
-/>
 
 <StatusCard
 
