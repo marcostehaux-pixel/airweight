@@ -692,9 +692,10 @@ return 28
 
 }
 
-function getCgFromIndex(
+function getCgFromEnvelope(
 
-index
+index,
+weight
 
 ){
 
@@ -702,16 +703,12 @@ const minIndex = 35
 
 const maxIndex = 90
 
-const minCg = 18
+const minWeight = 40000
 
-const maxCg = 32
+const maxWeight = 85000
 
 
-return (
-
-minCg +
-
-(
+const indexFactor =
 
 (
 
@@ -731,15 +728,52 @@ minIndex
 
 )
 
-)
 
-*
+const weightFactor =
 
 (
 
-maxCg -
+weight -
 
-minCg
+minWeight
+
+)
+
+/
+
+(
+
+maxWeight -
+
+minWeight
+
+)
+
+
+const cg =
+
+18 +
+
+(
+
+indexFactor * 12
+
+)
+
+-
+
+(
+
+weightFactor * 2
+
+)
+
+
+return Number(
+
+cg.toFixed(
+
+1
 
 )
 
@@ -749,27 +783,30 @@ minCg
 
 const zfCg =
 
-getCgFromIndex(
+getCgFromEnvelope(
 
-zfi
+zfi,
+zfw
 
 )
 
 
 const toCg =
 
-getCgFromIndex(
+getCgFromEnvelope(
 
-toi
+toi,
+tow
 
 )
 
 
 const lwCg =
 
-getCgFromIndex(
+getCgFromEnvelope(
 
-li
+li,
+ldw
 
 )
 const trimLabel =
@@ -1647,25 +1684,7 @@ status={true}
 
 />
 
-<StatusCard
 
-title="LI"
-
-value={
-
-li.toFixed(
-
-1
-
-)
-
-}
-
-unit="IU"
-
-status={true}
-
-/>
 <StatusCard
 
 title="FUEL INDEX"
