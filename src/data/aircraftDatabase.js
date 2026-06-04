@@ -14,7 +14,7 @@ lemac:627.1,
 
 basicWeight:42675,
 
-basicIndex:16.8,
+basicIndex:50,
 basicConfig:'2/4',
 basicCrew:'STD CREW',
 maxZFW:61688,
@@ -84,7 +84,7 @@ lemac:627.1,
 
 basicWeight:38500,
 
-basicIndex:17.5,
+basicIndex:46,
 
 basicConfig:'2/4',
 basicCrew:'STD CREW',
@@ -156,7 +156,7 @@ lemac:625,
 
 basicWeight:42000,
 
-basicIndex:22,
+basicIndex:52,
 basicConfig:'2/4',
 basicCrew:'STD CREW',
 maxZFW:62500,

@@ -187,7 +187,17 @@ rowArm =
 selectedAircraft.seatArmAft
 
 }
+console.log({
 
+fuel,
+
+fuelIndex,
+
+zfi,
+
+toi
+
+})
 
 return (
 
@@ -591,7 +601,13 @@ function getFuelIndex(
 fuel
 
 ){
+if (
 
+fuel <= 0
+
+)
+
+return 0
 const table = [
 
 [4000,1],
