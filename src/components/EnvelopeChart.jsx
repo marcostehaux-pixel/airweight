@@ -134,7 +134,7 @@ const maxWeight = 85000
 
 const top = 40
 
-const bottom = 200
+const bottom = 320
 
 
 return (
@@ -251,9 +251,9 @@ return (
     </h3>  
       <svg
 
-      width="620"
+      width="740"
 
-      height="250"
+      height="340"
 
       style={{
 
@@ -261,11 +261,13 @@ return (
           'rgba(0,0,0,0.18)',
 
         borderRadius:
-          '18px'
-
+          '18px',
+overflow:'visible'
       }}
+      >
+<g transform="translate(10,0">
 
->
+
  {/* GRID */}
 
 {
@@ -310,7 +312,7 @@ x1="50"
 
 y1={mapWeight(weight)}
 
-x2="560"
+x2="930"
 
 y2={mapWeight(weight)}
 
@@ -343,13 +345,13 @@ x1={
 
 (
 
-i * 40
+i * 60
 
 )
 
 }
 
-y1="200"
+y1="310"
 
 x2={
 
@@ -357,13 +359,13 @@ x2={
 
 (
 
-i * 40
+i * 60
 
 )
 
 }
 
-y2="206"
+y2="320"
 
 stroke="#7b8794"
 
@@ -377,13 +379,13 @@ x={
 
 (
 
-i * 40
+i * 60
 
 )
 
 }
 
-y="222"
+y="335"
 
 fill="#b8c0cc"
 
@@ -427,18 +429,24 @@ fontSize="10"
 }
 
   <line
-    x1="50"
-    y1="200"
-    x2="450"
-    y2="200"
-    stroke="#666"
-   />
+
+x1="50"
+
+y1={mapWeight(40000)}
+
+x2="930"
+
+y2={mapWeight(40000)}
+
+stroke="#666"
+
+/>
 
   <line
     x1="50"
     y1="30"
     x2="50"
-    y2="200"
+    y2="320"
     stroke="#666"
   />
 
@@ -451,12 +459,11 @@ fontSize="10"
 
     key={index}
 
-    x1={80 + index * 60}
+    x1={90 + index * 58}
 
     y1={40}
 
-    x2={120 + index * 40}
-
+    x2={170 + index * 30}
     y2={320}
 
     stroke="rgba(255,255,255,0.25)"
@@ -476,7 +483,7 @@ fontSize="10"
 
     x={70 + index * 60}
 
-    y={30}
+    y={20}
 
     fill="rgba(255,255,255,0.75)"
 
@@ -497,7 +504,7 @@ x1="110"
 
 y1={mapWeight(props.mtow || 79015)}
 
-x2="350"
+x2="810"
 
 y2={mapWeight(props.mtow || 79015)}
 
@@ -511,7 +518,7 @@ strokeWidth="2"
 
 x="370"
 
-y={mapWeight(props.mtow || 79015)+4}
+y={mapWeight(props.mtow || 79015)+10}
 
 fill="#00c8ff"
 
@@ -528,11 +535,11 @@ MTOW
 
 <line
 
-x1="120"
+x1="150"
 
 y1={mapWeight(props.mlw || 65317)}
 
-x2="380"
+x2="600"
 
 y2={mapWeight(props.mlw || 65317)}
 
@@ -546,7 +553,7 @@ strokeWidth="2"
 
 x="395"
 
-y={mapWeight(props.mlw || 65317)+4}
+y={mapWeight(props.mlw || 65317)+10}
 
 fill="#00ff88"
 
@@ -563,11 +570,11 @@ MLW
 
 <line
 
-x1="122"
+x1="160"
 
 y1={mapWeight(props.mzfw || 61688)}
 
-x2="380"
+x2="545"
 
 y2={mapWeight(props.mzfw || 61688)}
 
@@ -581,7 +588,7 @@ strokeWidth="2"
 
 x="390"
 
-y={mapWeight(props.mzfw || 61688)+4}
+y={mapWeight(props.mzfw || 61688)+10}
 
 fill="#ffff00"
 
@@ -597,17 +604,13 @@ MZFW
 
 points="
 
-140,200
-
-110,55
-
-340,55
-
-390,85
-
-390,140
-
-260,200
+100,50
+150,160
+210,310
+230,310
+830,70
+400,50
+395,50
 
 "
 
@@ -837,21 +840,21 @@ props.status
     x="10"
     y="25"
     fill="white"
-    fontSize="12"
+    fontSize="13"
   >
     Weight
   </text>
 
   <text
-    x="440"
-    y="230"
+    x="260"
+    y="350"
     fill="white"
-    fontSize="12"
+    fontSize="15"
   >
     INDEX
     <text
-  x="100"
-  y="225"
+  x="120"
+  y="240"
   fill="#b8c0cc"
   fontSize="11"
 >
@@ -860,7 +863,7 @@ props.status
 
 <text
   x="200"
-  y="225"
+  y="240"
   fill="#b8c0cc"
   fontSize="11"
 >
@@ -869,7 +872,7 @@ props.status
 
 <text
   x="300"
-  y="225"
+  y="240"
   fill="#b8c0cc"
   fontSize="11"
 >
@@ -878,16 +881,21 @@ props.status
 
 <text
   x="400"
-  y="225"
+  y="240"
   fill="#b8c0cc"
   fontSize="11"
 >
   65
 </text>
 </text>
+</g>
+
 </svg>
+
 </div>
-  )
+
+)
+
 }
 
 export default EnvelopeChart
