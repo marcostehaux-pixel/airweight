@@ -1,151 +1,79 @@
 function EnvelopeChart(props) {
 
-const cgX =
+const mapIndex=(index)=>{
 
-80 +
+const min=35
 
-(
+const max=90
 
-(
+const left=110
 
-props.cg -
-
-15
-
-)
-
-/
-
-17
-
-)
-
-*
-
-320
-
-
-const zfwX =
-
-props.zfCg
-
-?
-
-80 +
-
-(
-
-(
-
-props.zfCg -
-
-15
-
-)
-
-/
-
-17
-
-)
-
-*
-
-320
-
-:
-
-cgX
-
-
-const towX =
-
-props.toCg
-
-?
-
-80 +
-
-(
-
-(
-
-props.toCg -
-
-15
-
-)
-
-/
-
-17
-
-)
-
-*
-
-320
-
-:
-
-cgX
-
-
-const ldwX =
-
-props.lwCg
-
-?
-
-80 +
-
-(
-
-(
-
-props.lwCg -
-
-15
-
-)
-
-/
-
-17
-
-)
-
-*
-
-320
-
-:
-
-cgX
-const mapWeight = (
-
-weight
-
-)=>{
-
-const minWeight = 40000
-
-const maxWeight = 85000
-
-const top = 40
-
-const bottom = 320
+const right=620
 
 
 return (
 
-bottom -
+left+
 
 (
 
 (
 
-weight -
+index-
+
+min
+
+)
+
+/
+
+(
+
+max-
+
+min
+
+)
+
+)
+
+*
+
+(
+
+right-
+
+left
+
+)
+
+)
+
+}
+const mapWeight=(weight)=>{
+
+const minWeight=40000
+
+const maxWeight=85000
+
+const top=60
+
+const bottom=310
+
+
+return (
+
+bottom-
+
+(
+
+(
+
+Number(
+
+weight
+
+)-
 
 minWeight
 
@@ -155,7 +83,7 @@ minWeight
 
 (
 
-maxWeight -
+maxWeight-
 
 minWeight
 
@@ -167,7 +95,7 @@ minWeight
 
 (
 
-bottom -
+bottom-
 
 top
 
@@ -177,29 +105,95 @@ top
 
 }
 
-const zfwY =
+const zfwX=
 
-mapWeight(
+mapIndex(
 
-props.zfw
+props.zfi||
 
-)
-
-const towY =
-
-mapWeight(
-
-props.tow
+50
 
 )
 
-const ldwY =
 
-mapWeight(
+const towX=
 
-props.ldw
+mapIndex(
+
+props.toi||
+
+50
 
 )
+
+
+const ldwX = towX
+
+const weightToY=(weight)=>{
+
+const min=33000
+
+const max=85000
+
+const y40000 = mapWeight(40000)
+
+const y85000 = mapWeight(85000)
+
+
+return (
+
+y40000-
+
+(
+
+(
+
+Number(
+
+weight
+
+)-
+
+min
+
+)
+
+/
+
+(
+
+max-
+
+min
+
+)
+
+)
+
+*
+
+(
+
+y40000-y85000
+
+)
+
+)
+
+}
+const zfwY = weightToY(
+
+props.zfw || 42675
+
+)
+
+const towY = weightToY(
+
+props.tow || 42675
+
+)
+
+const ldwY = towY
 return (
 
   <div
@@ -446,7 +440,7 @@ stroke="#666"
     x1="50"
     y1="30"
     x2="50"
-    y2="320"
+    y2="310"
     stroke="#666"
   />
 
@@ -500,11 +494,11 @@ stroke="#666"
 
 <line
 
-x1="110"
+x1="120"
 
 y1={mapWeight(props.mtow || 79015)}
 
-x2="810"
+x2="770"
 
 y2={mapWeight(props.mtow || 79015)}
 
@@ -516,9 +510,9 @@ strokeWidth="2"
 
 <text
 
-x="370"
+x="360"
 
-y={mapWeight(props.mtow || 79015)+10}
+y={mapWeight(props.mtow || 79015)+12}
 
 fill="#00c8ff"
 
@@ -535,11 +529,11 @@ MTOW
 
 <line
 
-x1="150"
+x1="155"
 
 y1={mapWeight(props.mlw || 65317)}
 
-x2="600"
+x2="580"
 
 y2={mapWeight(props.mlw || 65317)}
 
@@ -553,7 +547,7 @@ strokeWidth="2"
 
 x="395"
 
-y={mapWeight(props.mlw || 65317)+10}
+y={mapWeight(props.mlw || 65317)+11}
 
 fill="#00ff88"
 
@@ -570,11 +564,11 @@ MLW
 
 <line
 
-x1="160"
+x1="165"
 
 y1={mapWeight(props.mzfw || 61688)}
 
-x2="545"
+x2="535"
 
 y2={mapWeight(props.mzfw || 61688)}
 
@@ -588,7 +582,7 @@ strokeWidth="2"
 
 x="390"
 
-y={mapWeight(props.mzfw || 61688)+10}
+y={mapWeight(props.mzfw || 61688)+11}
 
 fill="#ffff00"
 

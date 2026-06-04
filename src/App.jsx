@@ -698,9 +698,9 @@ index
 
 ){
 
-const minIndex = 10
+const minIndex = 35
 
-const maxIndex = 30
+const maxIndex = 90
 
 const minCg = 18
 
@@ -1788,6 +1788,12 @@ toCg={toCg}
 
 lwCg={lwCg}
 
+zfi={zfi}
+
+toi={toi}
+
+li={li}
+
 zfw={zfw}
 
 tow={tow}
@@ -1797,21 +1803,15 @@ ldw={ldw}
 status={cgStatus}
 
 mtow={
-
 selectedAircraft.maxTakeoffWeight
-
 }
 
 mlw={
-
 selectedAircraft.maxLandingWeight
-
 }
 
 mzfw={
-
 selectedAircraft.maxZeroFuel
-
 }
 
 />
