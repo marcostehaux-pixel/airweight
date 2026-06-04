@@ -251,7 +251,7 @@ return (
     </h3>  
       <svg
 
-      width="500"
+      width="620"
 
       height="250"
 
@@ -310,7 +310,7 @@ x1="50"
 
 y1={mapWeight(weight)}
 
-x2="450"
+x2="560"
 
 y2={mapWeight(weight)}
 
@@ -321,25 +321,7 @@ stroke="rgba(255,255,255,0.08)"
 
 {
 
-[
-
-35,
-
-40,
-
-45,
-
-50,
-
-55,
-
-60,
-
-65,
-
-70
-
-]
+[35,40,45,50,55,60,65,70,75,80,85,90]
 
 .map(
 
@@ -357,11 +339,11 @@ i
 
 x1={
 
-80 +
+90 +
 
 (
 
-i * 45
+i * 40
 
 )
 
@@ -371,11 +353,11 @@ y1="200"
 
 x2={
 
-80 +
+90 +
 
 (
 
-i * 45
+i * 40
 
 )
 
@@ -391,11 +373,11 @@ stroke="#7b8794"
 
 x={
 
-75 +
+84 +
 
 (
 
-i * 45
+i * 40
 
 )
 
@@ -463,7 +445,7 @@ fontSize="10"
   {/* SAFE ENVELOPE */}
 {/* %MAC LINES */}
 
-{[18,19,20,21,22,23,24,25,].map((value, index) => (
+{[18,19,20,21,22,23,24,25,26,27,28,29,30,31,32].map((value, index) => (
 
   <line
 
@@ -486,7 +468,7 @@ fontSize="10"
 ))}
 {/* %MAC LABELS */}
 
-{[18,19,20,21,22,23,24,25,].map((value, index) => (
+{[18,19,20,21,22,23,24,25,26,27,28,29,30,31,32].map((value, index) => (
 
   <text
 
@@ -623,9 +605,9 @@ points="
 
 390,85
 
-370,150
+390,140
 
-210,200
+260,200
 
 "
 
@@ -651,7 +633,19 @@ cx={towX}
 
 cy={towY}
 
-r="6"
+r={
+
+props.status
+
+?
+
+6
+
+:
+
+10
+
+}
 
 stroke="white"
 
@@ -661,7 +655,19 @@ style={{
 
 transition:
 
-'all 0.5s ease'
+'all .4s ease',
+
+transform:
+
+props.status
+
+?
+
+'scale(1)'
+
+:
+
+'scale(1.15)'
 
 }}
 
@@ -686,9 +692,9 @@ filter=
 />
   <text
 
-  x={towX + 12}
+  x={towX + 10}
 
-  y={towY + 4}
+  y={towY - 10}
 
   fill="#00ff88"
 
@@ -707,23 +713,48 @@ filter=
 
   cy={zfwY}
 
-  r="6"
+  r={
+
+props.status
+
+?
+
+6
+
+:
+
+10
+
+}
 
   fill="#00c8ff"
 
   style={{
 
-    transition:
-      'all 0.5s ease'
+transition:
 
-  }}
+'all .4s ease',
+
+transform:
+
+props.status
+
+?
+
+'scale(1)'
+
+:
+
+'scale(1.15)'
+
+}}
 
 />
 <text
 
-  x={ldwX + 12}
+  x={ldwX + 10}
 
-  y={ldwY + 4}
+  y={ldwY + 10}
 
   fill="#ff9900"
 
@@ -742,23 +773,48 @@ filter=
 
   cy={ldwY}
 
-  r="6"
+  r={
+
+props.status
+
+?
+
+6
+
+:
+
+10
+
+}
 
   fill="#ff9900"
 
-  style={{
+ style={{
 
-    transition:
-      'all 0.5s ease'
+transition:
 
-  }}
+'all .4s ease',
+
+transform:
+
+props.status
+
+?
+
+'scale(1)'
+
+:
+
+'scale(1.15)'
+
+}}
 
 />
 <text
 
-  x={zfwX + 12}
+  x={zfwX + 10}
 
-  y={zfwY + 4}
+  y={zfwY - 2}
 
   fill="#00c8ff"
 
