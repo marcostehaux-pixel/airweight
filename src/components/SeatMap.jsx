@@ -25,7 +25,7 @@ function SeatMap(props) {
         padding: '20px',
         borderRadius: '15px',
         marginTop: '40px',
-        width: '500px'
+        width: '700px'
       }}
     >
 
@@ -68,7 +68,7 @@ style={{
 
 textAlign:'center',
 
-fontSize:'11px',
+fontSize:'15px',
 
 opacity:0.35,
 
@@ -83,7 +83,47 @@ LAV ◻ ◻
 </div>
 </div>
 </div>
+<div
 
+style={{
+
+display:'flex',
+
+justifyContent:'center',
+
+gap:'150px',
+
+marginBottom:'12px',
+
+color:'rgba(255,255,255,0.35)',
+
+fontSize:'15px',
+
+letterSpacing:'6px'
+
+}}
+
+>
+
+<div>
+
+ABC
+
+</div>
+
+<div>
+
+AISLE
+
+</div>
+
+<div>
+
+DEF
+
+</div>
+
+</div>
       <div
         style={{
           display: 'grid',
@@ -91,7 +131,7 @@ LAV ◻ ◻
           justifyContent:
 
 'center',
-          gap: '25px',
+          gap: '18px',
           marginTop: '20px'
         }}
       >
@@ -150,7 +190,7 @@ seat === 29 ||
 
 seat === 30
 
-? '45px'
+? '48px'
 
 : '0px'
 
@@ -227,7 +267,32 @@ left:'50%',
 
 transform:'translateX(-50%)',
 
-top:'550px',
+top:'570px',
+
+fontSize:'13px',
+
+opacity:'0.5',
+
+letterSpacing:'2px'
+
+}}
+
+>
+
+← OVERWING EXIT →
+
+</div>
+<div
+
+style={{
+
+position:'absolute',
+
+left:'50%',
+
+transform:'translateX(-50%)',
+
+top:'680px',
 
 fontSize:'13px',
 
@@ -248,7 +313,7 @@ style={{
 
 textAlign:'center',
 
-fontSize:'12px',
+fontSize:'15px',
 
 opacity:0.45,
 
@@ -267,9 +332,9 @@ style={{
 
 textAlign:'center',
 
-fontSize:'11px',
+fontSize:'12px',
 
-opacity:0.35,
+opacity:0.80,
 
 marginBottom:'20px'
 
