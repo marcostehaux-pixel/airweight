@@ -1361,7 +1361,7 @@ style={{
 
 width:'100%',
 
-maxWidth:'900px'
+maxWidth:'600px'
 
 }}
 
@@ -1478,12 +1478,11 @@ marginBottom:'25px'
 
 src={
 selectedAircraft.type.includes(
-'a320'
 )
 
 ?
 
-'/src/assets/a320 perfil.png'
+'/src/assets/A320 perfil.png'
 
 :
 
@@ -1767,8 +1766,27 @@ kg
           setSelectedAircraft(aircraft)
 
         }}
+style={{
 
-      >
+background:'#141414',
+
+color:'#ffffff',
+
+border:'1px solid rgba(255,255,255,0.12)',
+
+padding:'10px 14px',
+
+borderRadius:'10px',
+
+fontSize:'14px',
+
+cursor:'pointer',
+boxShadow:
+'0 0 18px rgba(0,255,140,0.10)'
+}}
+
+>
+      
 
         {aircraftDatabase.map((aircraft) => (
 

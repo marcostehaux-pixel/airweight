@@ -87,7 +87,7 @@ LAV ◻ ◻
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(6, 55px)',
+          gridTemplateColumns: 'repeat(6, 78px)',
           justifyContent:
 
 'center',
