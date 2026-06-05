@@ -143,7 +143,15 @@ seat /
 +
 
 1
+console.log({
 
+seat,
+
+row,
+
+selectedAircraft
+
+})
 
 let rowArm =
 
@@ -187,17 +195,7 @@ rowArm =
 selectedAircraft.seatArmAft
 
 }
-console.log({
 
-fuel,
-
-fuelIndex,
-
-zfi,
-
-toi
-
-})
 
 return (
 
@@ -793,6 +791,22 @@ li,
 ldw
 
 )
+const toWithinEnvelope =
+
+toi >= 35 &&
+
+toi <= 90 &&
+
+tow <= selectedAircraft.maxTOW
+const zfWithinEnvelope =
+
+zfi >= 35 &&
+
+zfi <= 90 &&
+
+zfw >= 40000 &&
+
+zfw <= selectedAircraft.maxZFW
 const trimLabel =
 
   trim < 4
@@ -1460,21 +1474,31 @@ marginBottom:'25px'
 
 <img
 
-src={aircraftImage}
+src={
+selectedAircraft.type.includes(
+'A320'
+)
 
-alt="aircraft"
+?
+
+'/src/assets/A320 perfil.png'
+
+:
+
+'/src/assets/b737 perfil.png'
+}
 
 style={{
 
-width:'240px',
+width:'310px',
 
-height:'120px',
+maxHeight:'240px',
 
 objectFit:'contain',
 
-filter:
+display:'block',
 
-'drop-shadow(0 0 20px rgba(0,255,140,.18))'
+margin:'0 auto'
 
 }}
 
@@ -1716,7 +1740,7 @@ kg
 
   style={{
 
-    width: '120px',
+    width: '340px',
 
     objectFit: 'contain',
 
@@ -1781,13 +1805,40 @@ kg
     >
       <StatusCard
 title="ZF CG"
-value={zfCg.toFixed(1)}
+value={
+
+zfWithinEnvelope
+
+?
+
+zfCg.toFixed(1)
+
+:
+
+'OUT OF ENVELOPE'
+
+}
 unit="%"
+status={zfWithinEnvelope}
 />
 
 <StatusCard
 title="TO CG"
-value={toCg.toFixed(1)}
+value={
+
+toWithinEnvelope
+
+?
+
+toCg.toFixed(1)
+
+:
+
+'OUT OF ENVELOPE'
+
+}
+
+status={toWithinEnvelope}
 unit="%"
 />
 
