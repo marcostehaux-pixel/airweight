@@ -1,7 +1,6 @@
 const aircraftDatabase = [
 
 {
-
 registration:'LV-KGN',
 
 type:'B737-800',

@@ -698,62 +698,6 @@ index
 
 ){
 
-const minIndex = 35
-
-const maxIndex = 90
-
-const minCg = 18
-
-const maxCg = 32
-
-
-return (
-
-minCg +
-
-(
-
-(
-
-index-
-
-minIndex
-
-)
-
-/
-
-(
-
-maxIndex-
-
-minIndex
-
-)
-
-)
-
-*
-
-(
-
-maxCg-
-
-minCg
-
-)
-
-)
-
-}
-
-
-function getNearestCg(
-
-index
-
-){
-
 const minIndex=35
 
 const maxIndex=90
@@ -2103,7 +2047,7 @@ ldw={ldw}
 status={cgStatus}
 
 mtow={
-selectedAircraft.maxTow
+selectedAircraft.maxTOW
 }
 
 mlw={
