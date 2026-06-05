@@ -1500,7 +1500,43 @@ maxWidth:'620px'
 AIRCRAFT SUMMARY
 
 </h3>
+<div
 
+style={{
+
+display:'flex',
+
+justifyContent:'center',
+
+marginBottom:'25px'
+
+}}
+
+>
+
+<img
+
+src={aircraftImage}
+
+alt="aircraft"
+
+style={{
+
+width:'240px',
+
+height:'120px',
+
+objectFit:'contain',
+
+filter:
+
+'drop-shadow(0 0 20px rgba(0,255,140,.18))'
+
+}}
+
+ />
+
+</div>
 <div
 
 style={{
