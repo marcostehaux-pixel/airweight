@@ -132,11 +132,11 @@ const ldwX = towX
 
 const weightToY=(weight)=>{
 
-const min=33000
+const min=42675
 
 const max=85000
 
-const y40000 = mapWeight(40000)
+const y40000 = mapWeight(42675)
 
 const y85000 = mapWeight(85000)
 
