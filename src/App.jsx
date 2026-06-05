@@ -802,11 +802,39 @@ toCg <= 32 &&
 tow <= selectedAircraft.maxTOW
 const zfWithinEnvelope =
 
-zfi >= 18 &&
+zfw >= 40000 &&
 
-zfi <= 32 &&
+zfw <= selectedAircraft.maxZFW &&
 
-zfw <= selectedAircraft.maxZFW
+zfCg >= (
+
+18 +
+
+(
+
+(
+
+zfw -
+
+40000
+
+)
+
+/
+
+22000
+
+)
+
+*
+
+2
+
+)
+
+&&
+
+zfCg <= 32
 
 
 const trimLabel =

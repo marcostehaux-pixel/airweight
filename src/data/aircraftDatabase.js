@@ -23,9 +23,9 @@ envelope: {
 
 zf:{
 
-indexMin:10,
+indexMin:42,
 
-indexMax:90,
+indexMax:58,
 
 cgMin:18,
 

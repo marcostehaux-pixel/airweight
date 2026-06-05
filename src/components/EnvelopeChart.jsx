@@ -678,7 +678,7 @@ props.toStatus
 
 fill={
 
-props.toStatus
+props.status
 
 ?
 
@@ -712,6 +712,7 @@ filter=
   TOW
 
 </text>
+
   <circle
 
   cx={zfwX}
@@ -755,6 +756,7 @@ props.zfStatus
 }}
 
 />
+{/*
 <text
 
   x={ldwX + 10}
@@ -815,11 +817,12 @@ props.status
 }}
 
 />
+*/}
 <text
 
-  x={zfwX + 10}
+  x={zfwX + 12}
 
-  y={zfwY - 2}
+  y={zfwY - 1}
 
   fill="#00c8ff"
 
