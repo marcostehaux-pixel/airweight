@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import StatusCard from './components/StatusCard'
+import a320Perfil from './assets/A320 perfil.png'
 
+import b737Perfil from './assets/b737 perfil.png'
 import EnvelopeChart from './components/EnvelopeChart'
 
 import aircraftDatabase from './data/aircraftDatabase'
