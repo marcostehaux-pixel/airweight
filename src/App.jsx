@@ -1590,7 +1590,7 @@ MTOW<br/>
 
 {
 
-selectedAircraft.maxTakeoffWeight
+selectedAircraft.maxTOW
 
 }
 
@@ -1609,7 +1609,7 @@ MLW<br/>
 
 {
 
-selectedAircraft.maxLandingWeight
+selectedAircraft.maxLW
 
 }
 
@@ -1628,7 +1628,7 @@ MZFW<br/>
 
 {
 
-selectedAircraft.maxZeroFuel
+selectedAircraft.maxZFW
 
 }
 
@@ -2067,15 +2067,15 @@ ldw={ldw}
 status={cgStatus}
 
 mtow={
-selectedAircraft.maxTakeoffWeight
+selectedAircraft.maxTow
 }
 
 mlw={
-selectedAircraft.maxLandingWeight
+selectedAircraft.maxLW
 }
 
 mzfw={
-selectedAircraft.maxZeroFuel
+selectedAircraft.maxZFW
 }
 
 />
