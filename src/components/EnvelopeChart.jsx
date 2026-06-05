@@ -50,6 +50,7 @@ left
 )
 
 }
+
 const mapWeight=(weight)=>{
 
 const minWeight=40000
@@ -194,6 +195,12 @@ props.tow || 42675
 )
 
 const ldwY = towY
+const cgLines = [
+18,19,20,21,22,23,24,
+25,26,27,28,29,30,
+31,32
+]
+
 return (
 
   <div
@@ -445,6 +452,7 @@ stroke="#666"
   />
 
   {/* SAFE ENVELOPE */}
+  
 {/* %MAC LINES */}
 
 {[18,19,20,21,22,23,24,25,26,27,28,29,30,31,32].map((value, index) => (

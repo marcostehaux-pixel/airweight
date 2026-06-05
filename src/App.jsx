@@ -692,10 +692,9 @@ return 28
 
 }
 
-function getCgFromEnvelope(
+function getNearestCg(
 
-index,
-weight
+index
 
 ){
 
@@ -703,16 +702,20 @@ const minIndex = 35
 
 const maxIndex = 90
 
-const minWeight = 40000
+const minCg = 18
 
-const maxWeight = 85000
+const maxCg = 32
 
 
-const indexFactor =
+return (
+
+minCg +
 
 (
 
-index -
+(
+
+index-
 
 minIndex
 
@@ -722,20 +725,53 @@ minIndex
 
 (
 
-maxIndex -
+maxIndex-
 
 minIndex
 
 )
 
+)
 
-const weightFactor =
+*
 
 (
 
-weight -
+maxCg-
 
-minWeight
+minCg
+
+)
+
+)
+
+}
+
+
+function getNearestCg(
+
+index
+
+){
+
+const minIndex=35
+
+const maxIndex=90
+
+const minCg=18
+
+const maxCg=32
+
+
+return (
+
+minCg+
+
+(
+
+(
+
+index-minIndex
 
 )
 
@@ -743,35 +779,39 @@ minWeight
 
 (
 
-maxWeight -
-
-minWeight
+maxIndex-minIndex
 
 )
 
+)
 
-const cg =
-
-18 +
+*
 
 (
 
-indexFactor * 12
+maxCg-minCg
 
 )
 
--
-
-(
-
-weightFactor * 2
-
 )
 
+}
+
+
+function getCgFromEnvelope(
+
+index,
+weight
+
+){
 
 return Number(
 
-cg.toFixed(
+getNearestCg(
+
+index
+
+).toFixed(
 
 1
 
@@ -1209,7 +1249,7 @@ onMouseEnter={(e) => {
 
 onMouseLeave={(e) => {
 
-  if (activeMenu !== 'Dashboard') {
+  if (activeMenu !== 'Aircraft') {
 
     e.currentTarget.style.transform =
       'translateX(0px)'
@@ -1390,6 +1430,221 @@ toggleSeat
 )
 
 }
+{activeMenu === 'Aircraft' && (
+
+<div
+
+style={{
+
+flex:1,
+
+padding:'40px'
+
+}}
+
+>
+
+<h1
+
+style={{
+
+fontSize:'42px',
+
+marginBottom:'10px'
+
+}}
+
+>
+
+AIRCRAFT
+
+</h1>
+
+<p
+
+style={{
+
+color:'#b8c0cc',
+
+marginBottom:'30px'
+
+}}
+
+>
+
+Aircraft Information
+
+</p>
+
+
+<div
+
+style={{
+
+background:'rgba(255,255,255,.04)',
+
+border:'1px solid rgba(255,255,255,.08)',
+
+borderRadius:'18px',
+
+padding:'25px',
+
+maxWidth:'620px'
+
+}}
+
+>
+
+<h3>
+
+AIRCRAFT SUMMARY
+
+</h3>
+
+<div
+
+style={{
+
+display:'grid',
+
+gridTemplateColumns:'1fr 1fr',
+
+gap:'20px'
+
+}}
+
+>
+
+<div>
+
+REG<br/>
+
+<strong>
+
+{selectedAircraft.registration}
+
+</strong>
+
+</div>
+
+
+<div>
+
+TYPE<br/>
+
+<strong>
+
+{selectedAircraft.type}
+
+</strong>
+
+</div>
+
+
+<div>
+
+BASIC WT<br/>
+
+<strong>
+
+{effectiveBasicWeight}
+
+kg
+
+</strong>
+
+</div>
+
+
+<div>
+
+BASIC INDEX<br/>
+
+<strong>
+
+{effectiveBasicIndex?.toFixed(1)}
+
+</strong>
+
+</div>
+
+
+<div>
+
+CREW<br/>
+
+<strong>
+
+{crewConfiguration||'-'}
+
+</strong>
+
+</div>
+
+
+<div>
+
+MTOW<br/>
+
+<strong>
+
+{
+
+selectedAircraft.maxTakeoffWeight
+
+}
+
+kg
+
+</strong>
+
+</div>
+
+
+<div>
+
+MLW<br/>
+
+<strong>
+
+{
+
+selectedAircraft.maxLandingWeight
+
+}
+
+kg
+
+</strong>
+
+</div>
+
+
+<div>
+
+MZFW<br/>
+
+<strong>
+
+{
+
+selectedAircraft.maxZeroFuel
+
+}
+
+kg
+
+</strong>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+)}
 {activeMenu === 'Dashboard' && (
 
   <div
@@ -1557,11 +1812,6 @@ unit="%"
 />
 
 <StatusCard
-title="LW CG"
-value={lwCg.toFixed(1)}
-unit="%"
-/>
-<StatusCard
 
 title="Basic WT"
 
@@ -1580,17 +1830,14 @@ subtitle={
 />
 
 
+{/*
 <StatusCard
 
-title="BASIC INDEX"
+title="Basic Index"
 
-value={effectiveBasicIndex.toFixed(1)}
-
-unit="IU"
-
-status={true}
-
+...
 />
+*/}
 <StatusCard
         title="TOW"
         value={
@@ -1610,6 +1857,7 @@ extraCrew *
         status={towStatus}
        limit={selectedAircraft.maxTOW} 
       />
+      {/*
       <StatusCard
 
 title="TOI"
@@ -1629,6 +1877,7 @@ unit="IU"
 status={true}
 
 />
+      */}
       <StatusCard
         title="ZFW"
         value={
@@ -1648,7 +1897,7 @@ extraCrew *
         status={zfwStatus}
         limit={selectedAircraft.maxZFW}
       />
-
+{/*
     <StatusCard
 
 title="ZFI"
@@ -1668,6 +1917,7 @@ unit="IU"
 status={true}
 
 />
+
 <StatusCard
 
 title="TRIP FI"
@@ -1731,6 +1981,7 @@ unit="IU"
 status={true}
 
 />
+*/}
 <StatusCard
 
   title={`TRIM · ${trimLabel}`}
