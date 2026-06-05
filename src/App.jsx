@@ -1478,12 +1478,12 @@ marginBottom:'25px'
 
 src={
 selectedAircraft.type.includes(
-'A320'
+'a320'
 )
 
 ?
 
-'/src/assets/A320 perfil.png'
+'/src/assets/a320 perfil.png'
 
 :
 
