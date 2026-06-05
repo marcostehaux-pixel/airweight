@@ -6,7 +6,7 @@ const min=35
 
 const max=90
 
-const left=110
+const left=125
 
 const right=620
 
