@@ -640,7 +640,7 @@ cy={towY}
 
 r={
 
-props.status
+props.toStatus
 
 ?
 
@@ -664,7 +664,7 @@ transition:
 
 transform:
 
-props.status
+props.toStatus
 
 ?
 
@@ -678,7 +678,7 @@ props.status
 
 fill={
 
-props.status
+props.toStatus
 
 ?
 
@@ -720,7 +720,7 @@ filter=
 
   r={
 
-props.status
+props.zfStatus
 
 ?
 
@@ -742,7 +742,7 @@ transition:
 
 transform:
 
-props.status
+props.zfStatus
 
 ?
 

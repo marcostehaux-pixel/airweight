@@ -795,20 +795,20 @@ ldw
 )
 const toWithinEnvelope =
 
-toi >= 35 &&
+toCg >= 18 &&
 
-toi <= 90 &&
+toCg <= 32 &&
 
 tow <= selectedAircraft.maxTOW
 const zfWithinEnvelope =
 
-zfi >= 35 &&
+zfi >= 18 &&
 
-zfi <= 90 &&
-
-zfw >= 40000 &&
+zfi <= 32 &&
 
 zfw <= selectedAircraft.maxZFW
+
+
 const trimLabel =
 
   trim < 4
@@ -2100,7 +2100,8 @@ cg={cg}
 zfCg={zfCg}
 
 toCg={toCg}
-
+zfStatus={zfWithinEnvelope}
+toStatus={toWithinEnvelope}
 lwCg={lwCg}
 
 zfi={zfi}
