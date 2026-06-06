@@ -698,7 +698,7 @@ index
 
 ){
 
-const minIndex=35
+const minIndex=25
 
 const maxIndex=90
 
