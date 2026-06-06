@@ -6,7 +6,7 @@ const min=35
 
 const max=90
 
-const left=125
+const left=140
 
 const right=620
 
@@ -219,13 +219,13 @@ return (
       boxShadow:
         '0 0 45px rgba(0,0,0,0.25)',
 
-      padding: '25px',
+      padding: '45px',
 
-      borderRadius: '22px',
+      borderRadius: '20px',
 
-      marginTop: '40px',
+      marginTop: '30px',
 
-      width: '600px'
+      width: '920px'
 
     }}
 
@@ -252,9 +252,9 @@ return (
     </h3>  
       <svg
 
-      width="740"
+      width="950"
 
-      height="340"
+      height="380"
 
       style={{
 
@@ -266,7 +266,7 @@ return (
 overflow:'visible'
       }}
       >
-<g transform="translate(10,0)">
+<g transform="translate(-5)">
 
 
  {/* GRID */}
@@ -520,7 +520,7 @@ strokeWidth="2"
 
 x="360"
 
-y={mapWeight(props.mtow || 79015)+12}
+y={mapWeight(props.mtow || 79015)+14}
 
 fill="#00c8ff"
 
@@ -555,7 +555,7 @@ strokeWidth="2"
 
 x="395"
 
-y={mapWeight(props.mlw || 65317)+11}
+y={mapWeight(props.mlw || 65317)+14}
 
 fill="#00ff88"
 
@@ -590,7 +590,7 @@ strokeWidth="2"
 
 x="390"
 
-y={mapWeight(props.mzfw || 61688)+11}
+y={mapWeight(props.mzfw || 61688)+14}
 
 fill="#ffff00"
 

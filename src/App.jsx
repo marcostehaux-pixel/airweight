@@ -1519,7 +1519,7 @@ selectedAircraft.type.includes(
 
 style={{
 
-width:'310px',
+width:'320px',
 
 maxHeight:'240px',
 
