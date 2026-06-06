@@ -1,9 +1,9 @@
+import Login from './Login'
 import { useState } from 'react'
 import StatusCard from './components/StatusCard'
 import a320Perfil from './assets/A320 perfil.png'
 import b737Perfil from './assets/b737 perfil.png'
 import EnvelopeChart from './components/EnvelopeChart'
-
 import aircraftDatabase from './data/aircraftDatabase'
 import {
 
@@ -20,7 +20,17 @@ import generateLoadsheet from './utils/generateLoadsheet'
 import logo from './assets/logo.png'
 import aircraftImage from './assets/a320.png'
 function App() {
+const [
 
+logged,
+
+setLogged
+
+]=useState(
+
+false
+
+)
 const [tripFuel, setTripFuel] = useState(3000)
 
   const [fuel, setFuel] = useState(0)
@@ -900,7 +910,35 @@ const cgStatus =
   }
 
 }
+/*
+if(
 
+!logged
+
+){
+
+return(
+
+<Login
+
+onLogin={
+
+()=>
+
+setLogged(
+
+true
+
+)
+
+}
+
+/>
+
+)
+
+}
+*/
 return (
 
   <div
