@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import StatusCard from './components/StatusCard'
-import a320perfil from './assets/A320 perfil.png'
-
-import b737perfil from './assets/b737 perfil.png'
+import a320Perfil from './assets/A320 perfil.png'
+import b737Perfil from './assets/b737 perfil.png'
 import EnvelopeChart from './components/EnvelopeChart'
 
 import aircraftDatabase from './data/aircraftDatabase'
@@ -1505,16 +1504,19 @@ marginBottom:'25px'
 <img
 
 src={
+
 selectedAircraft.type.includes(
+'A320'
 )
 
 ?
 
-'/src/assets/A320 perfil.png'
+a320Perfil
 
 :
 
-'/src/assets/b737 perfil.png'
+b737Perfil
+
 }
 
 style={{
