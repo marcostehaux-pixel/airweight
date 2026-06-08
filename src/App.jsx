@@ -147,9 +147,6 @@ seat /
 
 )
 
-+
-
-1
 console.log({
 
 seat,
@@ -2821,9 +2818,29 @@ CATERING
 
     value={fuel}
 
-    onChange={(e) =>
-      setFuel(parseInt(e.target.value) || 0)
-    }
+    onChange={(e)=>{
+
+const value=
+
+parseInt(
+
+e.target.value
+
+)||0
+
+setFuel(
+
+Math.min(
+
+value,
+
+20598
+
+)
+
+)
+
+}}
 
     style={{
 

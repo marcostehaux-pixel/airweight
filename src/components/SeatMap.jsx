@@ -1,18 +1,51 @@
 function SeatMap(props) {
 
   const seats =
-    Array.from({ length: 60 }, (_, index) => index)
-    function getSeatZone(seat) {
+  Array.from(
 
-  if (seat < 10) {
-    return 'FWD'
-  }
+{
 
-  if (seat < 20) {
-    return 'MID'
-  }
+length:180
 
-  return 'AFT'
+},
+
+(_,
+
+index
+
+)=>
+
+index
+
+)
+
+function getSeatZone(
+
+seat
+
+){
+
+if(
+
+seat<60
+
+){
+
+return 'FWD'
+
+}
+
+if(
+
+seat<120
+
+){
+
+return 'MID'
+
+}
+
+return 'AFT'
 
 }
 
@@ -132,7 +165,7 @@ DEF
 
 'center',
           gap: '18px',
-          marginTop: '20px'
+          marginTop: '25px'
         }}
       >
 
@@ -183,7 +216,7 @@ seat === 23 ||
 
 seat === 35
 
-? '18px'
+? 'px'
 :
 
 seat === 29 ||
@@ -267,11 +300,11 @@ left:'50%',
 
 transform:'translateX(-50%)',
 
-top:'570px',
+top:'1113px',
 
 fontSize:'13px',
 
-opacity:'0.5',
+opacity:'1',
 
 letterSpacing:'2px'
 
@@ -292,11 +325,11 @@ left:'50%',
 
 transform:'translateX(-50%)',
 
-top:'680px',
+top:'1178px',
 
 fontSize:'13px',
 
-opacity:'0.5',
+opacity:'1',
 
 letterSpacing:'2px'
 
