@@ -711,40 +711,24 @@ const minIndex=25
 
 const maxIndex=90
 
-const minCg=18
+const minCg=21
 
-const maxCg=32
+const maxCg=34
 
 
 return (
 
-minCg+
+18+
 
 (
 
-(
-
-index-minIndex
-
-)
-
-/
-
-(
-
-maxIndex-minIndex
-
-)
+index-35
 
 )
 
 *
 
-(
-
-maxCg-minCg
-
-)
+0.235
 
 )
 
@@ -831,7 +815,7 @@ const polygon=[
 
 [400,50],
 
-[395,50]
+[,50]
 
 ]
 
@@ -985,15 +969,15 @@ const trimLabel =
 
       : 'READY FOR DISPATCH'
 const cgStatus =
-  cg >= 15 && cg <= 25
+  cg >= 18 && cg <= 32
   
  const cgLabel =
 
-  cg < 16
+  cg < 18
 
     ? 'FORWARD'
 
-    : cg > 22
+    : cg > 32
 
       ? 'AFT'
 
