@@ -230,7 +230,7 @@ catering
 
 'NO',
 
-174
+167
 
 )
 
@@ -246,7 +246,7 @@ effectiveBasicWeight ||
 
 } kg`,
 
-180
+175
 
 )
 
@@ -278,19 +278,21 @@ effectiveBasicIndex.toFixed(
 drawRow(
   'ZFW',
   `${zfw.toFixed(0)} kg`,
-  188
+  195
 )
 
 drawRow(
   'TOW',
   `${tow.toFixed(0)} kg`,
-  194
+  205
 )
 
 drawRow(
   'CG',
-  `${cg}`,
-  200
+  `${Number(
+    cg.toFixed(1)
+  )}%`,
+  215
 )
 doc.line(20, 170, 110, 170)
 doc.roundedRect(
