@@ -24,6 +24,34 @@ setPassword
 
 function login(){
 
+const expiration =
+
+new Date(
+
+'2026-06-15'
+
+)
+
+if(
+
+new Date()
+
+>
+
+expiration
+
+){
+
+alert(
+
+'Trial expired'
+
+)
+
+return
+
+}
+
 if(
 
 user==='Alumno1'

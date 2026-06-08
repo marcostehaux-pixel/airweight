@@ -910,7 +910,6 @@ const cgStatus =
   }
 
 }
-/*
 if(
 
 !logged
@@ -938,7 +937,6 @@ true
 )
 
 }
-*/
 return (
 
   <div
