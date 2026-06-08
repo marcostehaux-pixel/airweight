@@ -498,7 +498,11 @@ stroke="#666"
   </text>
 
 ))}
+
 {/* MTOW */}
+{false && (
+
+<>
 
 <line
 
@@ -532,9 +536,14 @@ MTOW
 
 </text>
 
+</>
+
+)}
 
 {/* MLW */}
+{false && (
 
+<>
 <line
 
 x1="155"
@@ -566,10 +575,13 @@ fontSize="11"
 MLW
 
 </text>
+</>
 
-
+)}
 {/* MZFW */}
+{false && (
 
+<>
 <line
 
 x1="165"
@@ -601,7 +613,9 @@ fontSize="11"
 MZFW
 
 </text>
+</>
 
+)}
 <polygon
 
 points="
