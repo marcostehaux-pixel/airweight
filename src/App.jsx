@@ -31,7 +31,7 @@ setLogged
 false
 
 )
-const [tripFuel, setTripFuel] = useState(3000)
+const [tripFuel, setTripFuel] = useState(0)
 
   const [fuel, setFuel] = useState(0)
   const [forwardCargo, setForwardCargo] =
@@ -105,17 +105,13 @@ selectedAircraft.lemac +
 
 selectedAircraft.mac *
 
-(
-
-selectedAircraft.basicIndex || 16
+22
 
 )
 
 /
 
 100
-
-)
 
 const basicMoment =
 
@@ -969,7 +965,10 @@ const trimLabel =
 
       : 'READY FOR DISPATCH'
 const cgStatus =
-  cg >= 18 && cg <= 32
+
+zfi >= 20 &&
+
+zfi <= 90
   
  const cgLabel =
 
@@ -1479,7 +1478,29 @@ gap:'30px'
 }}
 
 >
+<button
 
+onClick={()=>
+
+setSelectedSeats(
+
+[]
+
+)
+
+}
+
+style={{
+
+marginTop:'10px'
+
+}}
+
+>
+
+CLEAR ALL
+
+</button>
 <div>
 
 PAX:
@@ -2874,11 +2895,29 @@ CATERING
 
     value={forwardCargo}
 
-    onChange={(e) =>
-      setForwardCargo(
-        parseInt(e.target.value) || 0
-      )
-    }
+    onChange={(e)=>{
+
+const value=
+
+parseInt(
+
+e.target.value
+
+)||0
+
+setForwardCargo(
+
+Math.min(
+
+value,
+
+3000
+
+)
+
+)
+
+}}
 
     style={{
 
@@ -2914,11 +2953,29 @@ CATERING
 
     value={aftCargo}
 
-    onChange={(e) =>
-      setAftCargo(
-        parseInt(e.target.value) || 0
-      )
-    }
+    onChange={(e)=>{
+
+const value=
+
+parseInt(
+
+e.target.value
+
+)||0
+
+setAftCargo(
+
+Math.min(
+
+value,
+
+5000
+
+)
+
+)
+
+}}
 
     style={{
 
