@@ -1573,17 +1573,40 @@ gap:'30px'
   <div
 style={{
 
-display:'flex',
+fontSize:'14px',
 
-gap:'10px',
+fontWeight:'bold',
 
-marginBottom:'10px',
-
-alignItems:'center'
+marginBottom:'10px'
 
 }}
 
 >
+
+LOAD CABINS
+
+</div>
+
+<div
+
+style={{
+
+display:'flex',
+
+justifyContent:'flex-end',
+
+gap:'25px',
+
+marginBottom:'15px',
+
+alignItems:'flex-start'
+
+
+}}
+
+>
+FWD CABIN
+
 
 <input
 
@@ -1609,14 +1632,14 @@ e.target.value
 
 style={{
 
-width:'80px'
+width:'70px'
 
 }}
 
 >
 
 </input>
-
+MID CABIN
 <input
 
 type="number"
@@ -1641,14 +1664,14 @@ e.target.value
 
 style={{
 
-width:'80px'
+width:'70px'
 
 }}
 
 >
 
 </input>
-
+AFT CABIN
 <input
 
 type="number"
@@ -1673,7 +1696,7 @@ e.target.value
 
 style={{
 
-width:'80px'
+width:'70px'
 
 }}
 
@@ -1682,6 +1705,34 @@ width:'80px'
 </input>
 
 </div>
+
+<div
+
+style={{
+
+display:'flex',
+
+flexDirection:'column',
+
+gap:'8px'
+
+}}
+
+>
+
+<button
+
+onClick={
+
+loadCabins
+
+}
+
+>
+
+LOAD CABINS
+
+</button>
 
 <button
 
@@ -1695,42 +1746,17 @@ setSelectedSeats(
 
 }
 
-style={{
-
-marginTop:'10px'
-
-}}
-
 >
 
 CLEAR ALL
 
 </button>
-<button
 
-onClick={
-
-loadCabins
-
-}
-
-style={{
-
-marginTop:'10px',
-
-marginLeft:'10px'
-
-}}
-
->
-
-LOAD CABINS
-
-</button>
+</div>
 
 <div>
 
-PAX:
+TOTAL PAX:
 {' '}
 
 {selectedSeats.length}
