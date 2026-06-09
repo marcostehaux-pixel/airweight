@@ -27,7 +27,7 @@ seat
 
 if(
 
-seat<60
+seat<72
 
 ){
 
@@ -37,7 +37,7 @@ return 'FWD'
 
 if(
 
-seat<120
+seat<132
 
 ){
 

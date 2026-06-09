@@ -59,7 +59,7 @@ useState(0)
 
 selectedSeats.filter(
 
-seat => seat <= 24
+seat => seat <= 59
 
 ).length
 
@@ -69,9 +69,9 @@ selectedSeats.filter(
 
 seat =>
 
-seat > 24 &&
+seat > 60 &&
 
-seat <= 36
+seat <= 120
 
 ).length
 
@@ -79,7 +79,7 @@ const aftSeats =
 
 selectedSeats.filter(
 
-seat => seat > 36
+seat => seat > 119
 
 ).length
 const paxMoment =
