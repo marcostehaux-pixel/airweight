@@ -11,6 +11,7 @@ forwardCargo,
 aftCargo,
 
 fuel,
+tripFuel,
 
 zfw,
 
@@ -37,15 +38,97 @@ const currentDate = new Date()
 
 const formattedDate =
   currentDate.toLocaleDateString()
-function drawRow(label, value, y) {
+function drawRow(
 
-  doc.text(label, 25, y)
+label,
 
-  doc.text(
-    value,
-    90,
-    y
-  )
+value,
+
+y,
+
+highlight=false
+
+){
+
+doc.setFontSize(
+
+10
+
+)
+
+doc.setTextColor(
+
+120
+
+)
+
+doc.text(
+
+label,
+
+25,
+
+y
+
+)
+
+doc.setFontSize(
+
+10
+
+)
+
+if(
+
+highlight
+
+){
+
+doc.setTextColor(
+
+20,
+
+20,
+
+20
+
+)
+
+doc.setFont(
+
+'helvetica',
+
+'bold'
+
+)
+
+}else{
+
+doc.setTextColor(
+
+40
+
+)
+
+doc.setFont(
+
+'helvetica',
+
+'normal'
+
+)
+
+}
+
+doc.text(
+
+value,
+
+95,
+
+y
+
+)
 
 }
 const formattedTime =
@@ -65,10 +148,10 @@ doc.addImage(
 )
 doc.setTextColor(255, 255, 255)
 
-doc.setFontSize(26)
+doc.setFontSize(20)
 
 doc.text('AIRWEIGHT LOADSHEET', 5, 15)
-doc.setFontSize(12)
+doc.setFontSize(10)
 doc.text(
  'Electronic Loadsheet System',
  5,
@@ -80,7 +163,7 @@ doc.setTextColor(0, 0, 0)
 
 // AIRCRAFT SECTION
 
-doc.setFontSize(18)
+doc.setFontSize(14)
 
 doc.text('Aircraft Information', 20, 45)
 
@@ -88,7 +171,7 @@ doc.setLineWidth(0.5)
 
 doc.line(20, 48, 190, 48)
 
-doc.setFontSize(13)
+doc.setFontSize(10)
 
 doc.text(
   `Registration: ${selectedAircraft.registration}`,
@@ -104,33 +187,17 @@ doc.text(
 
 // LOAD DATA
 
-doc.setFontSize(18)
-
-doc.text('Loadsheet Data', 20, 85)
-doc.rect(
-  20,
-  100,
-  100,
-  40
-)
-doc.line(20, 107, 120, 107)
-
-doc.line(20, 113, 120, 113)
-
-doc.line(20, 119, 120, 119)
-
-doc.line(20, 125, 120, 125)
-doc.line(20, 131, 120, 131)
-doc.line(20, 90, 190, 90)
-
-doc.setFontSize(13)
 doc.setFontSize(12)
 
-doc.text('ITEM', 25, 95)
+doc.text('Loadsheet Data', 20, 85)
+doc.setFontSize(10)
+doc.setFontSize(10)
+
+doc.text('ITEM', 20, 95)
 
 doc.text('VALUE', 90, 95)
 
-doc.line(20, 100, 120, 100)
+
 
 drawRow(
   'Passengers',
@@ -151,14 +218,52 @@ drawRow(
 )
 
 drawRow(
-  'Fuel',
-  `${fuel} kg`,
-  123
+
+'TOTAL FUEL',
+
+`${fuel || 0} kg`,
+
+123
+
 )
-doc.line(20, 125, 120, 125)
+
+drawRow(
+
+'TRIP FUEL',
+
+`${tripFuel || 0} kg`,
+
+130
+
+)
+
+drawRow(
+
+'ARRIVAL FUEL',
+
+`${
+
+(
+
+fuel||0
+
+)-
+
+(
+
+tripFuel||0
+
+)
+
+} kg`,
+
+137
+
+)
+
 doc.setTextColor(0, 0, 0)
 
-doc.setFontSize(11)
+doc.setFontSize(9)
 
 doc.text(
   `Date: ${formattedDate}`,
@@ -174,33 +279,21 @@ doc.text(
 doc.setTextColor(0, 0, 0)
 // WEIGHT SUMMARY
 
-doc.setFontSize(18)
+doc.setFontSize(12)
 
 doc.text('Weight Summary', 20, 148)
-doc.rect(
-  20,
-  150,
-  90,
-  40
-)
-
-doc.line(20, 156, 110, 156)
-
-doc.line(20, 163, 110, 163)
-
-doc.line(20, 170, 110, 170)
-
-doc.line(75, 150, 75, 190)
 
 
-doc.setFontSize(14)
-doc.setFontSize(12)
+
+
+
+doc.setFontSize(10)
+doc.setFontSize(10)
 
 doc.text('ITEM', 25, 155)
 
 doc.text('VALUE', 90, 155)
 
-doc.line(20, 178, 110, 178)
 ,drawRow(
 
 'CREW CONFIG',
@@ -276,15 +369,51 @@ effectiveBasicIndex.toFixed(
 
 
 drawRow(
-  'ZFW',
-  `${zfw.toFixed(0)} kg`,
-  195
+
+'ZFW',
+
+`${
+
+zfw.toFixed(
+
+0
+
+)
+
+} / ${
+
+selectedAircraft.maxZFW
+
+} kg`,
+
+195,
+
+true
+
 )
 
 drawRow(
-  'TOW',
-  `${tow.toFixed(0)} kg`,
-  205
+
+'TOW',
+
+`${
+
+tow.toFixed(
+
+0
+
+)
+
+} / ${
+
+selectedAircraft.maxTOW
+
+} kg`,
+
+205,
+
+true
+
 )
 
 drawRow(
@@ -294,12 +423,12 @@ drawRow(
   )}%`,
   215
 )
-doc.line(20, 170, 110, 170)
+
 doc.roundedRect(
   115,
   145,
   70,
-  45,
+  40,
   3,
   3
 )

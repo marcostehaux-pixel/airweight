@@ -3310,6 +3310,7 @@ value,
           aftCargo,
 
           fuel,
+          tripFuel,
 
           zfw,
 
