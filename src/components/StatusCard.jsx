@@ -222,11 +222,11 @@ style={{
 
 fontSize:'11px',
 
-color:'#94a3b8',
+color:'#e5ebf0',
 
 margin:0,
 
-letterSpacing:'1px'
+letterSpacing:'2px'
 
 }}
 
@@ -254,9 +254,9 @@ props.limit && (
 
 style={{
 
-fontSize:'11px',
+fontSize:'14px',
 
-color:'#9aa6b2',
+color:'#e5ebf0',
 
 margin:0
 

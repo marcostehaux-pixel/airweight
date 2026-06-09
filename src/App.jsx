@@ -41,6 +41,14 @@ const [aftCargo, setAftCargo] =
   useState(0)
   const [selectedSeats, setSelectedSeats] =
   useState([])
+  const [fwdCabinPax, setFwdCabinPax] =
+useState(0)
+
+const [midCabinPax, setMidCabinPax] =
+useState(0)
+
+const [aftCabinPax, setAftCabinPax] =
+useState(0)
   const [selectedAircraft, setSelectedAircraft] =
     useState(aircraftDatabase[0])
    const [activeMenu, setActiveMenu] =
@@ -1005,6 +1013,93 @@ zfi <= 90
   }
 
 }
+function loadCabins(){
+
+const seats=[]
+
+for(
+
+let i=0;
+
+i<Math.min(
+
+fwdCabinPax,
+
+60
+
+);
+
+i++
+
+){
+
+seats.push(
+
+i
+
+)
+
+}
+
+for(
+
+let i=60;
+
+i<60+
+
+Math.min(
+
+midCabinPax,
+
+60
+
+);
+
+i++
+
+){
+
+seats.push(
+
+i
+
+)
+
+}
+
+for(
+
+let i=120;
+
+i<120+
+
+Math.min(
+
+aftCabinPax,
+
+60
+
+);
+
+i++
+
+){
+
+seats.push(
+
+i
+
+)
+
+}
+
+setSelectedSeats(
+
+seats
+
+)
+
+}
 if(
 
 !logged
@@ -1475,6 +1570,119 @@ gap:'30px'
 }}
 
 >
+  <div
+style={{
+
+display:'flex',
+
+gap:'10px',
+
+marginBottom:'10px',
+
+alignItems:'center'
+
+}}
+
+>
+
+<input
+
+type="number"
+
+placeholder="FWD PAX"
+
+value={fwdCabinPax}
+
+onChange={(e)=>
+
+setFwdCabinPax(
+
+parseInt(
+
+e.target.value
+
+)||0
+
+)
+
+}
+
+style={{
+
+width:'80px'
+
+}}
+
+>
+
+</input>
+
+<input
+
+type="number"
+
+placeholder="MID PAX"
+
+value={midCabinPax}
+
+onChange={(e)=>
+
+setMidCabinPax(
+
+parseInt(
+
+e.target.value
+
+)||0
+
+)
+
+}
+
+style={{
+
+width:'80px'
+
+}}
+
+>
+
+</input>
+
+<input
+
+type="number"
+
+placeholder="AFT PAX"
+
+value={aftCabinPax}
+
+onChange={(e)=>
+
+setAftCabinPax(
+
+parseInt(
+
+e.target.value
+
+)||0
+
+)
+
+}
+
+style={{
+
+width:'80px'
+
+}}
+
+>
+
+</input>
+
+</div>
+
 <button
 
 onClick={()=>
@@ -1498,6 +1706,28 @@ marginTop:'10px'
 CLEAR ALL
 
 </button>
+<button
+
+onClick={
+
+loadCabins
+
+}
+
+style={{
+
+marginTop:'10px',
+
+marginLeft:'10px'
+
+}}
+
+>
+
+LOAD CABINS
+
+</button>
+
 <div>
 
 PAX:
@@ -1506,6 +1736,7 @@ PAX:
 {selectedSeats.length}
 
 </div>
+
 
 <div>
 
@@ -1570,6 +1801,7 @@ toggleSeat
 )
 
 }
+
 {activeMenu === 'Aircraft' && (
 
 <div
