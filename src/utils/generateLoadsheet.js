@@ -409,7 +409,7 @@ doc.text(
 
 doc.setFontSize(12)
 
-doc.text('Loadsheet Data', 20, 85)
+doc.text('Loadsheet Data', 20, 90)
 doc.setFontSize(10)
 doc.setFontSize(10)
 
@@ -423,7 +423,7 @@ drawRow(
 
 `${fuel || 0} kg`,
 
-123
+100
 
 )
 
@@ -433,7 +433,7 @@ drawRow(
 
 `${tripFuel || 0} kg`,
 
-130
+105
 
 )
 
@@ -457,7 +457,7 @@ tripFuel||0
 
 } kg`,
 
-137
+110
 
 )
 
@@ -481,7 +481,7 @@ doc.setTextColor(0, 0, 0)
 
 doc.setFontSize(12)
 
-doc.text('Weight Summary', 20, 148)
+doc.text('Weight Summary', 20, 120)
 
 
 
@@ -490,9 +490,9 @@ doc.text('Weight Summary', 20, 148)
 doc.setFontSize(10)
 doc.setFontSize(10)
 
-doc.text('ITEM', 25, 155)
+doc.text('ITEM', 25, 125)
 
-doc.text('VALUE', 90, 155)
+doc.text('VALUE', 90, 125)
 
 ,
 
@@ -508,7 +508,7 @@ effectiveBasicWeight ||
 
 } kg`,
 
-175
+130
 
 )
 
@@ -530,7 +530,7 @@ effectiveBasicIndex.toFixed(
 
 '-',
 
-186
+135
 
 )
 
@@ -555,7 +555,7 @@ selectedAircraft.maxZFW
 
 } kg`,
 
-195,
+140,
 
 true
 
@@ -579,7 +579,7 @@ selectedAircraft.maxTOW
 
 } kg`,
 
-205,
+145,
 
 true
 
@@ -590,45 +590,11 @@ drawRow(
   `${Number(
     cg.toFixed(1)
   )}%`,
-  215
-)
-
-doc.roundedRect(
-  115,
-  145,
-  70,
-  40,
-  3,
-  3
-)
-
-doc.setFontSize(15)
-
-doc.text(
-  'LOAD STATUS',
-  130,
   150
 )
+doc.setFontSize(15)
 
-if (cgStatus) {
 
-  doc.setTextColor(0, 140, 0)
-
-} else {
-
-  doc.setTextColor(220, 0, 0)
-
-}
-
-doc.setFontSize(13)
-
-doc.text(
-  cgStatus
-    ? 'CG WITHIN LIMITS'
-    : 'CG OUT OF LIMITS',
-  130,
-  170
-)
 doc.setTextColor(0, 0, 0)
 // SIGNATURE
 
