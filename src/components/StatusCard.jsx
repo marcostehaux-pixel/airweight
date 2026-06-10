@@ -65,9 +65,9 @@ function StatusCard(props) {
 
         style={{
 
-          minWidth: '180px',
+          minWidth: '160px',
 
-          padding: '28px',
+          padding: '20px',
 
           borderRadius: '22px',
 

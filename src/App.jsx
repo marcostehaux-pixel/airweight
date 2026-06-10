@@ -2402,44 +2402,7 @@ boxShadow:
       }}
 
     >
-      <StatusCard
-title="ZF CG"
-value={
-
-zfWithinEnvelope
-
-?
-
-zfCg.toFixed(1)
-
-:
-
-'OUT OF ENVELOPE'
-
-}
-unit="%"
-status={zfWithinEnvelope}
-/>
-
-<StatusCard
-title="TO CG"
-value={
-
-toWithinEnvelope
-
-?
-
-toCg.toFixed(1)
-
-:
-
-'OUT OF ENVELOPE'
-
-}
-
-status={toWithinEnvelope}
-unit="%"
-/>
+     
 
 <StatusCard
 
@@ -2468,25 +2431,7 @@ title="Basic Index"
 ...
 />
 */}
-<StatusCard
-        title="TOW"
-        value={
 
-tow +
-
-(
-
-extraCrew *
-
-85
-
-)
-
-}
-        unit="kg"
-        status={towStatus}
-       limit={selectedAircraft.maxTOW} 
-      />
       {/*
       <StatusCard
 
@@ -2522,10 +2467,59 @@ extraCrew *
 
 )
 
++
+
+(
+
+catering
+
+?
+
+250
+
+:
+
+0
+
+)
+
 }
         unit="kg"
         status={zfwStatus}
         limit={selectedAircraft.maxZFW}
+      />
+      <StatusCard
+        title="TOW"
+        value={
+
+tow +
+
+(
+
+extraCrew *
+
+85
+
+)
++
+
+(
+
+catering
+
+?
+
+250
+
+:
+
+0
+
+)
+}
+        unit="kg"
+        status={towStatus}
+       limit={selectedAircraft.maxTOW} 
       />
 {/*
     <StatusCard
@@ -2612,6 +2606,44 @@ status={true}
 
 />
 */}
+ <StatusCard
+title="ZF CG"
+value={
+
+zfWithinEnvelope
+
+?
+
+zfCg.toFixed(1)
+
+:
+
+'OUT OF ENVELOPE'
+
+}
+unit="%"
+status={zfWithinEnvelope}
+/>
+
+<StatusCard
+title="TO CG"
+value={
+
+toWithinEnvelope
+
+?
+
+toCg.toFixed(1)
+
+:
+
+'OUT OF ENVELOPE'
+
+}
+
+status={toWithinEnvelope}
+unit="%"
+/>
 <StatusCard
 
   title={`TRIM · ${trimLabel}`}
