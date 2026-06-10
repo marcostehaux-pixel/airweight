@@ -28,6 +28,11 @@ catering,
 effectiveBasicWeight,
 
 effectiveBasicIndex,
+forwardSeats,
+
+midSeats,
+
+aftSeats,
 
 crewConfiguration
 
@@ -176,15 +181,230 @@ doc.setFontSize(10)
 doc.text(
   `Registration: ${selectedAircraft.registration}`,
   20,
-  60
+  55
 )
 
 doc.text(
   `Aircraft Type: ${selectedAircraft.type}`,
   20,
-  70
+  65
+)
+doc.setFontSize(
+
+8
+
 )
 
+doc.setTextColor(
+
+120
+
+)
+
+doc.text(
+
+'PAX DIST',
+
+120,
+
+55
+
+)
+
+doc.setFontSize(
+
+11
+
+)
+
+doc.setTextColor(
+
+30
+
+)
+
+doc.text(
+
+`FWD ${forwardSeats}`,
+
+120,
+
+60
+
+)
+
+doc.text(
+
+`MID ${midSeats}`,
+
+145,
+
+60
+)
+
+doc.text(
+
+`AFT ${aftSeats}`,
+
+170,
+
+60
+
+)
+doc.setFontSize(
+
+8
+
+)
+
+doc.setTextColor(
+
+120
+
+)
+
+doc.text(
+
+'CREW',
+
+120,
+
+65
+
+)
+
+doc.text(
+
+'CAT',
+
+170,
+
+65
+
+)
+
+doc.setFontSize(
+
+11
+
+)
+
+doc.setTextColor(
+
+30
+
+)
+
+doc.text(
+
+crewConfiguration ||
+
+'-',
+
+120,
+
+70
+
+)
+
+doc.text(
+
+catering
+
+?
+
+'YES'
+
+:
+
+'NO',
+
+170,
+
+70
+
+)
+doc.setFontSize(
+
+8
+
+)
+
+doc.setTextColor(
+
+120
+
+)
+
+doc.text(
+
+'FROM',
+
+120,
+
+75
+
+)
+
+doc.text(
+
+'TO',
+
+145,
+
+75
+
+)
+
+doc.text(
+
+'FLIGHT',
+
+170,
+
+75
+
+)
+
+doc.setFontSize(
+
+11)
+
+doc.setTextColor(
+
+30
+
+)
+
+doc.text(
+
+'---',
+
+120,
+
+80
+
+)
+
+doc.text(
+
+'---',
+
+145,
+
+80
+
+)
+
+doc.text(
+
+'---',
+
+170,
+
+80
+
+)
 // LOAD DATA
 
 doc.setFontSize(12)
@@ -196,26 +416,6 @@ doc.setFontSize(10)
 doc.text('ITEM', 20, 95)
 
 doc.text('VALUE', 90, 95)
-
-
-
-drawRow(
-  'Passengers',
-  `${selectedSeats.length}`,
-  105
-)
-
-drawRow(
-  'Forward Cargo',
-  `${forwardCargo} kg`,
-  112
-)
-
-drawRow(
-  'Aft Cargo',
-  `${aftCargo} kg`,
-  117
-)
 
 drawRow(
 
@@ -294,38 +494,7 @@ doc.text('ITEM', 25, 155)
 
 doc.text('VALUE', 90, 155)
 
-,drawRow(
-
-'CREW CONFIG',
-
-crewConfiguration ||
-
-'-',
-
-162
-
-)
-
-168
-
-
-drawRow(
-
-'CATERING',
-
-catering
-
-?
-
-'YES'
-
-:
-
-'NO',
-
-167
-
-)
+,
 
 drawRow(
 

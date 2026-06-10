@@ -422,6 +422,7 @@ extraCrew *
 +
 
 cateringWeight
+
 const crewConfiguration =
 
 extraCrew > 0
@@ -2581,6 +2582,20 @@ selectedAircraft.maxZFW
   </div>
 
 )}
+{
+
+activeMenu !==
+
+'Aircraft'
+
+&&
+
+activeMenu !==
+
+'Seat Map'
+
+&& (
+
 <div
 
   style={{
@@ -2723,6 +2738,8 @@ selectedAircraft.maxZFW
 
 </div>
 </div>
+)
+}
 {activeMenu === 'Loadsheet' && (
 
   <div
@@ -3310,6 +3327,7 @@ value,
           aftCargo,
 
           fuel,
+          
           tripFuel,
 
           zfw,
@@ -3317,9 +3335,15 @@ value,
           tow,
 
           cg,
+crewConfiguration,
 
-          cgStatus
+catering,
+          cgStatus,
+forwardSeats,
 
+midSeats,
+
+aftSeats
         })
 
       }
