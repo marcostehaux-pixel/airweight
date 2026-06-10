@@ -3485,6 +3485,9 @@ flightTo,
 
 flightNumber,
 trim,
+effectiveBasicWeight,
+
+effectiveBasicIndex,
 forwardSeats,
 
 midSeats,

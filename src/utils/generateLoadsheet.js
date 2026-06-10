@@ -194,7 +194,7 @@ doc.text(
 doc.text(
   `Aircraft Type: ${selectedAircraft.type}`,
   20,
-  65
+  60
 )
 doc.setFontSize(
 
@@ -204,7 +204,7 @@ doc.setFontSize(
 
 doc.setTextColor(
 
-120
+20
 
 )
 
@@ -220,7 +220,7 @@ doc.text(
 
 doc.setFontSize(
 
-11
+8
 
 )
 
@@ -266,7 +266,154 @@ doc.setFontSize(
 
 doc.setTextColor(
 
-120
+20
+
+)
+
+doc.text(
+
+'TOTAL PAX',
+
+85,
+
+55
+
+)
+
+doc.setFontSize(
+
+8
+
+)
+
+doc.setTextColor(
+
+30
+
+)
+
+doc.text(
+
+`${selectedSeats.length}`,
+
+90,
+
+60
+
+)
+
+doc.setFontSize(
+
+8
+
+)
+
+doc.setTextColor(
+
+20
+
+)
+
+doc.text(
+
+'CARGO DIST',
+
+120,
+
+85
+
+)
+
+doc.setFontSize(
+
+8
+
+)
+
+doc.setTextColor(
+
+30
+
+)
+
+doc.text(
+
+`FWD ${forwardCargo}`,
+
+120,
+
+90
+
+)
+
+doc.text(
+
+`AFT ${aftCargo}`,
+
+160,
+
+90
+
+)
+
+doc.setFontSize(
+
+8
+
+)
+
+doc.setTextColor(
+
+20
+
+)
+
+doc.text(
+
+'TOTAL',
+
+120,
+
+100
+
+)
+
+doc.setFontSize(
+
+8
+
+)
+
+doc.setTextColor(
+
+30
+
+)
+
+doc.text(
+
+`${
+
+forwardCargo +
+
+aftCargo
+
+} KG`,
+
+160,
+
+100
+
+)
+doc.setFontSize(
+
+8
+
+)
+
+doc.setTextColor(
+
+20
 
 )
 
@@ -276,7 +423,7 @@ doc.text(
 
 120,
 
-65
+70
 
 )
 
@@ -286,13 +433,13 @@ doc.text(
 
 170,
 
-65
+70
 
 )
 
 doc.setFontSize(
 
-11
+8
 
 )
 
@@ -310,7 +457,7 @@ crewConfiguration ||
 
 120,
 
-70
+75
 
 )
 
@@ -328,7 +475,7 @@ catering
 
 170,
 
-70
+75
 
 )
 doc.setFontSize(
@@ -339,14 +486,14 @@ doc.setFontSize(
 
 doc.setTextColor(
 
-120
+20
 
 )
 
 doc.text(
 'FROM',
-120,
-75
+55,
+70
 )
 
 doc.text(
@@ -354,16 +501,16 @@ flightFrom ||
 
 '',
 
-120,
+55,
 
-80
+75
 
 )
 
 doc.text(
 'TO',
-145,
-75
+67,
+70
 )
 
 doc.text(
@@ -371,16 +518,16 @@ flightTo ||
 
 '',
 
-145,
+67,
 
-80
+75
 
 )
 
 doc.text(
 'FLIGHT',
-170,
-75
+20,
+70
 )
 
 doc.text(
@@ -388,9 +535,9 @@ flightNumber ||
 
 '',
 
-170,
+20,
 
-80
+75
 
 )
 
@@ -409,8 +556,8 @@ doc.setTextColor(
 doc.setFontSize(12)
 
 doc.text('Loadsheet Data', 20, 90)
-doc.setFontSize(10)
-doc.setFontSize(10)
+doc.setFontSize(8)
+doc.setFontSize(8)
 
 doc.text('ITEM', 20, 95)
 
@@ -462,7 +609,7 @@ tripFuel||0
 
 doc.setTextColor(0, 0, 0)
 
-doc.setFontSize(9)
+doc.setFontSize(8)
 
 doc.text(
   `Date: ${formattedDate}`,
@@ -486,8 +633,8 @@ doc.text('Weight Summary', 20, 120)
 
 
 
-doc.setFontSize(10)
-doc.setFontSize(10)
+doc.setFontSize(8)
+doc.setFontSize(8)
 
 doc.text('ITEM', 25, 125)
 
@@ -654,7 +801,7 @@ trim
 true
 
 )
-doc.setFontSize(15)
+doc.setFontSize(8)
 
 
 doc.setTextColor(0, 0, 0)
