@@ -18,7 +18,9 @@ zfw,
 tow,
 
 cg,
-
+zfCg,
+trim,
+toCg,
 cgStatus,
 
 extraCrew,
@@ -342,32 +344,53 @@ doc.setTextColor(
 )
 
 doc.text(
-
 'FROM',
+120,
+75
+)
+
+doc.text(
+flightFrom ||
+
+'',
 
 120,
 
-75
+80
 
 )
 
 doc.text(
-
 'TO',
+145,
+75
+)
+
+doc.text(
+flightTo ||
+
+'',
 
 145,
 
-75
+80
 
 )
 
 doc.text(
-
 'FLIGHT',
+170,
+75
+)
+
+doc.text(
+flightNumber ||
+
+'',
 
 170,
 
-75
+80
 
 )
 
@@ -381,35 +404,6 @@ doc.setTextColor(
 
 )
 
-doc.text(
-
-'---',
-
-120,
-
-80
-
-)
-
-doc.text(
-
-'---',
-
-145,
-
-80
-
-)
-
-doc.text(
-
-'---',
-
-170,
-
-80
-
-)
 // LOAD DATA
 
 doc.setFontSize(12)
@@ -591,11 +585,74 @@ true
 )
 
 drawRow(
-  'CG',
-  `${Number(
-    cg.toFixed(1)
-  )}%`,
-  150
+
+'ZFW CG',
+
+`${
+
+Number(
+
+zfCg
+
+).toFixed(
+
+1
+
+)
+
+}%`,
+
+150,
+
+true
+
+)
+
+drawRow(
+
+'TOW CG',
+
+`${
+
+Number(
+
+toCg
+
+).toFixed(
+
+1
+
+)
+
+}%`,
+
+155,
+
+true
+
+)
+drawRow(
+
+'TRIM',
+
+`${
+
+Number(
+
+trim
+
+).toFixed(
+
+1
+
+)
+
+} UP`,
+
+160,
+
+true
+
 )
 doc.setFontSize(15)
 

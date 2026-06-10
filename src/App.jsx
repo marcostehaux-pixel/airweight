@@ -3476,11 +3476,15 @@ crewConfiguration,
 
 catering,
           cgStatus,
+          zfCg,
+
+toCg,
           flightFrom,
 
 flightTo,
 
 flightNumber,
+trim,
 forwardSeats,
 
 midSeats,
