@@ -32,7 +32,19 @@ false
 
 )
 const [tripFuel, setTripFuel] = useState(0)
+const [
 
+taxiFuel,
+
+setTaxiFuel
+
+]=
+
+useState(
+
+200
+
+)
   const [fuel, setFuel] = useState(0)
   const [
 
@@ -142,7 +154,11 @@ const paxMoment =
   forwardCargo +
 
   aftCargo 
+const rw =
 
+zfw +
+
+fuel
 const fuelWeight =
   fuel
 
@@ -352,7 +368,10 @@ const totalMoment =
 
   
  const tow =
-    zfw + fuel
+
+rw -
+
+taxiFuel
 const ldw = tow - tripFuel
 const arm =
 
@@ -2489,6 +2508,57 @@ catering
         limit={selectedAircraft.maxZFW}
       />
       <StatusCard
+
+title="RW"
+
+value={
+
+rw +
+
+(
+
+extraCrew *
+
+85
+
+)
+
++
+
+(
+
+catering
+
+?
+
+250
+
+:
+
+0
+
+)
+
+}
+
+unit="kg"
+
+status={
+
+rw <=
+
+selectedAircraft.maxTOW
+
+}
+
+limit={
+
+selectedAircraft.maxTOW
+
+}
+
+/>
+      <StatusCard
         title="TOW"
         value={
 
@@ -3254,15 +3324,16 @@ CATERING
     </div>
 <div style={{ marginBottom: '20px' }}>
 
-  <label>Fuel (kg)</label>
+<label>
 
-  <input
+Fuel (kg)
 
-    type="number"
+</label>
 
-    value={fuel}
-
-    onChange={(e)=>{
+<input
+  type="number"
+  value={fuel}
+  onChange={(e)=>{
 
 const value=
 
@@ -3286,66 +3357,38 @@ value,
 
 }}
 
-    style={{
-
-      width: '100%',
-
-      padding: '12px',
-
-      marginTop: '8px',
-
-      borderRadius: '10px',
-
-      border:
-        '1px solid rgba(255,255,255,0.08)',
-
-      background:
-        'rgba(255,255,255,0.05)',
-
-      color: 'white'
-
-    }}
-
-  />
-<div style={{ marginTop: '15px' }}>
-
-  <label>Trip Fuel (KG)</label>
-
-  <input
-
-    type="number"
-
-    value={tripFuel}
-
-    onChange={(e) =>
-      setTripFuel(parseInt(e.target.value) || 0)
-    }
-
-    style={{
-
-      width: '100%',
-
-      padding: '12px',
-
-      marginTop: '8px',
-
-      borderRadius: '10px',
-
-      border:
-        '1px solid rgba(255,255,255,0.08)',
-
-      background:
-        'rgba(255,255,255,0.05)',
-
-      color: 'white'
-
-    }}
-
-  />
+></input>
 
 </div>
-</div>
 
+<div style={{ marginBottom: '20px' }}>
+
+<label>
+
+Taxi Fuel (kg)
+
+</label>
+
+<input
+  type="number"
+  value={taxiFuel}
+  onChange={(e)=>{
+
+setTaxiFuel(
+
+parseInt(
+
+e.target.value
+
+)||0
+
+)
+
+}}
+
+></input>
+
+</div>
 <div style={{ marginBottom: '20px' }}>
 
   <label>Forward Cargo (kg)</label>
