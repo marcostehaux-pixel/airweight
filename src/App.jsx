@@ -34,6 +34,47 @@ false
 const [tripFuel, setTripFuel] = useState(0)
 
   const [fuel, setFuel] = useState(0)
+  const [
+
+flightFrom,
+
+setFlightFrom
+
+]=
+
+useState(
+
+''
+
+)
+
+const [
+
+flightTo,
+
+setFlightTo
+
+]=
+
+useState(
+
+''
+
+)
+
+const [
+
+flightNumber,
+
+setFlightNumber
+
+]=
+
+useState(
+
+''
+
+)
   const [forwardCargo, setForwardCargo] =
   useState(0)
 
@@ -2173,7 +2214,103 @@ kg
           {selectedAircraft.type}
 
         </p>
+<div
 
+style={{
+
+marginTop:'20px',
+
+display:'flex',
+
+gap:'12px',
+
+alignItems:'center',
+
+flexWrap:'wrap'
+
+}}
+
+>
+
+<input
+
+placeholder="FROM"
+
+value={flightFrom}
+
+onChange={(e)=>
+
+setFlightFrom(
+
+e.target.value
+
+)
+
+}
+
+style={{
+
+width:'90px'
+
+}}
+
+>
+
+</input>
+
+<input
+
+placeholder="TO"
+
+value={flightTo}
+
+onChange={(e)=>
+
+setFlightTo(
+
+e.target.value
+
+)
+
+}
+
+style={{
+
+width:'90px'
+
+}}
+
+>
+
+</input>
+
+<input
+
+placeholder="FLIGHT"
+
+value={flightNumber}
+
+onChange={(e)=>
+
+setFlightNumber(
+
+e.target.value
+
+)
+
+}
+
+style={{
+
+width:'120px'
+
+}}
+
+>
+
+</input>
+
+</div>
       </div>
 <img
 
@@ -3339,6 +3476,11 @@ crewConfiguration,
 
 catering,
           cgStatus,
+          flightFrom,
+
+flightTo,
+
+flightNumber,
 forwardSeats,
 
 midSeats,

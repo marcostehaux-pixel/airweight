@@ -33,6 +33,11 @@ forwardSeats,
 midSeats,
 
 aftSeats,
+flightFrom,
+
+flightTo,
+
+flightNumber,
 
 crewConfiguration
 
