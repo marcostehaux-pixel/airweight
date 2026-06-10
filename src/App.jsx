@@ -2547,13 +2547,13 @@ status={
 
 rw <=
 
-selectedAircraft.maxTOW
+selectedAircraft.maxRW
 
 }
 
 limit={
 
-selectedAircraft.maxTOW
+selectedAircraft.maxRW
 
 }
 

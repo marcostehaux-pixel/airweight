@@ -18,6 +18,7 @@ basicConfig:'2/4',
 basicCrew:'STD CREW',
 maxZFW:61688,
 maxTOW:79015,
+maxRW:79300,
 maxLW:65317,
 envelope: {
 
@@ -90,6 +91,7 @@ basicCrew:'STD CREW',
 
 maxZFW:56000,
 maxTOW:70000,
+maxRW:70300,
 maxLW:59000,
 envelope: {
 
@@ -160,6 +162,7 @@ basicConfig:'2/4',
 basicCrew:'STD CREW',
 maxZFW:62500,
 maxTOW:77000,
+maxRW:77300,
 maxLW:66000,
 envelope: {
 
