@@ -14,7 +14,7 @@ fuel,
 tripFuel,
 
 zfw,
-
+rw,
 tow,
 
 cg,
@@ -46,10 +46,22 @@ crewConfiguration
 }){
 
  const doc = new jsPDF()
+ 
 const currentDate = new Date()
 
 const formattedDate =
-  currentDate.toLocaleDateString()
+
+currentDate.toLocaleDateString(
+
+'en-GB',
+
+{
+
+timeZone:'UTC'
+
+}
+
+)
 function drawRow(
 
 label,
@@ -144,19 +156,21 @@ y
 
 }
 const formattedTime =
-  currentDate.toLocaleTimeString()
-// HEADER
 
-doc.setFillColor(15, 15, 15)
+currentDate.toLocaleTimeString(
 
-doc.rect(0, 0, 210, 30, 'F')
-doc.addImage(
-  logo,
-  'PNG',
-  150,
-  5,
-  40,
-  20
+'en-GB',
+
+{
+
+timeZone:'UTC',
+
+hour:'2-digit',
+
+minute:'2-digit'
+
+}
+
 )
 doc.setTextColor(255, 255, 255)
 
@@ -555,21 +569,13 @@ doc.setTextColor(
 
 doc.setFontSize(12)
 
-doc.text('Loadsheet Data', 20, 90)
-doc.setFontSize(8)
-doc.setFontSize(8)
-
-doc.text('ITEM', 20, 95)
-
-doc.text('VALUE', 90, 95)
-
 drawRow(
 
 'TOTAL FUEL',
 
 `${fuel || 0} kg`,
 
-100
+127
 
 )
 
@@ -579,7 +585,7 @@ drawRow(
 
 `${tripFuel || 0} kg`,
 
-105
+167
 
 )
 
@@ -603,7 +609,7 @@ tripFuel||0
 
 } kg`,
 
-110
+172
 
 )
 
@@ -612,36 +618,27 @@ doc.setTextColor(0, 0, 0)
 doc.setFontSize(8)
 
 doc.text(
-  `Date: ${formattedDate}`,
+  `Date UTC: ${formattedDate}`,
   160,
   35
 )
 
 doc.text(
-  `Time: ${formattedTime}`,
+  `Time UTC: ${formattedTime}`,
   160,
   43
 )
 doc.setTextColor(0, 0, 0)
-// WEIGHT SUMMARY
 
-doc.setFontSize(12)
+doc.text(
 
-doc.text('Weight Summary', 20, 120)
+'LOADSHEET DATA',
 
+20,
 
+90
 
-
-
-doc.setFontSize(8)
-doc.setFontSize(8)
-
-doc.text('ITEM', 25, 125)
-
-doc.text('VALUE', 90, 125)
-
-,
-
+)
 drawRow(
 
 'BASIC WT',
@@ -654,7 +651,7 @@ effectiveBasicWeight ||
 
 } kg`,
 
-130
+95
 
 )
 
@@ -676,11 +673,11 @@ effectiveBasicIndex.toFixed(
 
 '-',
 
-135
+100
 
 )
 
-150
+110
 
 
 drawRow(
@@ -701,12 +698,20 @@ selectedAircraft.maxZFW
 
 } kg`,
 
-140,
+111,
 
 true
 
 )
+drawRow(
 
+'RW',
+
+`${rw.toFixed(0)} kg`,
+
+135
+
+)
 drawRow(
 
 'TOW',
@@ -725,7 +730,7 @@ selectedAircraft.maxTOW
 
 } kg`,
 
-145,
+151,
 
 true
 
@@ -749,7 +754,7 @@ zfCg
 
 }%`,
 
-150,
+119,
 
 true
 
@@ -773,7 +778,7 @@ toCg
 
 }%`,
 
-155,
+159,
 
 true
 
@@ -796,7 +801,7 @@ trim
 
 } UP`,
 
-160,
+178,
 
 true
 

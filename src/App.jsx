@@ -2035,6 +2035,7 @@ REG<br/>
 </div>
 
 
+
 <div>
 
 TYPE<br/>
@@ -2090,7 +2091,24 @@ CREW<br/>
 
 
 <div>
+MRW<br/>
 
+<strong>
+
+{
+
+selectedAircraft.maxRW
+
+}
+
+kg
+
+</strong>
+
+</div>
+
+
+<div>
 MTOW<br/>
 
 <strong>
@@ -2976,7 +2994,85 @@ activeMenu !==
   </div>
 
 </div>
+<div
+
+style={{
+
+marginTop:'20px',
+
+padding:'14px',
+
+borderRadius:'14px',
+
+background:
+
+'rgba(255,255,255,0.04)',
+
+border:
+
+'1px solid rgba(255,255,255,0.08)',
+
+width:'100%'
+
+}}
+
+>
+
+<h3
+
+style={{
+
+marginBottom:'10px',
+
+fontSize:'14px'
+
+}}
+
+>
+
+TIME UTC
+
+</h3>
+
+<div
+
+style={{
+
+fontSize:'22px',
+
+fontWeight:'700'
+
+}}
+
+>
+
+{
+
+new Date()
+
+.toLocaleTimeString(
+
+'en-GB',
+
+{
+
+timeZone:'UTC',
+
+hour:'2-digit',
+
+minute:'2-digit'
+
+}
+
+)
+
+}Z
+
 </div>
+
+</div>
+</div>
+
 )
 }
 {activeMenu === 'Loadsheet' && (
@@ -3292,7 +3388,7 @@ CATERING
         border:
           '1px solid rgba(255,255,255,0.08)',
 
-        marginBottom: '30px'
+        marginBottom: '25px'
 
       }}
 
@@ -3326,7 +3422,7 @@ CATERING
 
 <label>
 
-Fuel (kg)
+Total Fuel (kg)
 
 </label>
 
@@ -3361,7 +3457,17 @@ value,
 
 </div>
 
-<div style={{ marginBottom: '20px' }}>
+<div
+
+style={{
+
+marginTop:'25px',
+
+marginBottom:'20px'
+
+}}
+
+>
 
 <label>
 
@@ -3387,8 +3493,17 @@ e.target.value
 }}
 
 ></input>
+<div
 
-<div style={{ marginBottom: '20px' }}>
+style={{
+
+marginTop:'20px',
+
+marginBottom:'20px'
+
+}}
+
+>
 
 <label>
 
@@ -3421,7 +3536,7 @@ e.target.value
 </div>
 
 </div>
-<div style={{ marginBottom: '20px' }}>
+<div style={{ marginBottom: '25px' }}>
 
   <label>Forward Cargo (kg)</label>
 
@@ -3575,9 +3690,8 @@ value,
           tripFuel,
 
           zfw,
-
+rw,
           tow,
-
           cg,
 crewConfiguration,
 
@@ -3596,7 +3710,6 @@ effectiveBasicWeight,
 
 effectiveBasicIndex,
 forwardSeats,
-
 midSeats,
 
 aftSeats
