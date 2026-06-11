@@ -42,7 +42,7 @@ setTaxiFuel
 
 useState(
 
-200
+0
 
 )
   const [fuel, setFuel] = useState(0)
@@ -3387,6 +3387,38 @@ e.target.value
 }}
 
 ></input>
+
+<div style={{ marginBottom: '20px' }}>
+
+<label>
+
+Trip Fuel (kg)
+
+</label>
+
+<input
+
+type="number"
+
+value={tripFuel}
+
+onChange={(e)=>{
+
+setTripFuel(
+
+parseInt(
+
+e.target.value
+
+)||0
+
+)
+
+}}
+
+></input>
+
+</div>
 
 </div>
 <div style={{ marginBottom: '20px' }}>
