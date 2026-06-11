@@ -12,7 +12,7 @@ aftCargo,
 
 fuel,
 tripFuel,
-
+ldw,
 zfw,
 rw,
 tow,
@@ -36,7 +36,6 @@ midSeats,
 
 aftSeats,
 flightFrom,
-
 flightTo,
 
 flightNumber,
@@ -588,7 +587,35 @@ drawRow(
 167
 
 )
+drawRow(
 
+'LW',
+
+`${
+
+Number(
+
+ldw ||
+
+0
+
+).toFixed(
+
+0
+
+)
+
+} kg  MAX ${
+
+selectedAircraft.maxLW
+
+}`,
+
+172,
+
+true
+
+)
 drawRow(
 
 'ARRIVAL FUEL',
@@ -609,7 +636,7 @@ tripFuel||0
 
 } kg`,
 
-172
+177
 
 )
 
@@ -693,9 +720,6 @@ effectiveBasicIndex.toFixed(
 
 )
 
-110
-
-
 drawRow(
 
 'ZFW',
@@ -708,11 +732,11 @@ zfw.toFixed(
 
 )
 
-} / ${
+} kg  MAX ${
 
 selectedAircraft.maxZFW
 
-} kg`,
+}`,
 
 111,
 
@@ -759,11 +783,11 @@ tow.toFixed(
 
 )
 
-} / ${
+} kg  MAX ${
 
 selectedAircraft.maxTOW
 
-} kg`,
+}`,
 
 151,
 
@@ -836,7 +860,7 @@ trim
 
 } UP`,
 
-178,
+182,
 
 true
 

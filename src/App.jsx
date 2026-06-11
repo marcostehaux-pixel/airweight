@@ -1575,7 +1575,47 @@ onMouseLeave={(e) => {
   Settings
 
 </div>
+<div
 
+onClick={()=>{
+
+localStorage.removeItem(
+
+'user'
+
+)
+
+window.location.reload()
+
+}}
+
+style={{
+
+marginTop:'auto',
+
+padding:'12px 16px',
+
+borderRadius:'12px',
+
+background:
+
+'rgba(255,80,80,0.08)',
+
+border:
+
+'1px solid rgba(255,80,80,0.15)',
+
+cursor:'pointer',
+
+transition:'0.3s'
+
+}}
+
+>
+
+Sign Out
+
+</div>
 </div>
 {/* MAIN CONTENT */}
 {
@@ -3692,8 +3732,9 @@ value,
           aftCargo,
 
           fuel,
-          
+          taxiFuel,
           tripFuel,
+          ldw,
 payload,
           zfw,
 rw,
