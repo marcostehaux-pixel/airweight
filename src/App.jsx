@@ -323,26 +323,8 @@ seat >= 36
 
 ).length
 
+const paxIndex = 0
 
-const paxIndex =
-
-(
-
-fwdPax *
-
--0.7
-
-)
-
-+
-
-(
-
-aftPax *
-
-0.7
-
-)
  const fuelMoment =
 
   calculateMoment(
