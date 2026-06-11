@@ -16,13 +16,13 @@ tripFuel,
 zfw,
 rw,
 tow,
-
+payload,
 cg,
 zfCg,
 trim,
 toCg,
 cgStatus,
-
+taxiFuel,
 extraCrew,
 
 catering,
@@ -654,7 +654,23 @@ effectiveBasicWeight ||
 95
 
 )
+drawRow(
 
+'PAYLOAD',
+
+`${
+
+payload.toFixed(
+
+0
+
+)
+
+} kg`,
+
+105
+
+)
 drawRow(
 
 'BASIC INDEX',
@@ -710,6 +726,25 @@ drawRow(
 `${rw.toFixed(0)} kg`,
 
 135
+
+)
+drawRow(
+
+'TAXI FUEL',
+
+`${
+
+Number(
+
+taxiFuel ||
+
+0
+
+)
+
+} kg`,
+
+143
 
 )
 drawRow(

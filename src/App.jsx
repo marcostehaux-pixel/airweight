@@ -144,7 +144,13 @@ const paxMoment =
     selectedAircraft.seatArmMid
 
   )
-  
+  const payload =
+
+passengerWeight +
+
+forwardCargo +
+
+aftCargo
  const zfw =
 
   selectedAircraft.basicWeight +
@@ -3688,7 +3694,7 @@ value,
           fuel,
           
           tripFuel,
-
+payload,
           zfw,
 rw,
           tow,
