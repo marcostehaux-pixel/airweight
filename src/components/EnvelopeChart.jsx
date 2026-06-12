@@ -726,13 +726,17 @@ filter=
 
 </text>
 
-  <circle
+  {
 
-  cx={zfwX}
+props.tow !== props.zfw && (
 
-  cy={zfwY}
+<circle
 
-  r={
+cx={zfwX}
+
+cy={zfwY}
+
+r={
 
 props.zfStatus
 
@@ -746,9 +750,9 @@ props.zfStatus
 
 }
 
-  fill="#00c8ff"
+fill="#00c8ff"
 
-  style={{
+style={{
 
 transition:
 
@@ -768,7 +772,13 @@ props.zfStatus
 
 }}
 
-/>
+>
+
+</circle>
+
+)
+
+}
 {/*
 <text
 
