@@ -210,7 +210,7 @@ seat
 
 const row =
 
-Math.floor(
+Math.ceil(
 
 seat /
 
@@ -235,7 +235,7 @@ selectedAircraft.seatArmMid
 
 if (
 
-row <= 4
+row <= 8
 
 )
 
@@ -249,7 +249,7 @@ selectedAircraft.seatArmFwd
 
 else if (
 
-row <= 6
+row <= 18
 
 )
 
@@ -297,7 +297,11 @@ selectedSeats.filter(
 
 seat =>
 
-seat < 24
+Math.ceil(
+
+seat / 6
+
+) <= 8
 
 ).length
 
@@ -308,7 +312,17 @@ selectedSeats.filter(
 
 seat =>
 
-seat >= 24 && seat < 36
+Math.ceil(
+
+seat / 6
+
+) > 8 &&
+
+Math.ceil(
+
+seat / 6
+
+) <= 18
 
 ).length
 
@@ -319,11 +333,33 @@ selectedSeats.filter(
 
 seat =>
 
-seat >= 36
+Math.ceil(
+
+seat / 6
+
+) > 18
 
 ).length
 
-const paxIndex = 0
+const paxIndex =
+
+(
+
+fwdPax *
+
+-0.15
+
+)
+
++
+
+(
+
+aftPax *
+
+0.15
+
+)
 
  const fuelMoment =
 
@@ -585,7 +621,7 @@ forwardCargo /
 
 (
 
--0.3
+-9
 
 )
 
@@ -603,16 +639,19 @@ aftCargo /
 
 (
 
-0.8
-
+7
 )
-
 
 const zfi =
 
 effectiveBasicIndex +
 
 paxIndex +
+
+cargoIndex
+const zfiDebug =
+
+effectiveBasicIndex +
 
 cargoIndex
 const fuelIndex =
@@ -2497,7 +2536,7 @@ title="Basic Index"
 />
 */}
 
-      {/*
+      
       <StatusCard
 
 title="TOI"
@@ -2517,7 +2556,7 @@ unit="IU"
 status={true}
 
 />
-      */}
+      
       <StatusCard
         title="ZFW"
         value={
@@ -2637,7 +2676,7 @@ catering
         status={towStatus}
        limit={selectedAircraft.maxTOW} 
       />
-{/*
+
     <StatusCard
 
 title="ZFI"
@@ -2657,7 +2696,7 @@ unit="IU"
 status={true}
 
 />
-
+{/*
 <StatusCard
 
 title="TRIP FI"
@@ -2724,6 +2763,7 @@ status={true}
 */}
  <StatusCard
 title="ZF CG"
+
 value={
 
 zfWithinEnvelope
@@ -2760,6 +2800,7 @@ toCg.toFixed(1)
 status={toWithinEnvelope}
 unit="%"
 />
+
 <StatusCard
 
   title={`TRIM · ${trimLabel}`}
