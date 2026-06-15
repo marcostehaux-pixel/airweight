@@ -4,32 +4,17 @@ try{
 
 const response =
 await fetch(
-
-`https://corsproxy.io/?https://tgftp.nws.noaa.gov/data/observations/metar/stations/${icao}.TXT`
-
+`/api/metar?icao=${icao}`
 )
 
-if(!response.ok){
+const data =
+await response.json()
 
-return null
-
-}
-
-const text =
-await response.text()
-
-const lines =
-text
-.split("\n")
-.filter(Boolean)
-
-return lines[1] || null
+return data.metar
 
 }
 
-catch(err){
-
-console.log("METAR ERROR:", err)
+catch{
 
 return null
 
