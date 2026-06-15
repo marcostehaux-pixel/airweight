@@ -1,5 +1,5 @@
 import Login from './Login'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import StatusCard from './components/StatusCard'
 import a320Perfil from './assets/A320 perfil.png'
 import b737Perfil from './assets/b737 perfil.png'
@@ -46,33 +46,22 @@ useState(
 
 )
   const [fuel, setFuel] = useState(0)
-  const [
 
-flightFrom,
+const [flightFrom, setFlightFrom] = useState('')
+const [flightTo, setFlightTo] = useState('')
 
-setFlightFrom
+const [metar, setMetar] = useState(null)
+useEffect(() => {
 
-]=
+async function loadMetar(){
 
-useState(
+setMetar(null)
 
-''
+}
 
-)
+loadMetar()
 
-const [
-
-flightTo,
-
-setFlightTo
-
-]=
-
-useState(
-
-''
-
-)
+}, [flightFrom])
 
 const [
 
@@ -904,7 +893,7 @@ const polygon=[
 
 [400,50],
 
-[,50]
+[395,50]
 
 ]
 
@@ -997,41 +986,14 @@ inside=!inside
 return inside
 
 }
-const zfWithinEnvelope =
 
-zfw >= 40000 &&
+const zfWithinEnvelope =
 
 zfw <= selectedAircraft.maxZFW &&
 
-zfCg >= (
+zfCg >= 18 &&
 
-18 +
-
-(
-
-(
-
-zfw -
-
-40000
-
-)
-
-/
-
-22000
-
-)
-
-*
-
-2
-
-)
-
-&&
-
-zfCg <= 32
+zfCg <= 34
 
 
 const trimLabel =
@@ -1046,22 +1008,34 @@ const trimLabel =
 
       : 'SET'
       
-      const loadStatus =
+     const loadStatus =
 
-  tow > selectedAircraft.maxTOW
+!zfWithinEnvelope ||
 
-    ? 'OUT OF LIMITS'
+!toWithinEnvelope ||
 
-    : trim < 4 || trim > 7
+tow > selectedAircraft.maxTOW
 
-      ? 'REVIEW LOAD'
+?
 
-      : 'READY FOR DISPATCH'
+'OUT OF ENVELOPE'
+
+:
+
+trim < 4 || trim > 7
+
+?
+
+'REVIEW LOAD'
+
+:
+
+'READY FOR DISPATCH'
 const cgStatus =
 
-zfi >= 20 &&
+zfWithinEnvelope &&
 
-zfi <= 90
+toWithinEnvelope
   
  const cgLabel =
 
@@ -3138,12 +3112,27 @@ minute:'2-digit'
 }Z
 
 </div>
+<div className="metar-card">
 
+<div className="metar-title">
+
+✈ {flightFrom || "DEP"}
+
+</div>
+
+<div className="metar-text">
+
+{metar || "METAR unavailable"}
+
+</div>
+
+</div>
 </div>
 </div>
 
 )
 }
+
 {activeMenu === 'Loadsheet' && (
 
   <div
