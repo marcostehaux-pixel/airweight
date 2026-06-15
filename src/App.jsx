@@ -3093,7 +3093,7 @@ style={{
 
 marginTop:'20px',
 
-padding:'14px',
+padding:'1px',
 
 borderRadius:'14px',
 
@@ -3166,7 +3166,7 @@ minute:'2-digit'
 
 <div className="metar-title">
 
-METAR · {flightFrom}
+METAR 
 
 </div>
 

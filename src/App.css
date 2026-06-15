@@ -68,23 +68,17 @@ h3 {
 
 display:flex;
 
-gap:12px;
+flex-direction:column;
 
-flex-wrap:wrap;
+gap:5px;
 
 }
 
 .metar-card{
 
-flex:1;
+width:100%;
 
-min-width:300px;
-
-padding:12px;
-
-border-radius:12px;
-
-background:#1f2937;
+padding:2px;
 
 }
 
@@ -102,10 +96,14 @@ color:#FFC300;
 
 font-family:monospace;
 
-white-space:pre-wrap;
+font-size:13px;
 
-line-height:1.5;
+line-height:1.4;
+
+letter-spacing:0.4px;
 
 color:#FFC300;
+
+white-space:pre-wrap;
 
 }
