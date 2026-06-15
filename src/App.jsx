@@ -2944,7 +2944,13 @@ activeMenu !==
 
 'Seat Map'
 
-&& (
+&&
+activeMenu !==
+
+'Loadsheet'
+
+&&
+(
 
 <div
 
