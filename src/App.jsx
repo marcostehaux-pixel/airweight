@@ -1,9 +1,11 @@
 import Login from './Login'
 import { useState, useEffect } from 'react'
+import './App.css'
 import StatusCard from './components/StatusCard'
 import a320Perfil from './assets/A320 perfil.png'
 import b737Perfil from './assets/b737 perfil.png'
 import EnvelopeChart from './components/EnvelopeChart'
+import { getMetar } from "./api/metar"
 import aircraftDatabase from './data/aircraftDatabase'
 import {
 
@@ -15,6 +17,7 @@ import {
 
 } from './utilit/calculations.js'
 import SeatMap from './components/SeatMap'
+
 import CargoPanel from './components/CargoPanel'
 import generateLoadsheet from './utils/generateLoadsheet'
 import logo from './assets/logo.png'
@@ -55,14 +58,61 @@ useEffect(() => {
 
 async function loadMetar(){
 
+if(
+flightFrom
+.trim()
+.length !== 4
+){
+
 setMetar(null)
+
+return
+
+}
+
+const result =
+await getMetar(
+flightFrom
+.toUpperCase()
+)
+
+setMetar(result)
 
 }
 
 loadMetar()
 
 }, [flightFrom])
+const [metarTo, setMetarTo] = useState(null)
+useEffect(() => {
 
+async function loadMetarTo(){
+
+if(
+flightTo
+.trim()
+.length !== 4
+){
+
+setMetarTo(null)
+
+return
+
+}
+
+const result =
+await getMetar(
+flightTo
+.toUpperCase()
+)
+
+setMetarTo(result)
+
+}
+
+loadMetarTo()
+
+}, [flightTo])
 const [
 
 flightNumber,
@@ -3116,13 +3166,43 @@ minute:'2-digit'
 
 <div className="metar-title">
 
-✈ {flightFrom || "DEP"}
+METAR · {flightFrom}
+
+</div>
+
+<div className="metar-container">
+
+<div className="metar-card">
+
+<div className="metar-title">
+
+FROM · {flightFrom}
 
 </div>
 
 <div className="metar-text">
 
-{metar || "METAR unavailable"}
+{metar || "Loading METAR..."}
+
+</div>
+
+</div>
+
+<div className="metar-card">
+
+<div className="metar-title">
+
+TO · {flightTo}
+
+</div>
+
+<div className="metar-text">
+
+{metarTo || "Loading METAR..."}
+
+</div>
+
+</div>
 
 </div>
 
