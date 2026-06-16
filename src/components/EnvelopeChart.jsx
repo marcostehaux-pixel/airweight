@@ -106,6 +106,42 @@ top
 
 }
 
+const envelope = [
+  [60, 50],
+  [130, 160],
+  [210, 310],
+  [230, 310],
+  [750, 70],
+  [400, 50],
+  [395, 50],
+]
+const isInsidePolygon = (x, y, polygon) => {
+  let inside = false
+
+  for (
+    let i = 0, j = polygon.length - 1;
+    i < polygon.length;
+    j = i++
+  ) {
+    const xi = polygon[i][0]
+    const yi = polygon[i][1]
+
+    const xj = polygon[j][0]
+    const yj = polygon[j][1]
+
+    const intersect =
+      (yi > y) !== (yj > y) &&
+      x <
+        ((xj - xi) * (y - yi)) /
+          (yj - yi) +
+          xi
+
+    if (intersect)
+      inside = !inside
+  }
+
+  return inside
+}
 const zfwX=
 
 mapIndex(
@@ -193,7 +229,44 @@ const towY = weightToY(
 props.tow || 42675
 
 )
+const zfwInside =
+  isInsidePolygon(
+    zfwX,
+    zfwY,
+    envelope
+  )
 
+const towInside =
+  isInsidePolygon(
+    towX,
+    towY,
+    envelope
+  )
+  console.log(
+'ENVELOPE',
+{
+zfwInside,
+towInside
+}
+)
+  if (
+props.onEnvelopeChange
+) {
+
+props.onEnvelopeChange({
+
+zfwInside,
+
+towInside
+
+})
+
+}
+const cgStatus =
+
+props.zfStatus &&
+
+props.toStatus
 const ldwY = towY
 const cgLines = [
 18,19,20,21,22,23,24,
@@ -616,33 +689,17 @@ MZFW
 </>
 )}
 <polygon
-
-points="
-
-60,50
-130,160
-210,310
-230,310
-750,70
-400,50
-395,50
-
-"
-
-fill="transparent"
-
-stroke="#00ff88"
-
-strokeWidth="2"
-
-style={{
-
-filter:
-
-'drop-shadow(0 0 6px rgba(0,255,140,.25))'
-
-}}
-
+  points={
+    envelope
+      .map(
+        p =>
+          `${p[0]},${p[1]}`
+      )
+      .join(' ')
+  }
+  fill="transparent"
+  stroke="#00ff88"
+  strokeWidth="2"
 />
 
 <circle
@@ -690,15 +747,10 @@ props.toStatus
 }}
 
 fill={
-
-props.status
-
+towInside
 ?
-
 '#00ff88'
-
 :
-
 '#ff4444'
 
 }
@@ -708,6 +760,86 @@ filter=
 "drop-shadow(0 0 10px currentColor)"
 
 />
+<text
+
+x={towX + 10}
+
+y={towY + 25}
+
+fill="#ffffff"
+
+fontSize="12"
+
+>
+{
+!towInside && (
+
+<text
+
+x="640"
+
+y="35"
+
+fill="#ff9900"
+
+fontSize="12"
+
+fontWeight="600"
+
+>
+
+⚠ CG envelope exceeded
+
+</text>
+
+)
+}
+{
+!towInside && (
+
+<g>
+
+<rect
+
+x="620"
+
+y="15"
+
+width="180"
+
+height="28"
+
+rx="10"
+
+fill="rgba(255,120,0,.18)"
+
+stroke="#ff9900"
+
+/>
+
+<text
+
+x="635"
+
+y="33"
+
+fill="#ffcc66"
+
+fontSize="12"
+
+fontWeight="700"
+
+>
+
+CG OUT OF ENVELOPE
+
+</text>
+
+</g>
+
+)
+}
+</text>
   <text
 
   x={towX + 10}
@@ -725,7 +857,29 @@ filter=
   TOW
 
 </text>
+{
+!towInside && (
 
+<text
+
+x="700"
+
+y="50"
+
+fill="#ff9900"
+
+fontSize="12"
+
+fontWeight="700"
+
+>
+
+⚠ CG OUT OF ENVELOPE
+
+</text>
+
+)
+}
   {
 
 props.tow !== props.zfw && (
@@ -779,6 +933,7 @@ props.zfStatus
 )
 
 }
+
 {/*
 <text
 

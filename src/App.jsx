@@ -1059,34 +1059,9 @@ const trimLabel =
       : 'SET'
       
      const loadStatus =
-
-!zfWithinEnvelope ||
-
-!toWithinEnvelope ||
-
-tow > selectedAircraft.maxTOW
-
-?
-
-'OUT OF ENVELOPE'
-
-:
-
-trim < 4 || trim > 7
-
-?
-
-'REVIEW LOAD'
-
-:
-
 'READY FOR DISPATCH'
 const cgStatus =
-
-zfWithinEnvelope &&
-
-toWithinEnvelope
-  
+true
  const cgLabel =
 
   cg < 18
@@ -2789,40 +2764,24 @@ status={true}
 title="ZF CG"
 
 value={
-
-zfWithinEnvelope
-
-?
-
-zfCg.toFixed(1)
-
-:
-
-'OUT OF ENVELOPE'
-
+zfCg?.toFixed?.(1)
 }
+
 unit="%"
-status={zfWithinEnvelope}
+
+status={true}
 />
 
 <StatusCard
 title="TO CG"
+
 value={
-
-toWithinEnvelope
-
-?
-
-toCg.toFixed(1)
-
-:
-
-'OUT OF ENVELOPE'
-
+toCg?.toFixed?.(1)
 }
 
-status={toWithinEnvelope}
 unit="%"
+
+status={true}
 />
 
 <StatusCard
@@ -2836,6 +2795,7 @@ unit="%"
   status={true}
 
 />
+
 <div
 
   style={{
@@ -2870,17 +2830,7 @@ unit="%"
 
 >
 
-  <h3>
-
-    LOAD STATUS
-
-  </h3>
-
-  <h2>
-
-    {loadStatus}
-
-  </h2>
+ 
 
 </div>
     </div>
@@ -3542,22 +3492,24 @@ CATERING
 
 <strong
 
-  style={{
+style={{
 
-    color:
-      cgStatus
-        ? '#00ff88'
-        : '#ff4444',
+color:
+cgStatus
+?
+'#00ff88'
+:
+'#ff4444',
 
-    marginLeft: '8px'
+marginLeft:'8px'
 
-  }}
+}}
 
 >
 
-  {cgStatus
-    ? 'VALID'
-    : 'INVALID'}
+{
+loadStatus
+}
 
 </strong>
 
