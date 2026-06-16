@@ -384,7 +384,7 @@ doc.setTextColor(
 
 doc.text(
 
-'TOTAL',
+'TOTAL CARGO',
 
 175,
 
