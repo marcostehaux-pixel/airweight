@@ -768,7 +768,7 @@ y={towY + 25}
 
 fill="#ffffff"
 
-fontSize="12"
+fontSize="15"
 
 >
 {
@@ -780,9 +780,9 @@ x="640"
 
 y="35"
 
-fill="#ff9900"
+fill="#daa555"
 
-fontSize="12"
+fontSize="15"
 
 fontWeight="600"
 
@@ -825,7 +825,7 @@ y="33"
 
 fill="#ffcc66"
 
-fontSize="12"
+fontSize="15"
 
 fontWeight="700"
 

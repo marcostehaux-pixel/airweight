@@ -26,7 +26,8 @@ taxiFuel,
 extraCrew,
 
 catering,
-
+metarFrom,
+metarTo,
 effectiveBasicWeight,
 
 effectiveBasicIndex,
@@ -900,9 +901,53 @@ doc.setFontSize(10)
 doc.text(
   'AIRWEIGHT Dispatch System v1.0',
   20,
-  285
+  290
+)
+doc.setFontSize(8)
+
+doc.setTextColor(70)
+
+if (
+typeof metarFrom !==
+'undefined'
+) {
+
+doc.text(
+'METAR DEP',
+20,
+262
 )
 
+doc.text(
+String(
+metarFrom || '-'
+),
+20,
+268
+)
+
+}
+
+if (
+typeof metarTo !==
+'undefined'
+) {
+
+doc.text(
+'METAR ARR',
+20,
+278
+)
+
+doc.text(
+String(
+metarTo || '-'
+),
+20,
+284
+)
+
+}
 doc.save('AIRWEIGHT_LOADSHEET.pdf')
 
 

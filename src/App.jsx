@@ -3774,7 +3774,8 @@ value,
         generateLoadsheet({
 
           selectedAircraft,
-
+metarFrom: metar,
+metarTo,
           selectedSeats,
 
           forwardCargo,
