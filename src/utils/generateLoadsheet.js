@@ -90,7 +90,7 @@ doc.text(
 
 label,
 
-25,
+20,
 
 y
 
@@ -191,24 +191,24 @@ doc.setTextColor(0, 0, 0)
 
 doc.setFontSize(14)
 
-doc.text('Aircraft Information', 20, 45)
+doc.text('Aircraft Information', 20, 20)
 
 doc.setLineWidth(0.5)
 
-doc.line(20, 48, 190, 48)
+doc.line(20, 25, 190, 25)
 
 doc.setFontSize(10)
 
 doc.text(
   `Registration: ${selectedAircraft.registration}`,
   20,
-  55
+  30
 )
 
 doc.text(
   `Aircraft Type: ${selectedAircraft.type}`,
   20,
-  60
+  35
 )
 doc.setFontSize(
 
@@ -226,9 +226,9 @@ doc.text(
 
 'PAX DIST',
 
-120,
+110,
 
-55
+30
 
 )
 
@@ -248,9 +248,9 @@ doc.text(
 
 `FWD ${forwardSeats}`,
 
-120,
+110,
 
-60
+35
 
 )
 
@@ -258,18 +258,18 @@ doc.text(
 
 `MID ${midSeats}`,
 
-145,
+135,
 
-60
+35
 )
 
 doc.text(
 
 `AFT ${aftSeats}`,
 
-170,
+160,
 
-60
+35
 
 )
 doc.setFontSize(
@@ -288,9 +288,9 @@ doc.text(
 
 'TOTAL PAX',
 
-85,
+175,
 
-55
+30
 
 )
 
@@ -310,9 +310,9 @@ doc.text(
 
 `${selectedSeats.length}`,
 
-90,
+180,
 
-60
+35
 
 )
 
@@ -332,9 +332,9 @@ doc.text(
 
 'CARGO DIST',
 
-120,
+110,
 
-85
+40
 
 )
 
@@ -354,9 +354,9 @@ doc.text(
 
 `FWD ${forwardCargo}`,
 
-120,
+110,
 
-90
+45
 
 )
 
@@ -364,9 +364,9 @@ doc.text(
 
 `AFT ${aftCargo}`,
 
-160,
+140,
 
-90
+45
 
 )
 
@@ -386,9 +386,9 @@ doc.text(
 
 'TOTAL',
 
-120,
+175,
 
-100
+40
 
 )
 
@@ -414,9 +414,9 @@ aftCargo
 
 } KG`,
 
-160,
+175,
 
-100
+45
 
 )
 doc.setFontSize(
@@ -435,19 +435,19 @@ doc.text(
 
 'CREW',
 
-120,
+70,
 
-70
+30
 
 )
 
 doc.text(
 
-'CAT',
+'BUFFET',
 
-170,
+80,
 
-70
+30
 
 )
 
@@ -469,9 +469,9 @@ crewConfiguration ||
 
 '-',
 
-120,
+73,
 
-75
+35
 
 )
 
@@ -487,9 +487,9 @@ catering
 
 'NO',
 
-170,
+82,
 
-75
+35
 
 )
 doc.setFontSize(
@@ -506,8 +506,8 @@ doc.setTextColor(
 
 doc.text(
 'FROM',
-55,
-70
+20,
+50
 )
 
 doc.text(
@@ -515,16 +515,16 @@ flightFrom ||
 
 '',
 
-55,
+20,
 
-75
+55
 
 )
 
 doc.text(
 'TO',
-67,
-70
+35,
+50
 )
 
 doc.text(
@@ -532,16 +532,16 @@ flightTo ||
 
 '',
 
-67,
+35,
 
-75
+55
 
 )
 
 doc.text(
 'FLIGHT',
 20,
-70
+40
 )
 
 doc.text(
@@ -549,9 +549,9 @@ flightNumber ||
 
 '',
 
-20,
+22,
 
-75
+45
 
 )
 
@@ -575,7 +575,7 @@ drawRow(
 
 `${fuel || 0} kg`,
 
-127
+90
 
 )
 
@@ -585,7 +585,7 @@ drawRow(
 
 `${tripFuel || 0} kg`,
 
-167
+110
 
 )
 drawRow(
@@ -612,7 +612,7 @@ selectedAircraft.maxLW
 
 }`,
 
-172,
+115,
 
 true
 
@@ -637,7 +637,7 @@ tripFuel||0
 
 } kg`,
 
-177
+120
 
 )
 
@@ -648,23 +648,24 @@ doc.setFontSize(8)
 doc.text(
   `Date UTC: ${formattedDate}`,
   160,
-  35
+  15
 )
 
 doc.text(
   `Time UTC: ${formattedTime}`,
   160,
-  43
+  20
 )
-doc.setTextColor(0, 0, 0)
 
+doc.setTextColor(0, 0, 0)
+doc.line(20, 60, 190, 60)
 doc.text(
 
 'LOADSHEET DATA',
 
 20,
 
-90
+65
 
 )
 drawRow(
@@ -679,7 +680,7 @@ effectiveBasicWeight ||
 
 } kg`,
 
-95
+70
 
 )
 drawRow(
@@ -696,7 +697,7 @@ payload.toFixed(
 
 } kg`,
 
-105
+80
 
 )
 drawRow(
@@ -717,7 +718,7 @@ effectiveBasicIndex.toFixed(
 
 '-',
 
-100
+75
 
 )
 
@@ -739,7 +740,7 @@ selectedAircraft.maxZFW
 
 }`,
 
-111,
+85,
 
 true
 
@@ -750,7 +751,7 @@ drawRow(
 
 `${rw.toFixed(0)} kg`,
 
-135
+95
 
 )
 drawRow(
@@ -769,7 +770,7 @@ taxiFuel ||
 
 } kg`,
 
-143
+100
 
 )
 drawRow(
@@ -790,7 +791,7 @@ selectedAircraft.maxTOW
 
 }`,
 
-151,
+105,
 
 true
 
@@ -814,7 +815,7 @@ zfCg
 
 }%`,
 
-119,
+154,
 
 true
 
@@ -861,7 +862,7 @@ trim
 
 } UP`,
 
-182,
+164,
 
 true
 
@@ -872,9 +873,9 @@ doc.setFontSize(8)
 doc.setTextColor(0, 0, 0)
 // SIGNATURE
 
-doc.line(120, 240, 190, 240)
+doc.line(120, 245, 190, 245)
 
-doc.setFontSize(11)
+doc.setFontSize(8)
 
 doc.text(
   'Captain Signature',
@@ -884,7 +885,7 @@ doc.text(
 doc.text(
   'DISPATCH RELEASE',
   20,
-  240
+  235
 )
 
 doc.line(20, 245, 90, 245)
@@ -892,7 +893,7 @@ doc.line(20, 245, 90, 245)
 doc.text(
   'Dispatcher Signature',
   25,
-  252
+  248
 )
 // FOOTER
 
