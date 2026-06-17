@@ -115,6 +115,21 @@ const envelope = [
   [400, 50],
   [395, 50],
 ]
+const zfwEnvelope = [
+
+[140,170],
+
+[140,180],
+
+[215,310],
+
+[320,310],
+
+[600,170],
+
+[530,170]
+
+]
 const isInsidePolygon = (x, y, polygon) => {
   let inside = false
 
@@ -218,10 +233,9 @@ y40000-y85000
 )
 
 }
-const zfwY = weightToY(
-
+const zfwY =
+mapWeight(
 props.zfw || 42675
-
 )
 
 const towY = weightToY(
@@ -231,9 +245,9 @@ props.tow || 42675
 )
 const zfwInside =
   isInsidePolygon(
-    zfwX,
+    zfwX - 15,
     zfwY,
-    envelope
+    zfwEnvelope
   )
 
 const towInside =
@@ -701,7 +715,26 @@ MZFW
   stroke="#00ff88"
   strokeWidth="2"
 />
+<polygon
 
+points={
+zfwEnvelope
+.map(
+p =>
+`${p[0]},${p[1]}`
+)
+.join(' ')
+}
+
+fill="transparent"
+
+stroke="#0099ff"
+
+strokeWidth="2"
+
+strokeDasharray="6 4"
+
+/>
 <circle
 
 cx={towX}
@@ -858,23 +891,47 @@ CG OUT OF ENVELOPE
 
 </text>
 {
-!towInside && (
+!zfwInside && (
 
 <text
 
-x="300"
+x="620"
 
-y="-20"
+y="40"
 
-fill="#ff1900"
+fill="#00c8ff"
 
-fontSize="20"
+fontSize="12"
 
 fontWeight="700"
 
 >
 
-⚠ CG OUT OF ENVELOPE
+⚠ ZFW CG OUT
+
+</text>
+
+)
+}
+
+{
+!towInside && (
+
+<text
+
+x="620"
+
+y="58"
+
+fill="#ff9900"
+
+fontSize="12"
+
+fontWeight="700"
+
+>
+
+⚠ TOW CG OUT
 
 </text>
 
@@ -890,44 +947,30 @@ cx={zfwX}
 
 cy={zfwY}
 
-r={
+r="6"
 
-props.zfStatus
+fill={
+
+zfwInside
 
 ?
 
-6
+'#00c8ff'
 
 :
 
-10
+'#ff4444'
 
 }
-
-fill="#00c8ff"
 
 style={{
 
 transition:
-
-'all .4s ease',
-
-transform:
-
-props.zfStatus
-
-?
-
-'scale(1)'
-
-:
-
-'scale(1.15)'
+'fill .25s ease'
 
 }}
 
 >
-
 </circle>
 
 )
