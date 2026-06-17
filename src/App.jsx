@@ -3488,17 +3488,27 @@ CATERING
 
     >
 
-   CG Status:
+   {
+activeMenu !== 'Loadsheet' && (
+
+<div>
+
+CG Status:
 
 <strong
 
 style={{
 
 color:
+
 cgStatus
+
 ?
+
 '#00ff88'
+
 :
+
 '#ff4444',
 
 marginLeft:'8px'
@@ -3508,11 +3518,18 @@ marginLeft:'8px'
 >
 
 {
+
 loadStatus
+
 }
 
 </strong>
 
+</div>
+
+)
+
+}
     </div>
 <div style={{ marginBottom: '20px' }}>
 

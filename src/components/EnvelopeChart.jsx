@@ -862,13 +862,13 @@ CG OUT OF ENVELOPE
 
 <text
 
-x="700"
+x="300"
 
-y="50"
+y="-20"
 
-fill="#ff9900"
+fill="#ff1900"
 
-fontSize="12"
+fontSize="20"
 
 fontWeight="700"
 
