@@ -2406,7 +2406,7 @@ flexWrap:'wrap'
 
 <input
 
-placeholder="FROM"
+placeholder="FROM-ICAO"
 
 value={flightFrom}
 
@@ -2432,7 +2432,7 @@ width:'90px'
 
 <input
 
-placeholder="TO"
+placeholder="TO-ICAO"
 
 value={flightTo}
 
@@ -2458,7 +2458,7 @@ width:'90px'
 
 <input
 
-placeholder="FLIGHT"
+placeholder="FLIGHT NR"
 
 value={flightNumber}
 
