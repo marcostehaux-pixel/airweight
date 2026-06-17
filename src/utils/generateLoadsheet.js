@@ -575,7 +575,7 @@ drawRow(
 
 `${fuel || 0} kg`,
 
-90
+85
 
 )
 
@@ -585,7 +585,7 @@ drawRow(
 
 `${tripFuel || 0} kg`,
 
-110
+105
 
 )
 drawRow(
@@ -612,7 +612,7 @@ selectedAircraft.maxLW
 
 }`,
 
-115,
+110,
 
 true
 
@@ -637,7 +637,7 @@ tripFuel||0
 
 } kg`,
 
-120
+115
 
 )
 
@@ -697,7 +697,7 @@ payload.toFixed(
 
 } kg`,
 
-80
+75
 
 )
 drawRow(
@@ -718,7 +718,7 @@ effectiveBasicIndex.toFixed(
 
 '-',
 
-75
+149
 
 )
 
@@ -740,7 +740,7 @@ selectedAircraft.maxZFW
 
 }`,
 
-85,
+80,
 
 true
 
@@ -751,7 +751,7 @@ drawRow(
 
 `${rw.toFixed(0)} kg`,
 
-95
+90
 
 )
 drawRow(
@@ -770,7 +770,7 @@ taxiFuel ||
 
 } kg`,
 
-100
+95
 
 )
 drawRow(
@@ -791,7 +791,7 @@ selectedAircraft.maxTOW
 
 }`,
 
-105,
+100,
 
 true
 
