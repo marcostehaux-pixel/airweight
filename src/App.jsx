@@ -6,16 +6,33 @@ import a320Perfil from './assets/A320 perfil.png'
 import b737Perfil from './assets/b737 perfil.png'
 import EnvelopeChart from './components/EnvelopeChart'
 import { getMetar } from "./api/metar"
+async function getTaf(icao){
+
+try{
+
+const response =
+await fetch(
+
+`/api/taf?icao=${icao}`
+
+)
+
+const data =
+await response.json()
+
+return data.taf
+
+}
+
+catch{
+
+return null
+
+}
+
+}
 import aircraftDatabase from './data/aircraftDatabase'
-import {
-
-  calculateMoment,
-  calculateCG,
-  calculateIndex,
-  calculateMAC,
-  calculateTrim
-
-} from './utilit/calculations.js'
+import {calculateMoment,calculateCG,calculateIndex,calculateMAC,calculateTrim} from './utilit/calculations.js'
 import SeatMap from './components/SeatMap'
 
 import CargoPanel from './components/CargoPanel'
@@ -83,6 +100,79 @@ setMetar(result)
 loadMetar()
 
 }, [flightFrom])
+async function searchAirportWeather(){
+
+if(
+weatherAirport
+.trim()
+.length !== 4
+){
+
+setSearchMetar(null)
+
+setSearchTaf(null)
+
+return
+
+}
+
+const icao =
+weatherAirport
+.toUpperCase()
+
+const metar =
+await getMetar(
+icao
+)
+
+setSearchMetar(
+metar
+)
+
+try{
+
+const response =
+await fetch(
+
+`/api/taf?icao=${icao}`
+
+)
+
+const data =
+await response.json()
+
+console.log(
+"TAF RESPONSE:",
+data
+)
+
+setSearchTaf(
+
+data.taf ||
+
+"NO TAF AVAILABLE"
+
+)
+
+}
+
+catch(err){
+
+console.log(
+
+err
+
+)
+
+setSearchTaf(
+
+"TAF unavailable"
+
+)
+
+}
+
+}
 const [metarTo, setMetarTo] = useState(null)
 useEffect(() => {
 
@@ -844,51 +934,22 @@ const minCg=21
 const maxCg=34
 
 
-return (
-
-18+
-
-(
-
-index-35
-
-)
-
-*
-
-0.235
+return (18+(index-35)*0.235
 
 )
 
 }
 
 
-function getCgFromEnvelope(
-
-index,
-weight
-
-){
+function getCgFromEnvelope(index,weight){
 
 return Number(
 
-getNearestCg(
-
-index
-
-).toFixed(
-
-1
-
-)
-
-)
+getNearestCg(index).toFixed(1))
 
 }
 
-const zfCg =
-
-getCgFromEnvelope(
+const zfCg =getCgFromEnvelope(
 
 zfi,
 zfw
@@ -1080,7 +1141,11 @@ true
 
   const towStatus =
     tow <= selectedAircraft.maxTOW
-    
+    const [weatherAirport,setWeatherAirport]=useState("")
+
+const [searchMetar,setSearchMetar]=useState(null)
+
+const [searchTaf,setSearchTaf]=useState(null)
   function toggleSeat(seat) {
 
   if (selectedSeats.includes(seat)) {
@@ -1528,11 +1593,14 @@ onMouseLeave={(e) => {
   Seat Map
 
 </div>
+
 <div
 
   onClick={() =>
     setActiveMenu('Settings')
+    
   }
+  
 onMouseEnter={(e) => {
 
   if (activeMenu !== 'Dashboard') {
@@ -1560,6 +1628,7 @@ onMouseLeave={(e) => {
   }
 
 }}
+
   style={{
 
     marginBottom: '20px',
@@ -1592,7 +1661,7 @@ onMouseLeave={(e) => {
 
 >
 
-  Settings
+  Wather Center
 
 </div>
 <div
@@ -2833,6 +2902,7 @@ status={true}
  
 
 </div>
+
     </div>
 
    <EnvelopeChart
@@ -3163,12 +3233,111 @@ TO · {flightTo}
 </div>
 
 </div>
+
 </div>
 </div>
 
 )
 }
+{activeMenu === 'Settings' && (
 
+<div
+
+style={{
+
+flex:1,
+
+padding:'40px'
+
+}}
+
+>
+
+<h1>
+
+WEATHER CENTER
+
+</h1>
+
+<div className="weather-search">
+
+<input
+
+placeholder="SEARCH ICAO"
+
+value={weatherAirport}
+
+onChange={(e)=>
+
+setWeatherAirport(
+e.target.value.toUpperCase()
+)
+
+}
+
+/>
+
+<button
+
+onClick={
+searchAirportWeather
+}
+
+>
+
+SEARCH
+
+</button>
+
+</div>
+
+<div className="metar-card">
+
+<div className="metar-title">
+
+METAR
+
+</div>
+
+<div className="metar-text">
+
+{
+
+searchMetar ||
+
+"ENTER ICAO"
+
+}
+
+</div>
+
+</div>
+
+<div className="metar-card">
+
+<div className="metar-title">
+
+TAF
+
+</div>
+
+<div className="metar-text">
+
+{
+
+searchTaf ||
+
+"COMING SOON"
+
+}
+
+</div>
+
+</div>
+
+</div>
+
+)}
 {activeMenu === 'Loadsheet' && (
 
   <div
@@ -3489,6 +3658,7 @@ CATERING
     >
 
    {
+    
 activeMenu !== 'Loadsheet' && (
 
 <div>
