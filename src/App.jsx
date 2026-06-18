@@ -102,10 +102,29 @@ loadMetar()
 }, [flightFrom])
 async function searchAirportWeather(){
 
-if(
+const airports =
 weatherAirport
-.trim()
-.length !== 4
+
+.split(",")
+
+.map(
+
+a => a.trim()
+
+.toUpperCase()
+
+)
+
+.filter(
+
+a => a.length === 4
+
+)
+
+if(
+
+airports.length===0
+
 ){
 
 setSearchMetar(null)
@@ -116,17 +135,27 @@ return
 
 }
 
-const icao =
-weatherAirport
-.toUpperCase()
+let metarResult=[]
+
+let tafResult=[]
+
+for(
+
+const icao of airports
+
+){
 
 const metar =
 await getMetar(
 icao
 )
 
-setSearchMetar(
-metar
+metarResult.push(
+
+`${icao}
+
+${metar || "METAR unavailable"}`
+
 )
 
 try{
@@ -141,36 +170,49 @@ await fetch(
 const data =
 await response.json()
 
-console.log(
-"TAF RESPONSE:",
-data
-)
+tafResult.push(
 
-setSearchTaf(
+`${icao}
 
-data.taf ||
-
-"NO TAF AVAILABLE"
+${data.taf || "TAF unavailable"}`
 
 )
 
 }
 
-catch(err){
+catch{
 
-console.log(
+tafResult.push(
 
-err
+`${icao}
+
+TAF unavailable`
+
+)
+
+}
+
+}
+
+setSearchMetar(
+
+metarResult.join(
+
+"\n\n"
+
+)
 
 )
 
 setSearchTaf(
 
-"TAF unavailable"
+tafResult.join(
+
+"\n\n"
 
 )
 
-}
+)
 
 }
 const [metarTo, setMetarTo] = useState(null)
