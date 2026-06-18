@@ -899,9 +899,9 @@ x="620"
 
 y="40"
 
-fill="#00c8ff"
+fill="#ff0000"
 
-fontSize="12"
+fontSize="18"
 
 fontWeight="700"
 
@@ -923,9 +923,9 @@ x="620"
 
 y="58"
 
-fill="#ff9900"
+fill="#ff0000"
 
-fontSize="12"
+fontSize="18"
 
 fontWeight="700"
 
