@@ -2594,17 +2594,18 @@ subtitle={
 }
 />
 
-
-{/*
 <StatusCard
 
-title="Basic Index"
+title="BWI"
 
-...
+value={effectiveBasicIndex}
+
+unit="ui"
+status={true}
+
 />
-*/}
 
-      
+
       <StatusCard
 
 title="TOI"
