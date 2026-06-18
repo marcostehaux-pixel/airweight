@@ -2640,9 +2640,10 @@ subtitle={
 
 title="BWI"
 
-value={effectiveBasicIndex}
+value={effectiveBasicIndex?.toFixed(2)}
 
-unit="ui"
+unit="UI"
+
 status={true}
 
 />
