@@ -66,7 +66,15 @@ useState(
 
 )
   const [fuel, setFuel] = useState(0)
+function clearCargo(){
 
+setCargoWeights(
+
+{}
+
+)
+
+}
 const [flightFrom, setFlightFrom] = useState('')
 const [flightTo, setFlightTo] = useState('')
 const [cargoWeights, setCargoWeights]=useState({})
@@ -1907,7 +1915,43 @@ marginBottom:'12px'
 B737-800 CF
 
 </h1>
+<button
 
+onClick={
+
+clearCargo
+
+}
+
+style={{
+
+marginBottom:'30px',
+
+padding:'10px 18px',
+
+borderRadius:'10px',
+
+border:
+
+'1px solid rgba(95, 255, 80, 0.2)',
+
+background:
+
+'rgba(12, 169, 117, 0.08)',
+
+color:'#ff6666',
+
+cursor:'pointer',
+
+fontWeight:'700'
+
+}}
+
+>
+
+CLEAR ALL
+
+</button>
 <div
 style={{
 
@@ -2854,9 +2898,131 @@ availablePayload
 </strong>
 
 </div>
-</div>
+<div
+
+style={{
+
+marginTop:'20px'
+
+}}
+
+>
+
+<div
+
+style={{
+
+height:'12px',
+
+borderRadius:'8px',
+
+background:
+
+'rgba(255,255,255,0.08)',
+
+overflow:'hidden'
+
+}}
+
+>
+
+<div
+
+style={{
+
+width:
+
+`${
+
+Math.min(
+
+(
+
+totalCargo
+
+/
+
+availablePayload
+
+)
+
+*
+
+100,
+
+100
+
+)
+
+}%`,
+
+height:'100%',
+
+background:
+
+totalCargo
+
+>
+
+availablePayload
+
+?
+
+'#ff4444'
+
+:
+
+'#00ff88'
+
+}}
+
+></div>
+
 </div>
 
+<div
+
+style={{
+
+marginTop:'8px',
+
+fontSize:'14px'
+
+}}
+
+>
+
+{
+
+(
+
+totalCargo
+
+/
+
+availablePayload
+
+*
+
+100
+
+)
+
+.toFixed(
+
+1
+
+)
+
+}
+
+%
+
+</div>
+
+</div>
+</div>
+</div>
 )
 
 }
