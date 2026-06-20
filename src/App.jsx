@@ -1432,6 +1432,33 @@ transform:
 
 </div>
 <div
+onClick={()=>
+setActiveMenu('Freighter')
+}
+
+style={{
+marginBottom:'20px',
+padding:'12px 16px',
+borderRadius:'12px',
+
+background:
+activeMenu==='Freighter'
+? 'rgba(0,255,140,0.12)'
+: 'rgba(255,255,255,0.03)',
+
+border:
+activeMenu==='Freighter'
+? '1px solid rgba(0,255,140,0.25)'
+: '1px solid transparent',
+
+cursor:'pointer'
+}}
+>
+
+Freighter
+
+</div>
+<div
 
   onClick={() =>
     setActiveMenu('Loadsheet')
@@ -1749,6 +1776,76 @@ Sign Out
 </div>
 </div>
 {/* MAIN CONTENT */}
+{
+activeMenu === 'Freighter'
+&& (
+
+<div
+style={{
+
+padding:'40px',
+
+borderRadius:'20px',
+
+background:
+'rgba(255,255,255,0.03)',
+
+border:
+'1px solid rgba(255,255,255,0.08)',
+
+textAlign:'center'
+
+}}
+>
+
+<h1
+style={{
+
+color:'#00ff88',
+
+marginBottom:'12px'
+
+}}
+>
+
+B737-800 CF
+
+</h1>
+
+<div
+style={{
+
+fontSize:'18px',
+
+color:'#b8c0cc'
+
+}}
+>
+
+UNDER CONSTRUCTION
+
+</div>
+
+<div
+style={{
+
+marginTop:'20px',
+
+fontSize:'14px',
+
+opacity:0.6
+
+}}
+>
+
+Cargo Weight & Balance Module
+
+</div>
+
+</div>
+
+)
+}
 {
 
 activeMenu ===
@@ -2972,7 +3069,8 @@ activeMenu !==
 'Loadsheet'
 
 &&
-(
+activeMenu !== 'Freighter'
+&& (
 
 <div
 
