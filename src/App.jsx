@@ -6,6 +6,7 @@ import a320Perfil from './assets/A320 perfil.png'
 import b737Perfil from './assets/b737 perfil.png'
 import EnvelopeChart from './components/EnvelopeChart'
 import { getMetar } from "./api/metar"
+import { Analytics } from '@vercel/analytics/react'
 async function getTaf(icao){
 
 try{
@@ -3975,6 +3976,8 @@ aftSeats
   </div>
 
 )}
+
+<Analytics />
 
 </div>
 
