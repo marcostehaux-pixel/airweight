@@ -2647,167 +2647,72 @@ unit="UI"
 status={true}
 
 />
-
-
-      <StatusCard
-
-title="TOI"
-
-value={
-
-toi.toFixed(
-
-1
-
-)
-
-}
-
-unit="IU"
-
-status={true}
-
-/>
-      
-      <StatusCard
+ <StatusCard
         title="ZFW"
         value={
 
 zfw +
 
-(
+(extraCrew *85)+
 
-extraCrew *
-
-85
-
-)
-
-+
-
-(
-
-catering
-
-?
-
-250
-
-:
-
-0
-
-)
+(catering ? 250 : 0)
 
 }
         unit="kg"
         status={zfwStatus}
         limit={selectedAircraft.maxZFW}
       />
-      <StatusCard
+<StatusCard
+
+title="ZFI"
+
+value={zfi.toFixed(1)}
+
+unit="IU"status={true}
+
+/>
+ <StatusCard
+title="ZF CG"
+
+value={
+zfCg?.toFixed?.(1)
+}
+
+unit="%"
+
+status={true}
+/>
+<StatusCard
 
 title="RW"
 
-value={
+value={rw +(extraCrew * 85) + (catering ? 250 : 0)}
 
-rw +
-
-(
-
-extraCrew *
-
-85
-
-)
-
-+
-
-(
-
-catering
-
-?
-
-250
-
-:
-
-0
-
-)
-
-}
-
-unit="kg"
-
-status={
-
-rw <=
-
-selectedAircraft.maxRW
-
-}
-
-limit={
-
-selectedAircraft.maxRW
-
-}
+unit="kg" status={rw <= selectedAircraft.maxRW} limit={ selectedAircraft.maxRW}
 
 />
-      <StatusCard
+  <StatusCard
         title="TOW"
-        value={
+        value={tow + (extraCrew *85)+
 
-tow +
-
-(
-
-extraCrew *
-
-85
-
-)
-+
-
-(
-
-catering
-
-?
-
-250
-
-:
-
-0
-
-)
+(catering ? 250:0)
 }
         unit="kg"
         status={towStatus}
        limit={selectedAircraft.maxTOW} 
       />
+      <StatusCard
 
-    <StatusCard
+title="TOI"
 
-title="ZFI"
+value={toi.toFixed(1)}
 
-value={
-
-zfi.toFixed(
-
-1
-
-)
-
-}
-
-unit="IU"
-
-status={true}
+unit="IU"status={true}
 
 />
+      
+     
+      
 {/*
 <StatusCard
 
@@ -2873,17 +2778,7 @@ status={true}
 
 />
 */}
- <StatusCard
-title="ZF CG"
 
-value={
-zfCg?.toFixed?.(1)
-}
-
-unit="%"
-
-status={true}
-/>
 
 <StatusCard
 title="TO CG"
