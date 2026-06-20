@@ -2686,21 +2686,84 @@ status={true}
 
 title="RW"
 
-value={rw +(extraCrew * 85) + (catering ? 250 : 0)}
+value={
 
-unit="kg" status={rw <= selectedAircraft.maxRW} limit={ selectedAircraft.maxRW}
+rw +
+
+(extraCrew * 85) +
+
+(catering ? 250 : 0)
+
+}
+
+unit="kg"
+
+status={
+
+(
+
+rw +
+
+(extraCrew * 85) +
+
+(catering ? 250 : 0)
+
+)
+
+<=
+
+selectedAircraft.maxRW
+
+}
+
+limit={
+
+selectedAircraft.maxRW
+
+}
 
 />
   <StatusCard
-        title="TOW"
-        value={tow + (extraCrew *85)+
 
-(catering ? 250:0)
+title="TOW"
+
+value={
+
+tow +
+
+(extraCrew *85)+
+
+(catering ? 250 : 0)
+
 }
-        unit="kg"
-        status={towStatus}
-       limit={selectedAircraft.maxTOW} 
-      />
+
+unit="kg"
+
+status={
+
+(
+
+tow +
+
+(extraCrew *85)+
+
+(catering ? 250 : 0)
+
+)
+
+<=
+
+selectedAircraft.maxTOW
+
+}
+
+limit={
+
+selectedAircraft.maxTOW
+
+}
+
+/>
       <StatusCard
 
 title="TOI"
