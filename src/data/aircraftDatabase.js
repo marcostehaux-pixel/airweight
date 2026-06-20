@@ -555,76 +555,105 @@ fuelArm:650,
 forwardCargoArm:320,
 aftCargoArm:900
 
+
 },
-
 {
+registration:'LV-NGR',
 
-registration:'LV-GOO',
-
-type:'A320',
+type:'B737-800CF',
 
 datum:0,
 
-mac:134.5,
+mac:155.8,
 
-lemac:625,
+lemac:627.1,
 
-basicWeight:42000,
+basicWeight:42675,
 
-basicIndex:52,
+basicIndex:50,
+
 basicConfig:'2/4',
+
 basicCrew:'STD CREW',
-maxZFW:62500,
-maxTOW:77000,
-maxRW:77300,
-maxLW:66000,
-envelope: {
+
+maxZFW:61688,
+
+maxTOW:79015,
+
+maxRW:79300,
+
+maxLW:65317,
+
+envelope:{
 
 zf:{
-
-indexMin:10,
-
-indexMax:90,
-
+indexMin:42,
+indexMax:58,
 cgMin:18,
-
 cgMax:32
-
 },
 
 tow:{
-
 indexMin:12,
-
 indexMax:92,
-
 cgMin:19,
-
 cgMax:31
-
 },
 
 lw:{
-
 indexMin:11,
-
 indexMax:91,
-
 cgMin:18,
-
 cgMax:31
-
 }
 
 },
-seatArmFwd:380,
-seatArmMid:640,
-seatArmAft:910,
 
-fuelArm:660,
+seatArmFwd:360,
 
-forwardCargoArm:350,
-aftCargoArm:920
+seatArmMid:620,
+
+seatArmAft:930,
+
+fuelArm:650,
+
+forwardCargoArm:320,
+
+aftCargoArm:900,
+
+cargoConfig:{
+
+mainDeck:[
+
+{id:'M1',max:6804},
+{id:'M2',max:6804},
+{id:'M3',max:6804},
+{id:'M4',max:6804},
+{id:'M5',max:6804},
+
+{id:'M6',max:6804},
+{id:'M7',max:6804},
+{id:'M8',max:6804},
+{id:'M9',max:6804},
+{id:'M10',max:6804},
+
+{id:'P12',max:2494}
+
+],
+
+lowerDeck:[
+
+{id:'F1',max:1600},
+{id:'F2',max:1600},
+{id:'F3',max:1600},
+
+{id:'R4',max:1600},
+{id:'R5',max:1600},
+{id:'R6',max:1600}
+
+]
+
+}
 
 }
 
