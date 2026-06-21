@@ -66,6 +66,21 @@ useState(
 
 )
   const [fuel, setFuel] = useState(0)
+  const [
+
+selectedCargoAircraft,
+
+setSelectedCargoAircraft
+
+]
+
+=
+
+useState(
+
+'LV-NGR'
+
+)
 function clearCargo(){
 
 setCargoWeights(
@@ -75,6 +90,7 @@ setCargoWeights(
 )
 
 }
+
 const [flightFrom, setFlightFrom] = useState('')
 const [flightTo, setFlightTo] = useState('')
 const [cargoWeights, setCargoWeights]=useState({})
@@ -281,8 +297,23 @@ useState(0)
 
 const [aftCabinPax, setAftCabinPax] =
 useState(0)
-  const [selectedAircraft, setSelectedAircraft] =
-    useState(aircraftDatabase[0])
+  const [
+
+selectedAircraft,
+
+setSelectedAircraft
+
+]
+
+=
+
+useState(
+
+aircraftDatabase[0]
+
+
+
+)
    const [activeMenu, setActiveMenu] =
   useState('Dashboard') 
  const passengerWeight =
@@ -345,11 +376,8 @@ zfw +
 
 fuel
 const mainCargo =
-
-selectedAircraft
-
+selectedCargoAircraft
 ?.cargoConfig
-
 ?.mainDeck
 
 ?.reduce(
@@ -388,11 +416,8 @@ position.id
 
 
 const lowerCargo =
-
-selectedAircraft
-
+selectedCargoAircraft
 ?.cargoConfig
-
 ?.lowerDeck
 
 ?.reduce(
@@ -1915,6 +1940,88 @@ marginBottom:'12px'
 B737-800 CF
 
 </h1>
+<select
+
+value={
+
+selectedCargoAircraft.registration
+
+}
+
+onChange={(e)=>{
+
+const aircraft =
+
+aircraftDatabase.find(
+
+a=>
+
+a.registration===
+
+e.target.value
+
+)
+
+setSelectedCargoAircraft(
+
+aircraft
+
+)
+
+}}
+
+style={{
+
+padding:'12px',
+
+borderRadius:'12px',
+
+marginBottom:'20px'
+
+}}
+
+>
+
+{
+
+aircraftDatabase
+
+.filter(
+
+a=>
+
+a.type
+
+===
+
+'B737-800CF'
+
+)
+
+.map(
+
+a=>(
+
+<option
+
+key={a.registration}
+
+value={a.registration}
+
+>
+
+{a.registration}
+
+</option>
+
+)
+
+)
+
+}
+
+</select>
+
 <button
 
 onClick={
@@ -1986,13 +2093,7 @@ gap:'12px'
 
 {
 
-selectedAircraft
-
-?.cargoConfig
-
-?.mainDeck
-
-?.map(
+selectedAircraft?.cargoConfig?.mainDeck?.map(
 
 (position)=>(
 
@@ -2203,7 +2304,27 @@ MAX {
 position.max
 
 } kg
+<div
 
+style={{
+
+fontSize:'11px',
+
+opacity:0.5,
+
+marginTop:'4px'
+
+}}
+
+>
+
+ARM {
+
+position.arm
+
+}
+
+</div>
 </div>
 
 {
@@ -2311,10 +2432,8 @@ margin:'0 auto'
 
 {
 
-selectedAircraft
-
+selectedCargoAircraft
 ?.cargoConfig
-
 ?.lowerDeck
 
 ?.map(
@@ -2499,7 +2618,27 @@ MAX {
 position.max
 
 } kg
+<div
 
+style={{
+
+fontSize:'11px',
+
+opacity:0.5,
+
+marginTop:'4px'
+
+}}
+
+>
+
+ARM {
+
+position.arm
+
+}
+
+</div>
 </div>
 
 {
@@ -2749,7 +2888,7 @@ cargoZfw
 
 >
 
-selectedAircraft.maxZFW
+selectedCargoAircraft.maxZFW
 
 ?
 
