@@ -1,10 +1,12 @@
 import Login from './Login'
+import aircraftCargoDatabase from './data/aircraftCargoDatabase'
 import { useState, useEffect } from 'react'
 import './App.css'
 import StatusCard from './components/StatusCard'
 import a320Perfil from './assets/A320 perfil.png'
 import b737Perfil from './assets/b737 perfil.png'
 import EnvelopeChart from './components/EnvelopeChart'
+
 import { getMetar } from "./api/metar"
 async function getTaf(icao){
 
@@ -68,6 +70,21 @@ useState(
   const [fuel, setFuel] = useState(0)
   const [
 
+selectedAircraft,
+
+setSelectedAircraft
+
+]
+
+=
+
+useState(
+
+aircraftDatabase[0]
+
+)
+ const [
+
 selectedCargoAircraft,
 
 setSelectedCargoAircraft
@@ -78,7 +95,7 @@ setSelectedCargoAircraft
 
 useState(
 
-'LV-NGR'
+aircraftCargoDatabase[0]
 
 )
 function clearCargo(){
@@ -90,7 +107,6 @@ setCargoWeights(
 )
 
 }
-
 const [flightFrom, setFlightFrom] = useState('')
 const [flightTo, setFlightTo] = useState('')
 const [cargoWeights, setCargoWeights]=useState({})
@@ -297,23 +313,6 @@ useState(0)
 
 const [aftCabinPax, setAftCabinPax] =
 useState(0)
-  const [
-
-selectedAircraft,
-
-setSelectedAircraft
-
-]
-
-=
-
-useState(
-
-aircraftDatabase[0]
-
-
-
-)
    const [activeMenu, setActiveMenu] =
   useState('Dashboard') 
  const passengerWeight =
@@ -370,6 +369,7 @@ aftCargo
   forwardCargo +
 
   aftCargo 
+  
 const rw =
 
 zfw +
@@ -1950,9 +1950,9 @@ selectedCargoAircraft.registration
 
 onChange={(e)=>{
 
-const aircraft =
+setSelectedCargoAircraft(
 
-aircraftDatabase.find(
+aircraftCargoDatabase.find(
 
 a=>
 
@@ -1961,10 +1961,6 @@ a.registration===
 e.target.value
 
 )
-
-setSelectedCargoAircraft(
-
-aircraft
 
 )
 
@@ -1984,19 +1980,7 @@ marginBottom:'20px'
 
 {
 
-aircraftDatabase
-
-.filter(
-
-a=>
-
-a.type
-
-===
-
-'B737-800CF'
-
-)
+aircraftCargoDatabase
 
 .map(
 
@@ -2093,7 +2077,7 @@ gap:'12px'
 
 {
 
-selectedAircraft?.cargoConfig?.mainDeck?.map(
+selectedCargoAircraft?.cargoConfig?.mainDeck?.map(
 
 (position)=>(
 
@@ -2916,7 +2900,7 @@ cargoZfw
 
 >
 
-selectedAircraft.maxZFW
+selectedCargoAircraft.maxZFW
 
 ?
 
