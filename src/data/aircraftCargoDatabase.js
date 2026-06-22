@@ -10,21 +10,21 @@ mac:155.8,
 
 lemac:627.1,
 
-basicWeight:42675,
+basicWeight:39188,
 
-basicIndex:50,
+basicIndex:26.5,
 
-basicConfig:'2/4',
+basicConfig:'2',
 
 basicCrew:'STD CREW',
 
-maxZFW:61688,
+maxZFW:62731,
 
 maxTOW:79015,
 
-maxRW:79300,
+maxRW:79242,
 
-maxLW:65317,
+maxLW:66360,
 
 envelope:{
 
@@ -109,21 +109,21 @@ mac:155.8,
 
 lemac:627.1,
 
-basicWeight:42528,
+basicWeight:39630,
 
-basicIndex:51,
+basicIndex:28,
 
-basicConfig:'2/4',
+basicConfig:'2',
 
 basicCrew:'STD CREW',
 
-maxZFW:61688,
+maxZFW:62731,
 
 maxTOW:79015,
 
-maxRW:79300,
+maxRW:79242,
 
-maxLW:65317,
+maxLW:66360,
 
 envelope:{
 

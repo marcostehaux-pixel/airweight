@@ -2705,7 +2705,160 @@ border:
 }}
 
 >
+<div
 
+style={{
+
+marginTop:'40px',
+
+padding:'24px',
+
+borderRadius:'16px',
+
+background:
+
+'rgba(255,255,255,0.04)',
+
+border:
+
+'1px solid rgba(255,255,255,0.08)',
+
+marginBottom:'20px'
+
+}}
+
+>
+
+<h2>
+
+AIRCRAFT DATA
+
+</h2>
+
+<div
+style={{
+
+display:'flex',
+
+gap:'12px',
+
+flexDirection:'column'
+
+}}
+
+>
+
+<div>
+
+BASIC
+
+<strong>
+
+{
+
+selectedCargoAircraft.basicWeight
+
+}
+
+kg
+
+</strong>
+
+</div>
+
+<div>
+
+MAX ZFW
+
+<strong>
+
+{
+
+selectedCargoAircraft.maxZFW
+
+}
+
+kg
+
+</strong>
+
+</div>
+
+<div>
+
+TOW
+
+<strong>
+
+{
+
+cargoZfw
+
+}
+
+kg
+
+</strong>
+
+</div>
+
+<div>
+
+MAX TOW
+
+<strong>
+
+{
+
+selectedCargoAircraft.maxTOW
+
+}
+
+kg
+
+</strong>
+
+</div>
+
+<div>
+
+LW
+
+<strong>
+
+{
+
+cargoZfw
+
+}
+
+kg
+
+</strong>
+
+</div>
+
+<div>
+
+MAX LW
+
+<strong>
+
+{
+
+selectedCargoAircraft.maxLW
+
+}
+
+kg
+
+</strong>
+
+</div>
+
+</div>
+
+</div>
 <h2>
 
 CARGO SUMMARY
@@ -2888,7 +3041,7 @@ selectedCargoAircraft.maxZFW
 
 <span>
 
-MZFW STATUS
+ZFW STATUS
 
 </span>
 
@@ -3537,6 +3690,115 @@ maxWidth:'620px'
 AIRCRAFT SUMMARY
 
 </h3>
+<select
+
+value={
+
+selectedAircraft.registration
+
+}
+
+onChange={(e)=>{
+
+const paxAircraft =
+
+aircraftDatabase.find(
+
+a=>
+
+a.registration===
+
+e.target.value
+
+)
+
+const cargoAircraft =
+
+aircraftCargoDatabase.find(
+
+a=>
+
+a.registration===
+
+e.target.value
+
+)
+
+if(
+
+paxAircraft
+
+)
+
+setSelectedAircraft(
+
+paxAircraft
+
+)
+
+if(
+
+cargoAircraft
+
+)
+
+setSelectedAircraft(
+
+cargoAircraft
+
+)
+
+}}
+
+style={{
+
+padding:'12px',
+
+marginBottom:'20px',
+
+borderRadius:'10px'
+
+}}
+
+>
+
+{
+
+[
+
+...aircraftDatabase,
+
+...aircraftCargoDatabase
+
+]
+
+.map(
+
+a=>(
+
+<option
+
+key={a.registration}
+
+value={a.registration}
+
+>
+
+{
+
+a.registration
+
+}
+
+</option>
+
+)
+
+)
+
+}
+
+</select>
 <div
 
 style={{
@@ -3982,7 +4244,8 @@ boxShadow:
 >
       
 
-        {aircraftDatabase.map((aircraft) => (
+        {
+        aircraftDatabase.map((aircraft) => (
 
           <option
 
