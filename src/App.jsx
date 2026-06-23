@@ -2786,24 +2786,6 @@ kg
 
 <div>
 
-TOW
-
-<strong>
-
-{
-
-cargoZfw
-
-}
-
-kg
-
-</strong>
-
-</div>
-
-<div>
-
 MAX TOW
 
 <strong>
@@ -2819,25 +2801,6 @@ kg
 </strong>
 
 </div>
-
-<div>
-
-LW
-
-<strong>
-
-{
-
-cargoZfw
-
-}
-
-kg
-
-</strong>
-
-</div>
-
 <div>
 
 MAX LW
@@ -2880,7 +2843,41 @@ marginBottom:'10px'
 }}
 
 >
+<span>
 
+BASIC WEIGHT
+
+</span>
+
+<strong>
+
+{
+
+selectedCargoAircraft.basicWeight
+
+}
+
+kg
+
+</strong>
+
+</div>
+
+<div
+
+style={{
+
+display:'flex',
+
+gap:'8px',
+
+alignItems:'center',
+
+marginBottom:'10px'
+
+}}
+
+>
 <span>
 
 MAIN
@@ -3139,7 +3136,7 @@ availablePayload
 
 <span>
 
-UTILIZATION
+Loaded
 
 </span>
 
@@ -3654,7 +3651,7 @@ AIRCRAFT
 
 style={{
 
-color:'#b8c0cc',
+color:'#ccc0b8',
 
 marginBottom:'30px'
 
