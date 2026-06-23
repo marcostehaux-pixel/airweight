@@ -7,6 +7,68 @@ import a320Perfil from './assets/A320 perfil.png'
 import b737cfPerfil from './assets/b737cfPerfil.png'
 import b737Perfil from './assets/b737 perfil.png'
 import EnvelopeChart from './components/EnvelopeChart'
+import {
+
+lowerDeckFactors,
+
+mainDeckTables
+
+}
+
+from
+
+'./utilit/cargoIndexTables'
+function getMainIndex(
+
+position,
+
+weight
+
+){
+
+if(
+
+!
+
+mainDeckTables[
+
+position
+
+]
+
+)
+
+return 0
+
+const row=
+
+mainDeckTables[
+
+position
+
+]
+
+.find(
+
+entry=>
+
+entry.kg===
+
+weight
+
+)
+
+return row
+
+?
+
+row.index
+
+:
+
+0
+
+}
 
 import { getMetar } from "./api/metar"
 async function getTaf(icao){
@@ -454,8 +516,182 @@ position.id
 ||
 
 0
+const lowerDeckIndex =
 
+selectedCargoAircraft
 
+?.cargoConfig
+
+?.lowerDeck
+
+?.reduce(
+
+(
+
+total,
+
+position
+
+)=>
+
+total
+
++
+
+(
+
+(
+
+cargoWeights[
+
+position.id
+
+]
+
+||
+
+0
+
+)
+
+*
+
+(
+
+lowerDeckFactors[
+
+position.id
+
+]
+
+||
+
+0
+
+)
+
+),
+
+0
+
+)
+
+.toFixed(
+
+2
+
+)
+console.log(
+
+'LOWER INDEX',
+
+lowerDeckIndex
+
+)
+
+function getMainIndex(
+
+position,
+
+weight
+
+){
+
+if(
+
+!
+
+mainDeckTables[
+
+position
+
+]
+
+)
+
+return 0
+
+const row=
+
+mainDeckTables[
+
+position
+
+]
+
+.find(
+
+v=>
+
+v.kg===
+
+weight
+
+)
+
+return row
+
+?
+
+row.index
+
+:
+
+0
+
+}
+const mainDeckIndex =
+
+selectedCargoAircraft
+
+?.cargoConfig
+
+?.mainDeck
+
+?.reduce(
+
+(
+
+total,
+
+position
+
+)=>
+
+total
+
++
+
+getMainIndex(
+
+position.id,
+
+cargoWeights[
+
+position.id
+
+]
+
+||
+
+0
+
+),
+
+0
+
+)
+
+||
+
+0
+console.log(
+
+'MAIN INDEX',
+
+mainDeckIndex
+
+)
 const totalCargo = mainCargo + lowerCargo
 const cargoZfw =
 
@@ -2721,21 +2957,28 @@ AIRCRAFT DATA
 </h2>
 
 <div
+
 style={{
 
 display:'flex',
 
-gap:'12px',
+gap:'15px',
 
-flexDirection:'column'
+flexDirection:'column',
+
+alignItems:'center'
 
 }}
 
 >
 
-<div>
+<div style={{display:'flex'}}>
+
+<span style={{width:'100px'}}>
 
 BASIC
+
+</span>
 
 <strong>
 
@@ -2751,9 +2994,13 @@ kg
 
 </div>
 
-<div>
+<div style={{display:'flex'}}>
+
+<span style={{width:'100px'}}>
 
 MAX ZFW
+
+</span>
 
 <strong>
 
@@ -2769,9 +3016,13 @@ kg
 
 </div>
 
-<div>
+<div style={{display:'flex'}}>
+
+<span style={{width:'100px'}}>
 
 MAX TOW
+
+</span>
 
 <strong>
 
@@ -2786,9 +3037,14 @@ kg
 </strong>
 
 </div>
-<div>
+
+<div style={{display:'flex'}}>
+
+<span style={{width:'100px'}}>
 
 MAX LW
+
+</span>
 
 <strong>
 
@@ -3044,6 +3300,82 @@ selectedCargoAircraft.maxZFW
 :
 
 'OK'
+
+}
+
+</strong>
+
+</div>
+<div
+
+style={{
+
+display:'flex',
+
+gap:'8px',
+
+alignItems:'center',
+
+marginBottom:'10px'
+
+}}
+
+>
+
+<span>
+
+LOWER INDEX
+
+</span>
+
+<strong>
+
+{
+
+lowerDeckIndex
+
+}
+
+</strong>
+
+</div>
+<div
+
+style={{
+
+display:'flex',
+
+gap:'8px',
+
+alignItems:'center',
+
+marginBottom:'10px'
+
+}}
+
+>
+
+<span>
+
+MAIN INDEX
+
+</span>
+
+<strong>
+
+{
+
+Number(
+
+mainDeckIndex
+
+)
+
+.toFixed(
+
+2
+
+)
 
 }
 
