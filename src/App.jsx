@@ -456,13 +456,21 @@ position.id
 
 
 const totalCargo = mainCargo + lowerCargo
-const cargoZfw = selectedAircraft.basicWeight + totalCargo
+const cargoZfw =
+
+selectedCargoAircraft.basicWeight
+
++
+
+totalCargo
 
 const availablePayload =
 
-selectedAircraft.maxZFW -
+selectedCargoAircraft.maxZFW
 
-selectedAircraft.basicWeight
+-
+
+cargoZfw
 const fuelWeight =
   fuel
 
@@ -2489,23 +2497,7 @@ style={{
 
 width:'90px',
 
-padding:'10px',
-
-textAlign:'center',
-
-background:
-
-'rgba(255,255,255,0.06)',
-
-border:
-
-'1px solid rgba(255,255,255,0.08)',
-
-borderRadius:'8px',
-
-color:'#00ff88',
-
-fontSize:'18px'
+width:'90px'
 
 }}
 
@@ -2515,29 +2507,21 @@ fontSize:'18px'
 
 style={{
 
-marginTop:'12px',
+marginTop:'10px',
 
-fontSize:'18px',
+fontSize:'12px',
 
-color:'#00ff88',
-
-fontWeight:'700'
+opacity:0.7
 
 }}
 
 >
 
+MAX
+
 {
 
-cargoWeights[
-
-position.id
-
-]
-
-||
-
-0
+position.max
 
 }
 

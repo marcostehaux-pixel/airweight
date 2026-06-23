@@ -67,31 +67,31 @@ cargoConfig:{
 
 mainDeck:[
 
-{id:'M1',max:6804,arm:420},
-{id:'M2',max:6804,arm:500},
-{id:'M3',max:6804,arm:580},
-{id:'M4',max:6804,arm:660},
-{id:'M5',max:6804,arm:740},
+{id:'M1',max:2494,arm:420},
+{id:'M2',max:2948,arm:500},
+{id:'M3',max:2948,arm:580},
+{id:'M4',max:2948,arm:660},
+{id:'M5',max:3628,arm:740},
 
-{id:'M6',max:6804,arm:820},
-{id:'M7',max:6804,arm:900},
-{id:'M8',max:6804,arm:980},
-{id:'M9',max:6804,arm:1060},
-{id:'M10',max:6804,arm:1140},
+{id:'M6',max:3628,arm:820},
+{id:'M7',max:2948,arm:900},
+{id:'M8',max:2948,arm:980},
+{id:'M9',max:2948,arm:1060},
+{id:'M10',max:2497,arm:1140},
 
-{id:'P12',max:2494,arm:1220}
+{id:'P12',max:1133,arm:1220}
 
 ],
 
 lowerDeck:[
 
-{id:'F1',max:1600,arm:350},
-{id:'F2',max:1600,arm:470},
-{id:'F3',max:1600,arm:590},
+{id:'F1',max:553,arm:350},
+{id:'F2',max:336,arm:470},
+{id:'F3',max:2670,arm:590},
 
-{id:'R4',max:1600,arm:870},
-{id:'R5',max:1600,arm:980},
-{id:'R6',max:1600,arm:1090}
+{id:'R4',max:4086,arm:870},
+{id:'R5',max:361,arm:980},
+{id:'R6',max:402,arm:1090}
 
 ]
 
@@ -166,31 +166,31 @@ cargoConfig:{
 
 mainDeck:[
 
-{id:'M1',max:6804,arm:420},
-{id:'M2',max:6804,arm:500},
-{id:'M3',max:6804,arm:580},
-{id:'M4',max:6804,arm:660},
-{id:'M5',max:6804,arm:740},
+{id:'M1',max:2494,arm:420},
+{id:'M2',max:2948,arm:500},
+{id:'M3',max:2948,arm:580},
+{id:'M4',max:2948,arm:660},
+{id:'M5',max:3628,arm:740},
 
-{id:'M6',max:6804,arm:820},
-{id:'M7',max:6804,arm:900},
-{id:'M8',max:6804,arm:980},
-{id:'M9',max:6804,arm:1060},
-{id:'M10',max:6804,arm:1140},
+{id:'M6',max:3628,arm:820},
+{id:'M7',max:2948,arm:900},
+{id:'M8',max:2948,arm:980},
+{id:'M9',max:2948,arm:1060},
+{id:'M10',max:2497,arm:1140},
 
-{id:'P12',max:2494,arm:1220}
+{id:'P12',max:1133,arm:1220}
 
 ],
 
 lowerDeck:[
 
-{id:'F1',max:1600,arm:350},
-{id:'F2',max:1600,arm:470},
-{id:'F3',max:1600,arm:590},
+{id:'F1',max:553,arm:350},
+{id:'F2',max:336,arm:470},
+{id:'F3',max:2670,arm:590},
 
-{id:'R4',max:1600,arm:870},
-{id:'R5',max:1600,arm:980},
-{id:'R6',max:1600,arm:1090}
+{id:'R4',max:4086,arm:870},
+{id:'R5',max:361,arm:980},
+{id:'R6',max:402,arm:1090}
 
 ]
 
