@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import StatusCard from './components/StatusCard'
 import a320Perfil from './assets/A320 perfil.png'
+import b737cfPerfil from './assets/b737cfPerfil.png'
 import b737Perfil from './assets/b737 perfil.png'
 import EnvelopeChart from './components/EnvelopeChart'
 
@@ -3799,12 +3800,14 @@ marginBottom:'25px'
 src={
 
 selectedAircraft.type.includes(
-'A320'
+
+'CF'
+
 )
 
 ?
 
-a320Perfil
+b737cfPerfil
 
 :
 
@@ -3826,7 +3829,7 @@ margin:'0 auto'
 
 }}
 
- />
+/>
 
 </div>
 <div
