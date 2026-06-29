@@ -10,6 +10,7 @@ import {getAvailablePayload} from './utilit/cargoCalculator'
 import {getTotalCargo} from './utilit/cargoCalculator'
 import {calculateCargoBalance} from './utilit/cargoCalculator'
 import { useState, useEffect } from 'react'
+import { calculateFuel } from './utilit/fuelCalculator'
 import './App.css'
 import StatusCard from './components/StatusCard'
 import a320Perfil from './assets/A320 perfil.png'
@@ -62,60 +63,12 @@ import generateLoadsheet from './utils/generateLoadsheet'
 import logo from './assets/logo.png'
 import aircraftImage from './assets/a320.png'
 function App() {
-const [
-
-logged,
-
-setLogged
-
-]=useState(
-
-false
-
-)
+const [logged,setLogged]=useState(false)
 const [tripFuel, setTripFuel] = useState(0)
-const [
-
-taxiFuel,
-
-setTaxiFuel
-
-]=
-
-useState(
-
-0
-
-)
-  const [fuel, setFuel] = useState(0)
-  const [
-
-selectedAircraft,
-
-setSelectedAircraft
-
-]
-
-=
-
-useState(
-
-aircraftDatabase[0]
-
-)
- const [
-
-selectedCargoAircraft,
-
-setSelectedCargoAircraft
-
-]
-
-=
-
-useState(
-
-aircraftCargoDatabase[0]
+const [taxiFuel,setTaxiFuel ]= useState(0)
+const [fuel, setFuel] = useState(0)
+const [selectedAircraft,setSelectedAircraft] = useState(aircraftDatabase[0])
+const [selectedCargoAircraft,setSelectedCargoAircraft] = useState(aircraftCargoDatabase[0]
 
 )
 function clearCargo(){
@@ -409,7 +362,13 @@ const {
   selectedCargoAircraft,
   cargoWeights
 )
+const fuelData = calculateFuel(
+  fuel,
+  taxiFuel,
+  tripFuel
+)
 
+console.log(fuelData)
 const basicArm =
 
 selectedAircraft.lemac +
@@ -603,13 +562,13 @@ aftPax *
 
 )
 
- const fuelMoment =
+ const FuelMoment =
 
   calculateMoment(
 
     fuel,
 
-    selectedAircraft.fuelArm
+    selectedAircraft.FuelArm
 
   )
 
@@ -626,7 +585,7 @@ const totalMoment =
 
   passengerMoment +
 
-  fuelMoment +
+  FuelMoment +
 
   forwardCargoMoment +
 
@@ -822,132 +781,17 @@ totalMoment
 :
 
 0
-const effectiveBasicIndex =
+const effectiveBasicIndex = doi + (extraCrew *0.1) + (catering? 0.2 : 0)
+const cargoIndex = (forwardCargo /1000) * (-9) + (aftCargo /1000) * (7)
 
-doi +
-
-(
-
-extraCrew *
-
-0.1
-
-)
-
-+
-
-(
-
-catering
-
-?
-
-0.2
-
-:
-
-0
-
-)
-const cargoIndex =
-
-(
-
-forwardCargo /
-
-1000
-
-)
-
-*
-
-(
-
--9
-
-)
-
-+
-
-(
-
-aftCargo /
-
-1000
-
-)
-
-*
-
-(
-
-7
-)
-
-const zfi =
-
-effectiveBasicIndex +
-
-paxIndex +
-
-cargoIndex
-const zfiDebug =
-
-effectiveBasicIndex +
-
-cargoIndex
-const fuelIndex =
-
-getFuelIndex(
-
-fuel
-)
-const toi =
-
-zfi +
-
-fuelIndex
-const tripFuelIndex =
-
-getFuelIndex(
-
-tripFuel
-
-)
-
-
-const li =
-
-toi -
-
-tripFuelIndex
-const trim =
-
-5.5 -
-
-(
-
-cg -
-
-15
-
-)
-
-*
-
-0.12
-function getFuelIndex(
-
-fuel
-
-){
-if (
-
-fuel <= 0
-
-)
-
-return 0
+const zfi = effectiveBasicIndex + paxIndex + cargoIndex
+const zfiDebug = effectiveBasicIndex + cargoIndex
+const FuelIndex = getFuelIndex(fuel)
+const toi = zfi + FuelIndex
+const tripFuelIndex = getFuelIndex(tripFuel)
+const li = toi - tripFuelIndex
+const trim = 5.5 - (cg - 15) * 0.12
+function getFuelIndex(fuel){if (fuel <= 0)return 0
 const table = [
 
 [4000,1],
@@ -4488,7 +4332,7 @@ title="FUEL INDEX"
 
 value={
 
-fuelIndex
+FuelIndex
 
 }
 
@@ -5320,7 +5164,7 @@ CATERING
 
     >
 
-      Fuel:
+      fuel:
       <strong>
         {' '}
         {fuel} KG
@@ -5396,7 +5240,7 @@ loadStatus
 
 <label>
 
-Total Fuel (kg)
+Block Fuel (kg)
 
 </label>
 
@@ -5405,26 +5249,11 @@ Total Fuel (kg)
   value={fuel}
   onChange={(e)=>{
 
-const value=
+const value= parseInt(e.target.value)||0
 
-parseInt(
-
-e.target.value
-
-)||0
-
-setFuel(
-
-Math.min(
-
-value,
-
-20598
-
+setfuel(Math.min(value,20598
 )
-
 )
-
 }}
 
 ></input>
@@ -5433,13 +5262,7 @@ value,
 
 <div
 
-style={{
-
-marginTop:'25px',
-
-marginBottom:'20px'
-
-}}
+style={{marginTop:'25px',marginBottom:'20px'}}
 
 >
 
@@ -5453,31 +5276,30 @@ Taxi Fuel (kg)
   type="number"
   value={taxiFuel}
   onChange={(e)=>{
+    setTaxiFuel(parseInt(e.target.value)||0)
+  }}
+/>
 
-setTaxiFuel(
-
-parseInt(
-
-e.target.value
-
-)||0
-
-)
-
-}}
-
-></input>
 <div
-
 style={{
-
-marginTop:'20px',
-
-marginBottom:'20px'
-
+  marginTop:'20px',
+  marginBottom:'20px'
 }}
-
 >
+
+<label>
+
+Takeoff Fuel (kg)
+
+</label>
+
+<input
+  type="number"
+  value={fuelData.takeoffFuel}
+  readOnly
+/>
+
+</div>
 
 <label>
 
@@ -5486,28 +5308,12 @@ Trip Fuel (kg)
 </label>
 
 <input
-
-type="number"
-
-value={tripFuel}
-
-onChange={(e)=>{
-
-setTripFuel(
-
-parseInt(
-
-e.target.value
-
-)||0
-
-)
-
-}}
-
-></input>
-
-</div>
+  type="number"
+  value={tripFuel}
+  onChange={(e)=>{
+    setTripFuel(parseInt(e.target.value)||0)
+  }}
+/>
 
 </div>
 <div style={{ marginBottom: '25px' }}>
