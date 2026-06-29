@@ -1,5 +1,14 @@
 import Login from './Login'
 import aircraftCargoDatabase from './data/aircraftCargoDatabase'
+import {getLowerDeckIndex} from './utilit/cargoCalculator'
+import {getMainDeckIndex} from './utilit/cargoCalculator'
+import {getMainCargo} from './utilit/cargoCalculator'
+import {getTotalCargoIndex} from './utilit/cargoCalculator'
+import {getLowerCargo} from './utilit/cargoCalculator'
+import {getCargoZfw} from './utilit/cargoCalculator'
+import {getAvailablePayload} from './utilit/cargoCalculator'
+import {getTotalCargo} from './utilit/cargoCalculator'
+import {calculateCargoBalance} from './utilit/cargoCalculator'
 import { useState, useEffect } from 'react'
 import './App.css'
 import StatusCard from './components/StatusCard'
@@ -7,67 +16,15 @@ import a320Perfil from './assets/A320 perfil.png'
 import b737cfPerfil from './assets/b737cfPerfil.png'
 import b737Perfil from './assets/b737 perfil.png'
 import EnvelopeChart from './components/EnvelopeChart'
-import {
-
-lowerDeckFactors,
-
-mainDeckTables
-
-}
-
-from
-
-'./utilit/cargoIndexTables'
-function getMainIndex(
-
-position,
-
-weight
-
-){
-
-if(
-
-!
-
-mainDeckTables[
-
-position
-
-]
-
-)
-
+import {lowerDeckFactors,mainDeckTables} from './utilit/cargoIndexTables'
+function getMainIndex(position,weight){
+if(!mainDeckTables[position])
 return 0
 
-const row=
-
-mainDeckTables[
-
-position
-
-]
-
-.find(
-
-entry=>
-
-entry.kg===
-
-weight
-
-)
-
+const row= mainDeckTables[position].find(v=> Number(weight)<=v.kg)
+console.log(position,weight,row)
 return row
-
-?
-
-row.index
-
-:
-
-0
-
+?row.index:0
 }
 
 import { getMetar } from "./api/metar"
@@ -439,154 +396,19 @@ zfw +
 
 fuel
 const mainCargo =
-selectedCargoAircraft
-?.cargoConfig
-?.mainDeck
-
-?.reduce(
-
-(
-
-total,
-
-position
-
-)=>
-
-total +
-
-(
-
-cargoWeights[
-
-position.id
-
-]
-
-||
-
-0
-
-),
-
-0
-
+getMainCargo(
+  selectedCargoAircraft,
+  cargoWeights
 )
-
-||
-
-0
-
-
 const lowerCargo =
-selectedCargoAircraft
-?.cargoConfig
-?.lowerDeck
-
-?.reduce(
-
-(
-
-total,
-
-position
-
-)=>
-
-total +
-
-(
-
-cargoWeights[
-
-position.id
-
-]
-
-||
-
-0
-
-),
-
-0
-
+getLowerCargo(
+  selectedCargoAircraft,
+  cargoWeights
 )
-
-||
-
-0
 const lowerDeckIndex =
-
-selectedCargoAircraft
-
-?.cargoConfig
-
-?.lowerDeck
-
-?.reduce(
-
-(
-
-total,
-
-position
-
-)=>
-
-total
-
-+
-
-(
-
-(
-
-cargoWeights[
-
-position.id
-
-]
-
-||
-
-0
-
-)
-
-*
-
-(
-
-lowerDeckFactors[
-
-position.id
-
-]
-
-||
-
-0
-
-)
-
-),
-
-0
-
-)
-
-.toFixed(
-
-2
-
-)
-console.log(
-
-'LOWER INDEX',
-
-lowerDeckIndex
-
+getLowerDeckIndex(
+  selectedCargoAircraft,
+  cargoWeights
 )
 
 function getMainIndex(
@@ -642,6 +464,8 @@ row.index
 }
 const mainDeckIndex =
 
+(
+
 selectedCargoAircraft
 
 ?.cargoConfig
@@ -658,13 +482,9 @@ position
 
 )=>
 
-total
+{
 
-+
-
-getMainIndex(
-
-position.id,
+const weight=
 
 cargoWeights[
 
@@ -676,7 +496,37 @@ position.id
 
 0
 
-),
+const index=
+
+getMainIndex(
+
+position.id,
+
+weight
+
+)
+
+console.log(
+
+position.id,
+
+weight,
+
+index
+
+)
+
+return (
+
+total
+
++
+
+index
+
+)
+
+},
 
 0
 
@@ -685,6 +535,8 @@ position.id
 ||
 
 0
+
+)
 console.log(
 
 'MAIN INDEX',
@@ -692,22 +544,32 @@ console.log(
 mainDeckIndex
 
 )
-const totalCargo = mainCargo + lowerCargo
+const totalCargoIndex =
+getTotalCargoIndex(
+  mainDeckIndex,
+  lowerDeckIndex
+)
+const totalCargo =
+getTotalCargo(
+  mainCargo,
+  lowerCargo
+)
 const cargoZfw =
-
-selectedCargoAircraft.basicWeight
-
-+
-
-totalCargo
+getCargoZfw(
+  selectedCargoAircraft,
+  totalCargo
+)
 
 const availablePayload =
-
-selectedCargoAircraft.maxZFW
-
--
-
-cargoZfw
+getAvailablePayload(
+  selectedCargoAircraft,
+  cargoZfw
+)
+const cargoData = calculateCargoBalance(
+  selectedCargoAircraft,
+  cargoWeights
+)
+console.log(cargoData)
 const fuelWeight =
   fuel
 
@@ -3381,6 +3243,24 @@ mainDeckIndex
 
 </strong>
 
+</div>
+<div
+  style={{
+
+display:'flex',
+
+gap:'8px',
+
+alignItems:'center',
+
+marginBottom:'10px'
+  }}
+>
+  <span>TOTAL INDEX</span>
+
+  <strong>
+    {totalCargoIndex.toFixed(2)}
+  </strong>
 </div>
 <div
 

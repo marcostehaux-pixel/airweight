@@ -28,7 +28,7 @@ const expiration =
 
 new Date(
 
-'2026-06-25'
+'2026-07-10'
 
 )
 
@@ -54,11 +54,11 @@ return
 
 if(
 
-user==='Alumno1'
+user==='Alumno2'
 
 &&
 
-password==='airweight2026'
+password==='airweight20'
 
 ){
 
