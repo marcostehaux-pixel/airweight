@@ -395,183 +395,20 @@ const rw =
 zfw +
 
 fuel
-const mainCargo =
-getMainCargo(
-  selectedCargoAircraft,
-  cargoWeights
-)
-const lowerCargo =
-getLowerCargo(
-  selectedCargoAircraft,
-  cargoWeights
-)
-const lowerDeckIndex =
-getLowerDeckIndex(
-  selectedCargoAircraft,
-  cargoWeights
-)
 
-function getMainIndex(
-
-position,
-
-weight
-
-){
-
-if(
-
-!
-
-mainDeckTables[
-
-position
-
-]
-
-)
-
-return 0
-
-const row=
-
-mainDeckTables[
-
-position
-
-]
-
-.find(
-
-v=>
-
-v.kg===
-
-weight
-
-)
-
-return row
-
-?
-
-row.index
-
-:
-
-0
-
-}
-const mainDeckIndex =
-
-(
-
-selectedCargoAircraft
-
-?.cargoConfig
-
-?.mainDeck
-
-?.reduce(
-
-(
-
-total,
-
-position
-
-)=>
-
-{
-
-const weight=
-
-cargoWeights[
-
-position.id
-
-]
-
-||
-
-0
-
-const index=
-
-getMainIndex(
-
-position.id,
-
-weight
-
-)
-
-console.log(
-
-position.id,
-
-weight,
-
-index
-
-)
-
-return (
-
-total
-
-+
-
-index
-
-)
-
-},
-
-0
-
-)
-
-||
-
-0
-
-)
-console.log(
-
-'MAIN INDEX',
-
-mainDeckIndex
-
-)
-const totalCargoIndex =
-getTotalCargoIndex(
-  mainDeckIndex,
-  lowerDeckIndex
-)
-const totalCargo =
-getTotalCargo(
+const {
   mainCargo,
-  lowerCargo
-)
-const cargoZfw =
-getCargoZfw(
-  selectedCargoAircraft,
-  totalCargo
-)
-
-const availablePayload =
-getAvailablePayload(
-  selectedCargoAircraft,
-  cargoZfw
-)
-const cargoData = calculateCargoBalance(
+  lowerCargo,
+  totalCargo,
+  cargoZfw,
+  availablePayload,
+  mainDeckIndex,
+  lowerDeckIndex,
+  totalCargoIndex
+} = calculateCargoBalance(
   selectedCargoAircraft,
   cargoWeights
 )
-console.log(cargoData)
-const fuelWeight =
-  fuel
 
 const basicArm =
 
@@ -2184,13 +2021,9 @@ gap:'12px'
 
 {
 
-selectedCargoAircraft?.cargoConfig?.mainDeck?.map(
+selectedCargoAircraft?.cargoConfig?.mainDeck?.map((position ) => (
 
-(position)=>(
-
-<div
-
-key={position.id}
+<div key={position.id}
 
 style={{
 
@@ -2526,30 +2359,25 @@ margin:'0 auto'
 selectedCargoAircraft
 ?.cargoConfig
 ?.lowerDeck
-
 ?.map(
 
 (position)=>(
 
-<div>
+<div
+key={position.id}
+>
 
 <div
 style={{
-
 fontWeight:'700',
-
 fontSize:'22px',
-
 marginBottom:'18px'
-
 }}
-
 >
 
 {position.id}
 
 </div>
-
 <input
 
 type="number"
