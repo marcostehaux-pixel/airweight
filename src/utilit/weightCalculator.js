@@ -9,12 +9,24 @@ export function getLandingWeight(cargoZfw, remainingFuel) {
   return cargoZfw + remainingFuel
 
 }
+export function getRampWeight(
+  cargoZfw,
+  fuel
+) {
 
+  return (
+    cargoZfw +
+    fuel
+  )
+
+}
 export function calculateWeight(
   cargoZfw,
   takeoffFuel,
   remainingFuel
-) {
+) 
+
+{
 
   const takeoffWeight =
     getTakeoffWeight(

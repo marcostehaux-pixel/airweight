@@ -369,6 +369,7 @@ console.log(fuelData)
 const weightData = calculateWeight(cargoZfw,fuelData.takeoffFuel,fuelData.remainingFuel)
 
 console.log(weightData)
+const rampWeight = cargoZfw + fuel
 const basicArm = selectedAircraft.lemac + (selectedAircraft.mac *22) /100
 
 const basicMoment =(selectedAircraft.basicWeight || 0) * basicArm
@@ -549,144 +550,18 @@ selectedAircraft.mac
 
 0
 
-const [
-
-extraCrew,
-
-setExtraCrew
-
-]
-
-=
-
-useState(
-
-0
-
-)
-const [
-
-catering,
-
-setCatering
-
-]
-
-=
-
-useState(
-
-0
-
-)
-const dow =
-
-selectedAircraft.basicWeight
-const cateringWeight =
-
-catering
-
-?
-
-250
-
-:
-
-0
-
-
-const effectiveBasicWeight =
-
-dow +
-
-(
-
-extraCrew *
-
-85
-
-)
-
-+
-
-cateringWeight
-
-const crewConfiguration =
-
-extraCrew > 0
-
-?
-
-`2/${4 + extraCrew}`
-
-:
-
-selectedAircraft.basicConfig
-const basicWeightDelta =
-
-effectiveBasicWeight -
-
-selectedAircraft.basicWeight
-const effectiveBasicMoment =
-
-(
-
-extraCrew *
-
-85 *
-
-360
-
-)
-
-+
-
-(
-
-catering
-
-?
-
-250 * 420
-
-:
-
-0
-
-)
-const doi =
-
-selectedAircraft.basicIndex +
-
-(
-
-extraCrew *
-
-0.1
-
-)
-const index =
-
-Number.isFinite(
-
-totalMoment
-
-)
-
-?
-
-calculateIndex(
-
-totalMoment
-
-)
-
-:
-
-0
+const [extraCrew,setExtraCrew] = useState(0)
+const [ catering,setCatering] = useState( 0 )
+const dow = selectedAircraft.basicWeight
+const cateringWeight = catering ? 250 :0
+const effectiveBasicWeight = dow + (extraCrew *85) + cateringWeight
+const crewConfiguration = extraCrew > 0 ? `2/${4 + extraCrew}` : selectedAircraft.basicConfig
+const basicWeightDelta = effectiveBasicWeight - selectedAircraft.basicWeight
+const effectiveBasicMoment = (extraCrew * 85 * 360) + (catering ? 250 * 420 : 0)
+const doi = selectedAircraft.basicIndex + (extraCrew * 0.1)
+const index = Number.isFinite(totalMoment) ? calculateIndex(totalMoment) :0
 const effectiveBasicIndex = doi + (extraCrew *0.1) + (catering? 0.2 : 0)
 const cargoIndex = (forwardCargo /1000) * (-9) + (aftCargo /1000) * (7)
-
 const zfi = effectiveBasicIndex + paxIndex + cargoIndex
 const zfiDebug = effectiveBasicIndex + cargoIndex
 const FuelIndex = getFuelIndex(fuel)
@@ -2393,6 +2268,7 @@ marginBottom:'10px'
 }}
 
 >
+  
 <span>
 
 BASIC WEIGHT
@@ -2401,13 +2277,7 @@ BASIC WEIGHT
 
 <strong>
 
-{
-
-selectedCargoAircraft.basicWeight
-
-}
-
-kg
+{selectedCargoAircraft.basicWeight} kg
 
 </strong>
 
@@ -2415,17 +2285,7 @@ kg
 
 <div
 
-style={{
-
-display:'flex',
-
-gap:'8px',
-
-alignItems:'center',
-
-marginBottom:'10px'
-
-}}
+style={{ display:'flex', gap:'8px', alignItems:'center', marginBottom:'10px'}}
 
 >
 <span>
@@ -2436,13 +2296,7 @@ MAIN
 
 <strong>
 
-{
-
-mainCargo
-
-}
-
-kg
+{mainCargo} kg
 
 </strong>
 
@@ -2450,42 +2304,47 @@ kg
 
 <div
 
-style={{
-
-display:'flex',
-
-gap:'8px',
-
-alignItems:'center',
-
-marginBottom:'10px'
-
-}}
-
+style={{ display:'flex', gap:'8px', alignItems:'center', marginBottom:'10px'}}
 >
-
 <span>
-
 LOWER
-
 </span>
-
 <strong>
-
-{
-
-lowerCargo
-
-}
-
-kg
+{lowerCargo} kg
 
 </strong>
 
 </div>
 
 <div
+style={{display:'flex', gap:'8px', alignItems:'center', marginBottom:'10px'}}
+>
 
+<span>
+TRAFFIC LOAD
+</span>
+
+<strong>
+{totalCargo} kg
+</strong>
+ 
+</div>
+<div 
+style={{ display:'flex', gap:'8px', alignItems:'center', marginBottom:'10px'}}
+
+>
+
+<span>
+ZFW
+</span>
+<strong>
+
+{cargoZfw} kg
+
+</strong>
+
+</div>
+<div
 style={{
 
 display:'flex',
@@ -2497,30 +2356,16 @@ alignItems:'center',
 marginBottom:'10px'
 
 }}
-
 >
-
 <span>
-
-TOTAL
-
+BLOCK FUEL
 </span>
-
 <strong>
-
-{
-
-totalCargo
-
-}
-
-kg
-
+{fuel} kg
 </strong>
 
 </div>
 <div
-
 style={{
 
 display:'flex',
@@ -2532,12 +2377,11 @@ alignItems:'center',
 marginBottom:'10px'
 
 }}
-
 >
 
 <span>
 
-CARGO ZFW
+RAMP WEIGHT
 
 </span>
 
@@ -2545,7 +2389,7 @@ CARGO ZFW
 
 {
 
-cargoZfw
+rampWeight
 
 }
 
@@ -2555,7 +2399,6 @@ kg
 
 </div>
 <div
-
 style={{
 
 display:'flex',
@@ -2564,9 +2407,124 @@ gap:'8px',
 
 alignItems:'center',
 
-marginBottom:'10px',
+marginBottom:'10px'
 
-color:
+}}
+>
+
+<span>
+
+TAXI FUEL
+
+</span>
+
+<strong>
+
+{
+
+taxiFuel
+
+}
+
+kg
+
+</strong>
+
+</div>
+<div
+style={{
+
+display:'flex',
+
+gap:'8px',
+
+alignItems:'center',
+
+marginBottom:'10px'
+
+}}
+>
+
+<span>
+
+TAKEOFF WEIGHT
+
+</span>
+
+<strong>
+
+{
+
+weightData.takeoffWeight
+
+}
+
+kg
+
+</strong>
+
+</div>
+<div
+style={{
+
+display:'flex',
+
+gap:'8px',
+
+alignItems:'center',
+
+marginBottom:'10px'
+
+}}
+>
+
+<span>
+
+TRIP FUEL
+
+</span>
+
+<strong>
+
+{tripFuel}
+
+kg
+
+</strong>
+
+</div>
+<div
+style={{
+
+display:'flex',
+
+gap:'8px',
+
+alignItems:'center',
+
+marginBottom:'10px'
+
+}}
+>
+
+<span>
+
+LANDING WEIGHT
+
+</span>
+
+<strong>
+
+{weightData.landingWeight}
+
+kg
+
+</strong>
+
+</div>
+<div
+
+style={{display:'flex', gap:'8px', alignItems:'center', marginBottom:'10px', color:
 
 cargoZfw
 
@@ -3988,6 +3946,17 @@ zfCg?.toFixed?.(1)
 unit="%"
 
 status={true}
+/>
+<StatusCard
+
+title="BLOCK FUEL"
+
+value={fuel}
+
+unit="kg"
+
+status={true}
+
 />
 <StatusCard
 
