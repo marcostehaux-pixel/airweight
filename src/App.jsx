@@ -9,8 +9,9 @@ import {getCargoZfw} from './utilit/cargoCalculator'
 import {getAvailablePayload} from './utilit/cargoCalculator'
 import {getTotalCargo} from './utilit/cargoCalculator'
 import {calculateCargoBalance} from './utilit/cargoCalculator'
+import { calculateWeight } from './utilit/weightCalculator'
 import { useState, useEffect } from 'react'
-import { calculateFuel } from './utilit/fuelCalculator'
+import { calculateFuel,getFuelIndex} from './utilit/fuelCalculator'
 import './App.css'
 import StatusCard from './components/StatusCard'
 import a320Perfil from './assets/A320 perfil.png'
@@ -369,65 +370,16 @@ const fuelData = calculateFuel(
 )
 
 console.log(fuelData)
-const basicArm =
 
-selectedAircraft.lemac +
+const basicArm = selectedAircraft.lemac + (selectedAircraft.mac *22) /100
 
-(
+const basicMoment =(selectedAircraft.basicWeight || 0) * basicArm
 
-selectedAircraft.mac *
+const passengerMoment = selectedSeats.reduce((total,seat)=>{
 
-22
+const row = Math.ceil(seat /6)
 
-)
-
-/
-
-100
-
-const basicMoment =
-
-(
-
-selectedAircraft.basicWeight || 0
-
-)
-
-*
-
-basicArm
-
-const passengerMoment =
-
-selectedSeats.reduce(
-
-(
-
-total,
-
-seat
-
-)=>{
-
-const row =
-
-Math.ceil(
-
-seat /
-
-6
-
-)
-
-console.log({
-
-seat,
-
-row,
-
-selectedAircraft
-
-})
+console.log({seat,row,selectedAircraft})
 
 let rowArm =
 
@@ -791,96 +743,7 @@ const toi = zfi + FuelIndex
 const tripFuelIndex = getFuelIndex(tripFuel)
 const li = toi - tripFuelIndex
 const trim = 5.5 - (cg - 15) * 0.12
-function getFuelIndex(fuel){if (fuel <= 0)return 0
-const table = [
-
-[4000,1],
-
-[4900,2],
-
-[5500,3],
-
-[6000,4],
-
-[6500,5],
-
-[6800,6],
-
-[7200,7],
-
-[7500,8],
-
-[8300,9],
-
-[8700,10],
-
-[9200,11],
-
-[9700,12],
-
-[10800,14],
-
-[11400,15],
-
-[12800,16],
-
-[13600,17],
-
-[14200,18],
-
-[15000,19],
-
-[15700,20],
-
-[17250,22],
-
-[18000,23],
-
-[18600,24],
-
-[19250,25],
-
-[19900,26],
-
-[20400,28]
-
-]
-
-for (
-
-const [
-
-limit,
-
-index
-
-]
-
-of table
-
-){
-
-if (
-
-fuel <= limit
-
-){
-
-return index
-
-}
-
-}
-
-return 28
-
-}
-
-function getNearestCg(
-
-index
-
-){
+function getNearestCg(index){
 
 const minIndex=25
 
@@ -888,57 +751,18 @@ const maxIndex=90
 
 const minCg=21
 
-const maxCg=34
-
-
-return (18+(index-35)*0.235
-
-)
-
+const maxCg=34 
+return (18+(index-35)*0.235)
+}
+function getCgFromEnvelope(index,weight){return Number(getNearestCg(index).toFixed(1))
 }
 
+const zfCg =getCgFromEnvelope(zfi,zfw)
 
-function getCgFromEnvelope(index,weight){
+const toCg = getCgFromEnvelope(toi,tow)
 
-return Number(
-
-getNearestCg(index).toFixed(1))
-
-}
-
-const zfCg =getCgFromEnvelope(
-
-zfi,
-zfw
-
-)
-
-
-const toCg =
-
-getCgFromEnvelope(
-
-toi,
-tow
-
-)
-
-
-const lwCg =
-
-getCgFromEnvelope(
-
-li,
-ldw
-
-)
-const toWithinEnvelope =
-
-toCg >= 18 &&
-
-toCg <= 32 &&
-
-tow <= selectedAircraft.maxTOW
+const lwCg = getCgFromEnvelope(li,ldw)
+const toWithinEnvelope = toCg >= 18 && toCg <= 32 && tow <= selectedAircraft.maxTOW
 function isInsideEnvelope(
 
 x,
