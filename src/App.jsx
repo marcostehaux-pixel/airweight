@@ -363,14 +363,12 @@ const {
   selectedCargoAircraft,
   cargoWeights
 )
-const fuelData = calculateFuel(
-  fuel,
-  taxiFuel,
-  tripFuel
-)
+const fuelData = calculateFuel(fuel,taxiFuel,tripFuel)
 
 console.log(fuelData)
+const weightData = calculateWeight(cargoZfw,fuelData.takeoffFuel,fuelData.remainingFuel)
 
+console.log(weightData)
 const basicArm = selectedAircraft.lemac + (selectedAircraft.mac *22) /100
 
 const basicMoment =(selectedAircraft.basicWeight || 0) * basicArm
@@ -381,61 +379,17 @@ const row = Math.ceil(seat /6)
 
 console.log({seat,row,selectedAircraft})
 
-let rowArm =
+let rowArm = selectedAircraft.seatArmMid 
+if (row <= 8)
 
-selectedAircraft.seatArmMid
+{rowArm = selectedAircraft.seatArmFwd}
 
+else if (row <= 18)
+{rowArm =selectedAircraft.seatArmMid}
 
-if (
+else {rowArm = selectedAircraft.seatArmAft}
 
-row <= 8
-
-)
-
-{
-
-rowArm =
-
-selectedAircraft.seatArmFwd
-
-}
-
-else if (
-
-row <= 18
-
-)
-
-{
-
-rowArm =
-
-selectedAircraft.seatArmMid
-
-}
-
-else
-
-{
-
-rowArm =
-
-selectedAircraft.seatArmAft
-
-}
-
-
-return (
-
-total +
-
-calculateMoment(
-
-84,
-
-rowArm
-
-)
+return (total + calculateMoment(84,rowArm)
 
 )
 
@@ -544,11 +498,8 @@ const totalMoment =
   aftCargoMoment
 
   
- const tow =
-
-rw -
-
-taxiFuel
+const tow = weightData.takeoffWeight
+const lw = weightData.landingWeight
 const ldw = tow - tripFuel
 const arm =
 
@@ -5075,7 +5026,7 @@ Block Fuel (kg)
 
 const value= parseInt(e.target.value)||0
 
-setfuel(Math.min(value,20598
+setFuel(Math.min(value,20598
 )
 )
 }}
