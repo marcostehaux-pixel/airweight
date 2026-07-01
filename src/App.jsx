@@ -2259,7 +2259,7 @@ style={{
 
 display:'flex',
 
-gap:'8px',
+gap:'25px',
 
 alignItems:'center',
 
@@ -2285,7 +2285,7 @@ BASIC WEIGHT
 
 <div
 
-style={{ display:'flex', gap:'8px', alignItems:'center', marginBottom:'10px'}}
+style={{ display:'flex', gap:'130px', alignItems:'center', marginBottom:'10px'}}
 
 >
 <span>
@@ -2304,7 +2304,7 @@ MAIN
 
 <div
 
-style={{ display:'flex', gap:'8px', alignItems:'center', marginBottom:'10px'}}
+style={{ display:'flex', gap:'120px', alignItems:'center', marginBottom:'10px'}}
 >
 <span>
 LOWER
@@ -2317,7 +2317,7 @@ LOWER
 </div>
 
 <div
-style={{display:'flex', gap:'8px', alignItems:'center', marginBottom:'10px'}}
+style={{display:'flex', gap:'70px', alignItems:'center', marginBottom:'10px'}}
 >
 
 <span>
@@ -2329,19 +2329,83 @@ TRAFFIC LOAD
 </strong>
  
 </div>
-<div 
-style={{ display:'flex', gap:'8px', alignItems:'center', marginBottom:'10px'}}
+<div
+style={{
 
+display:'flex',
+
+gap:'100px',
+
+alignItems:'center',
+
+marginBottom:'10px'
+
+}}
 >
 
 <span>
+
 ZFW
+
 </span>
+
+<div
+style={{
+
+display:'flex',
+
+gap:'50px',
+
+alignItems:'center'
+
+}}
+>
+
 <strong>
 
 {cargoZfw} kg
 
 </strong>
+
+<strong
+style={{
+
+color:
+
+cargoZfw >
+
+selectedCargoAircraft.maxZFW
+
+?
+
+'#ff4444'
+
+:
+
+'#00ff88'
+
+}}
+>
+
+{
+
+cargoZfw >
+
+selectedCargoAircraft.maxZFW
+
+?
+
+'🔴 LIMIT EXCEEDED'
+
+:
+
+'🟢 OK'
+
+}
+
+</strong>
+
+</div>
 
 </div>
 <div
@@ -2349,7 +2413,7 @@ style={{
 
 display:'flex',
 
-gap:'8px',
+gap:'80px',
 
 alignItems:'center',
 
@@ -2370,7 +2434,7 @@ style={{
 
 display:'flex',
 
-gap:'8px',
+gap:'30px',
 
 alignItems:'center',
 
@@ -2403,7 +2467,7 @@ style={{
 
 display:'flex',
 
-gap:'8px',
+gap:'100px',
 
 alignItems:'center',
 
@@ -2433,33 +2497,67 @@ kg
 </div>
 <div
 style={{
-
-display:'flex',
-
-gap:'8px',
-
-alignItems:'center',
-
-marginBottom:'10px'
-
+  display:'flex',
+  alignItems:'center',
+  marginBottom:'10px'
 }}
 >
 
-<span>
+<span
+style={{
+  width:'140px'
+}}
+>
 
 TAKEOFF WEIGHT
 
 </span>
 
-<strong>
+<strong
+style={{
+  width:'110px'
+}}
+>
+
+{weightData.takeoffWeight} kg
+
+</strong>
+
+<strong
+style={{
+
+color:
+
+weightData.takeoffWeight >
+
+selectedCargoAircraft.maxTOW
+
+?
+
+'#ff4444'
+
+:
+
+'#00ff88'
+
+}}
+>
 
 {
 
-weightData.takeoffWeight
+weightData.takeoffWeight >
+
+selectedCargoAircraft.maxTOW
+
+?
+
+'🔴 LIMIT EXCEEDED'
+
+:
+
+'🟢 OK'
 
 }
-
-kg
 
 </strong>
 
@@ -2469,7 +2567,7 @@ style={{
 
 display:'flex',
 
-gap:'8px',
+gap:'100px',
 
 alignItems:'center',
 
@@ -2495,42 +2593,40 @@ kg
 </div>
 <div
 style={{
-
-display:'flex',
-
-gap:'8px',
-
-alignItems:'center',
-
-marginBottom:'10px'
-
+  display:'flex',
+  alignItems:'center',
+  marginBottom:'10px'
 }}
 >
 
-<span>
+<span
+style={{
+  width:'140px'
+}}
+>
 
 LANDING WEIGHT
 
 </span>
 
-<strong>
+<strong
+style={{
+  width:'110px'
+}}
+>
 
-{weightData.landingWeight}
-
-kg
+{weightData.landingWeight} kg
 
 </strong>
 
-</div>
-<div
+<strong
+style={{
 
-style={{display:'flex', gap:'8px', alignItems:'center', marginBottom:'10px', color:
+color:
 
-cargoZfw
+weightData.landingWeight >
 
->
-
-selectedCargoAircraft.maxZFW
+selectedCargoAircraft.maxLW
 
 ?
 
@@ -2541,32 +2637,21 @@ selectedCargoAircraft.maxZFW
 '#00ff88'
 
 }}
-
 >
-
-<span>
-
-ZFW STATUS
-
-</span>
-
-<strong>
 
 {
 
-cargoZfw
+weightData.landingWeight >
 
->
-
-selectedCargoAircraft.maxZFW
+selectedCargoAircraft.maxLW
 
 ?
 
-'LIMIT EXCEEDED'
+'🔴 LIMIT EXCEEDED'
 
 :
 
-'OK'
+'🟢 OK'
 
 }
 
