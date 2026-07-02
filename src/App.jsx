@@ -9,6 +9,7 @@ import {getCargoZfw} from './utilit/cargoCalculator'
 import {getAvailablePayload} from './utilit/cargoCalculator'
 import {getTotalCargo} from './utilit/cargoCalculator'
 import {calculateCargoBalance} from './utilit/cargoCalculator'
+import {getZeroFuelIndex,getTakeoffIndex,getLandingIndex} from './utilit/cgCalculator'
 import { calculateWeight } from './utilit/weightCalculator'
 import { useState, useEffect } from 'react'
 import { calculateFuel,getFuelIndex} from './utilit/fuelCalculator'
@@ -449,107 +450,16 @@ seat / 6
 
 ).length
 
-const paxIndex =
-
-(
-
-fwdPax *
-
--0.15
-
-)
-
-+
-
-(
-
-aftPax *
-
-0.15
-
-)
-
- const FuelMoment =
-
-  calculateMoment(
-
-    fuel,
-
-    selectedAircraft.FuelArm
-
-  )
-
-
-const forwardCargoMoment =
-  forwardCargo * selectedAircraft.forwardCargoArm
-
-const aftCargoMoment =
-  aftCargo * selectedAircraft.aftCargoArm
-  
-const totalMoment =
-
-  basicMoment +
-
-  passengerMoment +
-
-  FuelMoment +
-
-  forwardCargoMoment +
-
-  aftCargoMoment
-
-  
+const paxIndex = (fwdPax * -0.15) + (aftPax * 0.15)
+const FuelMoment = calculateMoment(fuel,selectedAircraft.FuelArm)
+const forwardCargoMoment = forwardCargo * selectedAircraft.forwardCargoArm
+const aftCargoMoment = aftCargo * selectedAircraft.aftCargoArm
+const totalMoment = basicMoment + passengerMoment + FuelMoment + forwardCargoMoment + aftCargoMoment
 const tow = weightData.takeoffWeight
 const lw = weightData.landingWeight
 const ldw = tow - tripFuel
-const arm =
-
-tow > 0
-
-?
-
-(
-
-totalMoment /
-
-tow
-
-)
-
-:
-
-0
-
-const cg =
-
-arm > 0
-
-?
-
-(
-
-(
-
-arm -
-
-selectedAircraft.lemac
-
-)
-
-/
-
-selectedAircraft.mac
-
-)
-
-*
-
-100
-
-:
-
-0
-
+const arm = tow > 0? (totalMoment / tow) : 0
+const cg = arm > 0 ? (( arm - selectedAircraft.lemac) / selectedAircraft.mac) * 100 : 0
 const [extraCrew,setExtraCrew] = useState(0)
 const [ catering,setCatering] = useState( 0 )
 const dow = selectedAircraft.basicWeight
@@ -559,6 +469,12 @@ const crewConfiguration = extraCrew > 0 ? `2/${4 + extraCrew}` : selectedAircraf
 const basicWeightDelta = effectiveBasicWeight - selectedAircraft.basicWeight
 const effectiveBasicMoment = (extraCrew * 85 * 360) + (catering ? 250 * 420 : 0)
 const doi = selectedAircraft.basicIndex + (extraCrew * 0.1)
+const cargoDow = selectedCargoAircraft.basicWeight
+const cargoDoi = selectedCargoAircraft.basicIndex + (extraCrew * 0.1)
+const cargoEffectiveBasicIndex = cargoDoi + (extraCrew * 0.1) + (catering ? 0.2 : 0)
+const cargoZfwIndex = getZeroFuelIndex(cargoEffectiveBasicIndex,totalCargoIndex)
+const cargoTowIndex = getTakeoffIndex(cargoZfwIndex, fuelData.fuelIndex)
+const cargoLandingIndex = getLandingIndex(cargoTowIndex,fuelData.tripFuelIndex)
 const index = Number.isFinite(totalMoment) ? calculateIndex(totalMoment) :0
 const effectiveBasicIndex = doi + (extraCrew *0.1) + (catering? 0.2 : 0)
 const cargoIndex = (forwardCargo /1000) * (-9) + (aftCargo /1000) * (7)
@@ -570,33 +486,18 @@ const tripFuelIndex = getFuelIndex(tripFuel)
 const li = toi - tripFuelIndex
 const trim = 5.5 - (cg - 15) * 0.12
 function getNearestCg(index){
-
 const minIndex=25
-
 const maxIndex=90
-
 const minCg=21
-
 const maxCg=34 
 return (18+(index-35)*0.235)
 }
-function getCgFromEnvelope(index,weight){return Number(getNearestCg(index).toFixed(1))
-}
-
+ function getCgFromEnvelope(index,weight){return Number(getNearestCg(index).toFixed(1))}
 const zfCg =getCgFromEnvelope(zfi,zfw)
-
 const toCg = getCgFromEnvelope(toi,tow)
-
 const lwCg = getCgFromEnvelope(li,ldw)
 const toWithinEnvelope = toCg >= 18 && toCg <= 32 && tow <= selectedAircraft.maxTOW
-function isInsideEnvelope(
-
-x,
-
-y
-
-){
-
+function isInsideEnvelope(x, y){
 const polygon=[
 
 [100,50],
@@ -615,19 +516,8 @@ const polygon=[
 
 ]
 
-let inside=false
-
-for(
-
-let i=0,
-
-j=polygon.length-1;
-
-i<polygon.length;
-
-j=i++
-
-){
+let inside=false 
+for( let i=0, j=polygon.length-1; i<polygon.length; j=i++){
 
 const xi=polygon[i][0]
 
@@ -639,141 +529,29 @@ const yj=polygon[j][1]
 
 const intersect=
 
-(
+(( yi>y ) !== ( yj>y )) && (x< (xj-xi) * (y-yi) / (yj-yi) + xi)
 
-(
-
-yi>y
-
-)
-
-!==
-
-(
-
-yj>y
-
-)
-
-)
-
-&&
-
-(
-
-x<
-
-(
-
-xj-xi
-
-)
-
-*
-
-(
-
-y-yi
-
-)
-
-/
-
-(
-
-yj-yi
-
-)
-
-+
-
-xi
-
-)
-
-if(
-
-intersect
-
-)
-
-inside=!inside
-
+if(intersect) inside=!inside
 }
 
 return inside
-
 }
 
-const zfWithinEnvelope =
-
-zfw <= selectedAircraft.maxZFW &&
-
-zfCg >= 18 &&
-
-zfCg <= 34
-
-
-const trimLabel =
-
-  trim < 4
-
-    ? 'NOSE UP'
-
-    : trim > 7
-
-      ? 'NOSE DOWN'
-
-      : 'SET'
-      
-     const loadStatus =
-'READY FOR DISPATCH'
-const cgStatus =
-true
- const cgLabel =
-
-  cg < 18
-
-    ? 'FORWARD'
-
-    : cg > 32
-
-      ? 'AFT'
-
-      : 'NORMAL'
-      
-
-  const zfwStatus =
-    zfw <= selectedAircraft.maxZFW
-
-  const towStatus =
-    tow <= selectedAircraft.maxTOW
-    const [weatherAirport,setWeatherAirport]=useState("")
-
+const zfWithinEnvelope = zfw <= selectedAircraft.maxZFW && zfCg >= 18 && zfCg <= 34
+const trimLabel = trim < 4 ? 'NOSE UP' : trim > 7 ? 'NOSE DOWN' : 'SET'
+const loadStatus = 'READY FOR DISPATCH'
+const cgStatus = true
+const cgLabel = cg < 18 ? 'FORWARD' : cg > 32 ? 'AFT' : 'NORMAL'
+const zfwStatus = zfw <= selectedAircraft.maxZFW
+const towStatus = tow <= selectedAircraft.maxTOW
+const [weatherAirport,setWeatherAirport]=useState("")
 const [searchMetar,setSearchMetar]=useState(null)
-
 const [searchTaf,setSearchTaf]=useState(null)
-  function toggleSeat(seat) {
-
-  if (selectedSeats.includes(seat)) {
-
-    setSelectedSeats(
-      selectedSeats.filter(
-        s => s !== seat
-      )
-    )
-
-  } else {
-
-    setSelectedSeats(
-      [...selectedSeats, seat]
-    )
-
-  }
-
+function toggleSeat(seat) {if (selectedSeats.includes(seat)) {setSelectedSeats(selectedSeats.filter(s => s !== seat))
+  } else {setSelectedSeats( [...selectedSeats, seat])
+}
 }
 function loadCabins(){
-
 const seats=[]
 
 for(
@@ -2658,6 +2436,45 @@ selectedCargoAircraft.maxLW
 </strong>
 
 </div>
+
+<div
+style={{
+  fontSize:'18px',
+  fontWeight:'700',
+  marginBottom:'15px',
+  marginTop:'10px'
+}}
+>
+
+LOAD INDEX
+
+</div>
+<div
+style={{
+  display:'flex',
+  alignItems:'center',
+  marginBottom:'10px'
+}}
+>
+
+<span
+style={{
+  width:'100px'
+}}
+>
+
+BASIC INDEX
+
+</span>
+
+<strong>
+
+{cargoEffectiveBasicIndex.toFixed(2)}
+
+</strong>
+
+</div>
+
 <div
 
 style={{
@@ -2676,7 +2493,7 @@ marginBottom:'10px'
 
 <span>
 
-LOWER INDEX
+LOWER DECK INDEX
 
 </span>
 
@@ -2709,7 +2526,7 @@ marginBottom:'10px'
 
 <span>
 
-MAIN INDEX
+MAIN DECK INDEX
 
 </span>
 
@@ -2734,6 +2551,7 @@ mainDeckIndex
 </strong>
 
 </div>
+
 <div
   style={{
 
@@ -2746,43 +2564,83 @@ alignItems:'center',
 marginBottom:'10px'
   }}
 >
-  <span>TOTAL INDEX</span>
+  <span>TOTAL DECK INDEX</span>
 
   <strong>
     {totalCargoIndex.toFixed(2)}
   </strong>
 </div>
 <div
-
 style={{
-
-display:'flex',
-
-gap:'8px',
-
-alignItems:'center',
-
-marginBottom:'10px'
-
+  display:'flex',
+  alignItems:'center',
+  marginBottom:'10px'
 }}
-
 >
 
-<span>
+<span
+style={{
+  width:'85px'
+}}
+>
 
-AVAILABLE
+ZFW INDEX
 
 </span>
 
 <strong>
 
-{
+{cargoZfwIndex.toFixed(2)}
 
-availablePayload
+</strong>
 
-}
+</div>
+<div
+style={{
+  display:'flex',
+  alignItems:'center',
+  marginBottom:'10px'
+}}
+>
 
-kg
+<span
+style={{
+  width:'120px'
+}}
+>
+
+TAKEOFF INDEX
+
+</span>
+
+<strong>
+
+{cargoTowIndex.toFixed(2)}
+
+</strong>
+
+</div>
+<div
+style={{
+  display:'flex',
+  alignItems:'center',
+  marginBottom:'10px'
+}}
+>
+
+<span
+style={{
+  width:'120px'
+}}
+>
+
+LANDING INDEX
+
+</span>
+
+<strong>
+
+{cargoLandingIndex.toFixed(2)}
 
 </strong>
 
@@ -2797,25 +2655,7 @@ gap:'8px',
 
 alignItems:'center',
 
-marginTop:'16px',
-
-fontSize:'18px',
-
-color:
-
-totalCargo
-
->
-
-availablePayload
-
-?
-
-'#ff4444'
-
-:
-
-'#00ff88'
+marginBottom:'10px'
 
 }}
 
@@ -2939,6 +2779,58 @@ availablePayload
 ></div>
 
 </div>
+<span>
+
+AVAILABLE PAYLOAD
+
+</span>
+
+<strong>
+
+{
+
+availablePayload
+
+}
+
+kg
+
+</strong>
+
+</div>
+<div
+
+style={{
+
+display:'flex',
+
+gap:'8px',
+
+alignItems:'center',
+
+marginTop:'16px',
+
+fontSize:'18px',
+
+color:
+
+totalCargo
+
+>
+
+availablePayload
+
+?
+
+'#ff4444'
+
+:
+
+'#00ff88'
+
+}}
+
+>
 
 <div
 

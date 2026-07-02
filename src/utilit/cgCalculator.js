@@ -11,10 +11,10 @@ export function getPayloadIndex(
 }
 
 export function getZeroFuelIndex(
-  effectiveBasicIndex,
-  payloadIndex
-) {
-  return effectiveBasicIndex + payloadIndex
+    basicIndex,
+    loadIndex
+){
+    return basicIndex + loadIndex
 }
 
 export function getTakeoffIndex(
@@ -57,6 +57,10 @@ const zeroFuelIndex = getZeroFuelIndex(
   effectiveBasicIndex,
   payloadIndex
 )
+const cargoZfwIndex = getZeroFuelIndex(
+  cargoEffectiveBasicIndex,
+  totalCargoIndex
+)
 const takeoffIndex = getTakeoffIndex(
   zeroFuelIndex,
   fuelIndex
@@ -65,6 +69,7 @@ const landingIndex = getLandingIndex(
   takeoffIndex,
   tripFuelIndex
 )
+
 return {
 
   payloadIndex,
