@@ -31,6 +31,20 @@ export function getLandingIndex(
   return takeoffIndex - tripFuelIndex
 }
 
+export function getCG(
+  arm,
+  lemac,
+  mac
+) {
+
+  if (arm <= 0) return 0
+
+  return (
+    ((arm - lemac) / mac) * 100
+  )
+
+}
+
 export function calculateBalanceCG({
 
   effectiveBasicIndex,

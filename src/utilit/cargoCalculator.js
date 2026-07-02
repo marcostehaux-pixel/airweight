@@ -35,7 +35,28 @@ export function getMainCargo(selectedCargoAircraft, cargoWeights) {
   )
 
 }
+export function getMainDeckMoment(
+  selectedCargoAircraft,
+  cargoWeights
+) {
 
+  return (
+
+    selectedCargoAircraft?.cargoConfig?.mainDeck?.reduce(
+
+      (total, position) =>
+
+        total +
+
+        ((cargoWeights[position.id] || 0) * position.arm),
+
+      0
+
+    ) || 0
+
+  )
+
+}
 /* ===========================================================
    CARGA LOWER DECK
 =========================================================== */
@@ -51,7 +72,28 @@ export function getLowerCargo(selectedCargoAircraft, cargoWeights) {
   )
 
 }
+export function getLowerDeckMoment(
+  selectedCargoAircraft,
+  cargoWeights
+) {
 
+  return (
+
+    selectedCargoAircraft?.cargoConfig?.lowerDeck?.reduce(
+
+      (total, position) =>
+
+        total +
+
+        ((cargoWeights[position.id] || 0) * position.arm),
+
+      0
+
+    ) || 0
+
+  )
+
+}
 /* ===========================================================
    CARGA TOTAL
 =========================================================== */
@@ -74,7 +116,32 @@ export function getCargoZfw(selectedCargoAircraft, totalCargo) {
   )
 
 }
+export function getBasicMoment(selectedCargoAircraft) {
 
+  return (
+    selectedCargoAircraft.basicWeight *
+    selectedCargoAircraft.lemac
+  )
+
+}
+export function getZfwArm(
+  zfwMoment,
+  cargoZfw
+) {
+
+  if (cargoZfw <= 0) return 0
+
+  return zfwMoment / cargoZfw
+
+}
+export function getFuelMoment(
+  fuelWeight,
+  fuelArm
+) {
+
+  return fuelWeight * fuelArm
+
+}
 /* ===========================================================
    PAYLOAD DISPONIBLE
 =========================================================== */
@@ -163,48 +230,42 @@ export function getTotalCargoIndex(mainDeckIndex, lowerDeckIndex) {
 
 export function calculateCargoBalance(
   selectedCargoAircraft,
-  cargoWeights
-) {
+  cargoWeights,
+  takeoffFuel
+)
+ {
 
-  const mainCargo = getMainCargo(
-    selectedCargoAircraft,
-    cargoWeights
-  )
+  const mainCargo = getMainCargo( selectedCargoAircraft, cargoWeights)
 
-  const lowerCargo = getLowerCargo(
-    selectedCargoAircraft,
-    cargoWeights
-  )
+  const lowerCargo = getLowerCargo(selectedCargoAircraft,cargoWeights)
 
-  const totalCargo = getTotalCargo(
-    mainCargo,
-    lowerCargo
-  )
+  const totalCargo = getTotalCargo(mainCargo, lowerCargo)
 
-  const cargoZfw = getCargoZfw(
-    selectedCargoAircraft,
-    totalCargo
-  )
+  const cargoZfw = getCargoZfw(selectedCargoAircraft,totalCargo)
 
-  const availablePayload = getAvailablePayload(
-    selectedCargoAircraft,
-    cargoZfw
-  )
+  const availablePayload = getAvailablePayload(selectedCargoAircraft,cargoZfw)
 
-  const mainDeckIndex = getMainDeckIndex(
-    selectedCargoAircraft,
-    cargoWeights
-  )
+  const mainDeckIndex = getMainDeckIndex(selectedCargoAircraft,cargoWeights)
 
-  const lowerDeckIndex = getLowerDeckIndex(
-    selectedCargoAircraft,
-    cargoWeights
-  )
+  const lowerDeckIndex = getLowerDeckIndex(selectedCargoAircraft,cargoWeights)
 
-  const totalCargoIndex = getTotalCargoIndex(
-    mainDeckIndex,
-    lowerDeckIndex
-  )
+  const totalCargoIndex = getTotalCargoIndex(mainDeckIndex,lowerDeckIndex)
+  
+  const mainDeckMoment = getMainDeckMoment(selectedCargoAircraft,cargoWeights)
+
+  const lowerDeckMoment = getLowerDeckMoment(selectedCargoAircraft,cargoWeights)
+
+  const totalCargoMoment = mainDeckMoment + lowerDeckMoment
+
+  const basicMoment = getBasicMoment(selectedCargoAircraft)
+
+  const zfwMoment = basicMoment + totalCargoMoment
+
+  const zfwArm = getZfwArm(zfwMoment,cargoZfw)
+
+  const fuelMoment = takeoffFuel * selectedCargoAircraft.fuelArm
+
+  const towMoment = zfwMoment + fuelMoment
 
   return {
 
@@ -222,7 +283,23 @@ export function calculateCargoBalance(
 
     lowerDeckIndex,
 
-    totalCargoIndex
+    totalCargoIndex,
+
+    mainDeckMoment,
+
+    lowerDeckMoment,
+
+    totalCargoMoment,
+    
+    basicMoment,
+
+    zfwMoment,
+
+    zfwArm,
+
+    fuelMoment,
+
+    towMoment
 
   }
 

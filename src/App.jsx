@@ -9,8 +9,9 @@ import {getCargoZfw} from './utilit/cargoCalculator'
 import {getAvailablePayload} from './utilit/cargoCalculator'
 import {getTotalCargo} from './utilit/cargoCalculator'
 import {calculateCargoBalance} from './utilit/cargoCalculator'
-import {getZeroFuelIndex,getTakeoffIndex,getLandingIndex} from './utilit/cgCalculator'
+import {getZeroFuelIndex,getTakeoffIndex,getLandingIndex,getCG} from './utilit/cgCalculator'
 import { calculateWeight } from './utilit/weightCalculator'
+import {getTotalMoment, getArm} from './utilit/passengerMomentCalculator.js'
 import { useState, useEffect } from 'react'
 import { calculateFuel,getFuelIndex} from './utilit/fuelCalculator'
 import './App.css'
@@ -328,29 +329,11 @@ const paxMoment =
     selectedAircraft.seatArmMid
 
   )
-  const payload =
-
-passengerWeight +
-
-forwardCargo +
-
-aftCargo
- const zfw =
-
-  selectedAircraft.basicWeight +
-
-  passengerWeight +
-
-  forwardCargo +
-
-  aftCargo 
-  
-const rw =
-
-zfw +
-
-fuel
-
+  const payload = passengerWeight + forwardCargo + aftCargo
+const zfw = selectedAircraft.basicWeight + passengerWeight + forwardCargo + aftCargo 
+const rw = zfw + fuel
+const fuelData = calculateFuel(fuel,taxiFuel,tripFuel)
+console.log(fuelData)
 const {
   mainCargo,
   lowerCargo,
@@ -359,16 +342,22 @@ const {
   availablePayload,
   mainDeckIndex,
   lowerDeckIndex,
-  totalCargoIndex
+  totalCargoIndex,
+  mainDeckMoment,
+  lowerDeckMoment,
+  totalCargoMoment,
 } = calculateCargoBalance(
   selectedCargoAircraft,
-  cargoWeights
+  cargoWeights,
+  fuelData.takeoffFuel
 )
-const fuelData = calculateFuel(fuel,taxiFuel,tripFuel)
 
-console.log(fuelData)
-const weightData = calculateWeight(cargoZfw,fuelData.takeoffFuel,fuelData.remainingFuel)
-
+const weightData = calculateWeight(
+  cargoZfw,
+  fuel,
+  fuelData.takeoffFuel,
+  fuelData.remainingFuel
+)
 console.log(weightData)
 const rampWeight = cargoZfw + fuel
 const basicArm = selectedAircraft.lemac + (selectedAircraft.mac *22) /100
@@ -378,78 +367,15 @@ const basicMoment =(selectedAircraft.basicWeight || 0) * basicArm
 const passengerMoment = selectedSeats.reduce((total,seat)=>{
 
 const row = Math.ceil(seat /6)
-
 console.log({seat,row,selectedAircraft})
-
 let rowArm = selectedAircraft.seatArmMid 
-if (row <= 8)
-
-{rowArm = selectedAircraft.seatArmFwd}
-
-else if (row <= 18)
-{rowArm =selectedAircraft.seatArmMid}
-
+if (row <= 8) {rowArm = selectedAircraft.seatArmFwd}
+else if (row <= 18) {rowArm =selectedAircraft.seatArmMid}
 else {rowArm = selectedAircraft.seatArmAft}
-
-return (total + calculateMoment(84,rowArm)
-
-)
-
-},
-
-0
-
-)
-const fwdPax =
-
-selectedSeats.filter(
-
-seat =>
-
-Math.ceil(
-
-seat / 6
-
-) <= 8
-
-).length
-
-
-const midPax =
-
-selectedSeats.filter(
-
-seat =>
-
-Math.ceil(
-
-seat / 6
-
-) > 8 &&
-
-Math.ceil(
-
-seat / 6
-
-) <= 18
-
-).length
-
-
-const aftPax =
-
-selectedSeats.filter(
-
-seat =>
-
-Math.ceil(
-
-seat / 6
-
-) > 18
-
-).length
-
+return (total + calculateMoment(84,rowArm))}, 0)
+const fwdPax = selectedSeats.filter(seat => Math.ceil(seat / 6) <= 8).length
+const midPax = selectedSeats.filter(seat => Math.ceil(seat / 6) > 8 && Math.ceil(seat / 6 ) <= 18).length
+const aftPax = selectedSeats.filter(seat => Math.ceil(seat / 6) > 18).length
 const paxIndex = (fwdPax * -0.15) + (aftPax * 0.15)
 const FuelMoment = calculateMoment(fuel,selectedAircraft.FuelArm)
 const forwardCargoMoment = forwardCargo * selectedAircraft.forwardCargoArm
@@ -475,6 +401,7 @@ const cargoEffectiveBasicIndex = cargoDoi + (extraCrew * 0.1) + (catering ? 0.2 
 const cargoZfwIndex = getZeroFuelIndex(cargoEffectiveBasicIndex,totalCargoIndex)
 const cargoTowIndex = getTakeoffIndex(cargoZfwIndex, fuelData.fuelIndex)
 const cargoLandingIndex = getLandingIndex(cargoTowIndex,fuelData.tripFuelIndex)
+const cargoCg = getCG(arm,selectedCargoAircraft.lemac,selectedCargoAircraft.mac)
 const index = Number.isFinite(totalMoment) ? calculateIndex(totalMoment) :0
 const effectiveBasicIndex = doi + (extraCrew *0.1) + (catering? 0.2 : 0)
 const cargoIndex = (forwardCargo /1000) * (-9) + (aftCargo /1000) * (7)
