@@ -134,6 +134,16 @@ export function getZfwArm(
   return zfwMoment / cargoZfw
 
 }
+export function getTowArm(
+  towMoment,
+  takeoffWeight
+) {
+
+  if (takeoffWeight <= 0) return 0
+
+  return towMoment / takeoffWeight
+
+}
 export function getFuelMoment(
   fuelWeight,
   fuelArm
@@ -267,6 +277,8 @@ export function calculateCargoBalance(
 
   const towMoment = zfwMoment + fuelMoment
 
+  const towArm = getTowArm(towMoment,cargoZfw + takeoffFuel)
+
   return {
 
     mainCargo,
@@ -298,6 +310,8 @@ export function calculateCargoBalance(
     zfwArm,
 
     fuelMoment,
+
+    towArm,
 
     towMoment
 

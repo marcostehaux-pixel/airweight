@@ -13,7 +13,11 @@ lemac:627.1,
 basicWeight:39188,
 
 basicIndex:26.5,
+indexReferenceArm: 658.3,
 
+indexConstant: 35000,
+
+indexOffset: 45,
 basicConfig:'2',
 
 basicCrew:'STD CREW',
@@ -112,7 +116,11 @@ lemac:627.1,
 basicWeight:39630,
 
 basicIndex:28,
+indexReferenceArm: 658.3,
 
+indexConstant: 35000,
+
+indexOffset: 45,
 basicConfig:'2',
 
 basicCrew:'STD CREW',

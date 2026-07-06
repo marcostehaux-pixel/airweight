@@ -1,4 +1,5 @@
 import Login from './Login'
+import { getCargoFuelIndex } from './utilit/cargoFuelIndex'
 import aircraftCargoDatabase from './data/aircraftCargoDatabase'
 import {getLowerDeckIndex} from './utilit/cargoCalculator'
 import {getMainDeckIndex} from './utilit/cargoCalculator'
@@ -58,7 +59,15 @@ return null
 
 }
 import aircraftDatabase from './data/aircraftDatabase'
-import {calculateMoment,calculateCG,calculateIndex,calculateMAC,calculateTrim} from './utilit/calculations.js'
+import {
+  calculateMoment,
+  calculateCG,
+  calculateMAC,
+  calculateIndex,
+  calculateTrim,
+  indexToArm,
+  armToIndex
+} from './utilit/calculations'
 import SeatMap from './components/SeatMap'
 
 import CargoPanel from './components/CargoPanel'
@@ -346,12 +355,30 @@ const {
   mainDeckMoment,
   lowerDeckMoment,
   totalCargoMoment,
+  zfwArm,
+towArm
 } = calculateCargoBalance(
   selectedCargoAircraft,
   cargoWeights,
   fuelData.takeoffFuel
 )
+const cargoZfwCg = getCG(
+  zfwArm,
+  selectedCargoAircraft.lemac,
+  selectedCargoAircraft.mac
+)
 
+const cargoTowCg = getCG(
+  towArm,
+  selectedCargoAircraft.lemac,
+  selectedCargoAircraft.mac
+)
+console.log({
+  zfwArm,
+  towArm,
+  cargoZfwCg,
+  cargoTowCg
+})
 const weightData = calculateWeight(
   cargoZfw,
   fuel,
@@ -359,6 +386,7 @@ const weightData = calculateWeight(
   fuelData.remainingFuel
 )
 console.log(weightData)
+
 const rampWeight = cargoZfw + fuel
 const basicArm = selectedAircraft.lemac + (selectedAircraft.mac *22) /100
 
@@ -399,8 +427,26 @@ const cargoDow = selectedCargoAircraft.basicWeight
 const cargoDoi = selectedCargoAircraft.basicIndex + (extraCrew * 0.1)
 const cargoEffectiveBasicIndex = cargoDoi + (extraCrew * 0.1) + (catering ? 0.2 : 0)
 const cargoZfwIndex = getZeroFuelIndex(cargoEffectiveBasicIndex,totalCargoIndex)
-const cargoTowIndex = getTakeoffIndex(cargoZfwIndex, fuelData.fuelIndex)
-const cargoLandingIndex = getLandingIndex(cargoTowIndex,fuelData.tripFuelIndex)
+const cargoFuelIndex = getCargoFuelIndex(fuelData.takeoffFuel)
+
+const cargoTripFuelIndex = getCargoFuelIndex(fuelData.tripFuel)
+const cargoTowIndex = getTakeoffIndex(
+  cargoZfwIndex,
+  cargoFuelIndex
+)
+const cargoTowArm = indexToArm(
+  cargoTowIndex,
+  weightData.takeoffWeight,
+  selectedCargoAircraft.indexReferenceArm,
+  selectedCargoAircraft.indexConstant,
+  selectedCargoAircraft.indexOffset
+)
+
+console.log("Cargo TOW Arm:", cargoTowArm)
+const cargoLandingIndex = getLandingIndex(
+  cargoTowIndex,
+  cargoTripFuelIndex
+)
 const cargoCg = getCG(arm,selectedCargoAircraft.lemac,selectedCargoAircraft.mac)
 const index = Number.isFinite(totalMoment) ? calculateIndex(totalMoment) :0
 const effectiveBasicIndex = doi + (extraCrew *0.1) + (catering? 0.2 : 0)
@@ -411,6 +457,7 @@ const FuelIndex = getFuelIndex(fuel)
 const toi = zfi + FuelIndex
 const tripFuelIndex = getFuelIndex(tripFuel)
 const li = toi - tripFuelIndex
+
 const trim = 5.5 - (cg - 15) * 0.12
 function getNearestCg(index){
 const minIndex=25
@@ -420,9 +467,9 @@ const maxCg=34
 return (18+(index-35)*0.235)
 }
  function getCgFromEnvelope(index,weight){return Number(getNearestCg(index).toFixed(1))}
-const zfCg =getCgFromEnvelope(zfi,zfw)
-const toCg = getCgFromEnvelope(toi,tow)
-const lwCg = getCgFromEnvelope(li,ldw)
+const zfCg = 0
+const toCg = 0
+const lwCg = 0
 const toWithinEnvelope = toCg >= 18 && toCg <= 32 && tow <= selectedAircraft.maxTOW
 function isInsideEnvelope(x, y){
 const polygon=[

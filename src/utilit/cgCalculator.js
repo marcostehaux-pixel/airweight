@@ -1,6 +1,10 @@
+
+
 import {
   calculateCG,
-  calculateTrim
+  calculateTrim,
+  indexToArm,
+  armToIndex
 } from './calculations'
 
 export function getPayloadIndex(

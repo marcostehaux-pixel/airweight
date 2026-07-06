@@ -14,6 +14,11 @@ lemac:627.1,
 basicWeight:42675,
 
 basicIndex:50,
+indexReferenceArm: 658.3,
+
+indexConstant: 35000,
+
+indexOffset: 45,
 basicConfig:'2/4',
 basicCrew:'STD CREW',
 maxZFW:61688,
@@ -84,6 +89,11 @@ lemac:627.1,
 basicWeight:45235,
 
 basicIndex:46,
+indexReferenceArm: 658.3,
+
+indexConstant: 35000,
+
+indexOffset: 45,
 basicConfig:'2/4',
 basicCrew:'STD CREW',
 maxZFW: 64818,
@@ -153,6 +163,11 @@ lemac:627.1,
 basicWeight:45364,
 
 basicIndex:45,
+indexReferenceArm: 658.3,
+
+indexConstant: 35000,
+
+indexOffset: 45,
 basicConfig:'2/4',
 basicCrew:'STD CREW',
 maxZFW:64818,
@@ -222,6 +237,11 @@ lemac:627.1,
 basicWeight:42275,
 
 basicIndex:54,
+indexReferenceArm: 658.3,
+
+indexConstant: 35000,
+
+indexOffset: 45,
 basicConfig:'2/4',
 basicCrew:'STD CREW',
 maxZFW:61688,
@@ -291,6 +311,11 @@ lemac:627.1,
 basicWeight:42245,
 
 basicIndex:53,
+indexReferenceArm: 658.3,
+
+indexConstant: 35000,
+
+indexOffset: 45,
 basicConfig:'2/4',
 basicCrew:'STD CREW',
 maxZFW:61688,
@@ -360,6 +385,11 @@ lemac:627.1,
 basicWeight:42045,
 
 basicIndex:52,
+indexReferenceArm: 658.3,
+
+indexConstant: 35000,
+
+indexOffset: 45,
 basicConfig:'2/4',
 basicCrew:'STD CREW',
 maxZFW:61688,
@@ -429,6 +459,11 @@ lemac:627.1,
 basicWeight:42003,
 
 basicIndex:45,
+indexReferenceArm: 658.3,
+
+indexConstant: 35000,
+
+indexOffset: 45,
 basicConfig:'2/4',
 basicCrew:'STD CREW',
 maxZFW:61688,
@@ -499,7 +534,11 @@ lemac:627.1,
 basicWeight:38500,
 
 basicIndex:46,
+indexReferenceArm: 658.3,
 
+indexConstant: 35000,
+
+indexOffset: 45,
 basicConfig:'2/4',
 basicCrew:'STD CREW',
 
