@@ -394,9 +394,11 @@ const FuelMoment = calculateMoment(fuel,selectedAircraft.FuelArm)
 const forwardCargoMoment = forwardCargo * selectedAircraft.forwardCargoArm
 const aftCargoMoment = aftCargo * selectedAircraft.aftCargoArm
 const totalMoment = basicMoment + passengerMoment + FuelMoment + forwardCargoMoment + aftCargoMoment
-const tow = weightData.takeoffWeight
-const lw = weightData.landingWeight
+const tow = rw - taxiFuel
+
 const ldw = tow - tripFuel
+
+const lw = ldw
 const arm = tow > 0? (totalMoment / tow) : 0
 const cg = arm > 0 ? (( arm - selectedAircraft.lemac) / selectedAircraft.mac) * 100 : 0
 const [extraCrew,setExtraCrew] = useState(0)
@@ -875,7 +877,7 @@ cursor:'pointer'
 }}
 >
 
-Freighter - Under contruction
+Freighter
 
 </div>
 <div
@@ -945,7 +947,76 @@ transform:
 
 >
 
-  Loadsheet
+  Passenger Loadsheet
+
+</div>
+<div
+
+  onClick={() =>
+    setActiveMenu('Fuel')
+  }
+
+  onMouseEnter={(e) => {
+
+    if (activeMenu !== 'Fuel') {
+
+      e.currentTarget.style.transform =
+        'translateX(4px)'
+
+      e.currentTarget.style.boxShadow =
+        '0 0 18px rgba(255,255,255,0.08)'
+
+    }
+
+  }}
+
+  onMouseLeave={(e) => {
+
+    if (activeMenu !== 'Fuel') {
+
+      e.currentTarget.style.transform =
+        'translateX(0px)'
+
+      e.currentTarget.style.boxShadow =
+        'none'
+
+    }
+
+  }}
+
+  style={{
+
+    marginBottom: '20px',
+
+    padding: '12px 16px',
+
+    borderRadius: '12px',
+
+    background:
+      activeMenu === 'Fuel'
+        ? 'rgba(0,255,140,0.12)'
+        : 'rgba(255,255,255,0.03)',
+
+    border:
+      activeMenu === 'Fuel'
+        ? '1px solid rgba(0,255,140,0.25)'
+        : '1px solid transparent',
+
+    boxShadow:
+      activeMenu === 'Fuel'
+        ? '0 0 25px rgba(0,255,140,0.15)'
+        : 'none',
+
+    transition:
+      'all 0.3s ease',
+
+    cursor: 'pointer'
+
+  }}
+
+>
+
+  Fuel
 
 </div>
 <div
@@ -1012,7 +1083,7 @@ onMouseLeave={(e) => {
 
 >
 
-  Aircraft
+  Aircraft Data
 
 </div>
 <div
@@ -3299,7 +3370,7 @@ marginBottom:'10px'
 
 >
 
-AIRCRAFT
+AIRCRAFT DATA
 
 </h1>
 
@@ -4299,7 +4370,7 @@ activeMenu !==
 &&
 activeMenu !==
 
-'Loadsheet'
+'Passenger'
 
 &&
 activeMenu !== 'Freighter'
@@ -5033,85 +5104,11 @@ loadStatus
 )
 
 }
+
     </div>
 <div style={{ marginBottom: '20px' }}>
 
-<label>
 
-Block Fuel (kg)
-
-</label>
-
-<input
-  type="number"
-  value={fuel}
-  onChange={(e)=>{
-
-const value= parseInt(e.target.value)||0
-
-setFuel(Math.min(value,20598
-)
-)
-}}
-
-></input>
-
-</div>
-
-<div
-
-style={{marginTop:'25px',marginBottom:'20px'}}
-
->
-
-<label>
-
-Taxi Fuel (kg)
-
-</label>
-
-<input
-  type="number"
-  value={taxiFuel}
-  onChange={(e)=>{
-    setTaxiFuel(parseInt(e.target.value)||0)
-  }}
-/>
-
-<div
-style={{
-  marginTop:'20px',
-  marginBottom:'20px'
-}}
->
-
-<label>
-
-Takeoff Fuel (kg)
-
-</label>
-
-<input
-  type="number"
-  value={fuelData.takeoffFuel}
-  readOnly
-/>
-
-</div>
-
-<label>
-
-Trip Fuel (kg)
-
-</label>
-
-<input
-  type="number"
-  value={tripFuel}
-  onChange={(e)=>{
-    setTripFuel(parseInt(e.target.value)||0)
-  }}
-/>
 
 </div>
 <div style={{ marginBottom: '25px' }}>
@@ -5327,6 +5324,173 @@ aftSeats
       Generate Loadsheet PDF
 
     </button>
+
+  </div>
+
+
+
+)}
+{activeMenu === 'Fuel' && (
+
+  <div
+
+    style={{
+
+      flex: 1,
+
+      padding: '40px'
+
+    }}
+
+  >
+
+    <h1
+
+      style={{
+
+        fontSize: '42px',
+
+        margin: 0,
+
+        marginBottom: '30px'
+
+      }}
+
+    >
+
+      Fuel
+
+    </h1>
+
+
+    <div>
+
+      <label>
+
+        Block Fuel (kg)
+
+      </label>
+
+      <input
+
+        type="number"
+
+        value={fuel}
+
+        onChange={(e) => {
+
+          const value =
+            parseInt(e.target.value) || 0
+
+          setFuel(
+
+            Math.min(
+              value,
+              20598
+            )
+
+          )
+
+        }}
+
+      />
+
+    </div>
+
+
+    <div
+
+      style={{
+
+        marginTop: '25px',
+
+        marginBottom: '20px'
+
+      }}
+
+    >
+
+      <label>
+
+        Taxi Fuel (kg)
+
+      </label>
+
+      <input
+
+        type="number"
+
+        value={taxiFuel}
+
+        onChange={(e) => {
+
+          setTaxiFuel(
+
+            parseInt(e.target.value) || 0
+
+          )
+
+        }}
+
+      />
+
+
+      <div
+
+        style={{
+
+          marginTop: '20px',
+
+          marginBottom: '20px'
+
+        }}
+
+      >
+
+        <label>
+
+          Takeoff Fuel (kg)
+
+        </label>
+
+        <input
+
+          type="number"
+
+          value={fuelData.takeoffFuel}
+
+          readOnly
+
+        />
+
+      </div>
+
+
+      <label>
+
+        Trip Fuel (kg)
+
+      </label>
+
+      <input
+
+        type="number"
+
+        value={tripFuel}
+
+        onChange={(e) => {
+
+          setTripFuel(
+
+            parseInt(e.target.value) || 0
+
+          )
+
+        }}
+
+      />
+
+    </div>
 
   </div>
 
