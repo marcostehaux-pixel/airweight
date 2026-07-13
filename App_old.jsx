@@ -1,5 +1,4 @@
 import Login from './Login'
-import { getCargoFuelIndex } from './utilit/cargoFuelIndex'
 import aircraftCargoDatabase from './data/aircraftCargoDatabase'
 import {getLowerDeckIndex} from './utilit/cargoCalculator'
 import {getMainDeckIndex} from './utilit/cargoCalculator'
@@ -10,12 +9,7 @@ import {getCargoZfw} from './utilit/cargoCalculator'
 import {getAvailablePayload} from './utilit/cargoCalculator'
 import {getTotalCargo} from './utilit/cargoCalculator'
 import {calculateCargoBalance} from './utilit/cargoCalculator'
-import {getZeroFuelIndex,getTakeoffIndex,getLandingIndex,getCG} from './utilit/cgCalculator'
-import { getCgFromIndex } from './utilit/indexToCG'
-import { calculateWeight } from './utilit/weightCalculator'
-import {getTotalMoment, getArm} from './utilit/passengerMomentCalculator.js'
 import { useState, useEffect } from 'react'
-import { calculateFuel,getFuelIndex} from './utilit/fuelCalculator'
 import './App.css'
 import StatusCard from './components/StatusCard'
 import a320Perfil from './assets/A320 perfil.png'
@@ -60,15 +54,7 @@ return null
 
 }
 import aircraftDatabase from './data/aircraftDatabase'
-import {
-  calculateMoment,
-  calculateCG,
-  calculateMAC,
-  calculateIndex,
-  calculateTrim,
-  indexToArm,
-  armToIndex
-} from './utilit/calculations'
+import {calculateMoment,calculateCG,calculateIndex,calculateMAC,calculateTrim} from './utilit/calculations.js'
 import SeatMap from './components/SeatMap'
 
 import CargoPanel from './components/CargoPanel'
@@ -76,12 +62,60 @@ import generateLoadsheet from './utils/generateLoadsheet'
 import logo from './assets/logo.png'
 import aircraftImage from './assets/a320.png'
 function App() {
-const [logged,setLogged]=useState(false)
+const [
+
+logged,
+
+setLogged
+
+]=useState(
+
+false
+
+)
 const [tripFuel, setTripFuel] = useState(0)
-const [taxiFuel,setTaxiFuel ]= useState(0)
-const [fuel, setFuel] = useState(0)
-const [selectedAircraft,setSelectedAircraft] = useState(aircraftDatabase[0])
-const [selectedCargoAircraft,setSelectedCargoAircraft] = useState(aircraftCargoDatabase[0]
+const [
+
+taxiFuel,
+
+setTaxiFuel
+
+]=
+
+useState(
+
+0
+
+)
+  const [fuel, setFuel] = useState(0)
+  const [
+
+selectedAircraft,
+
+setSelectedAircraft
+
+]
+
+=
+
+useState(
+
+aircraftDatabase[0]
+
+)
+ const [
+
+selectedCargoAircraft,
+
+setSelectedCargoAircraft
+
+]
+
+=
+
+useState(
+
+aircraftCargoDatabase[0]
 
 )
 function clearCargo(){
@@ -339,188 +373,899 @@ const paxMoment =
     selectedAircraft.seatArmMid
 
   )
-  const payload = passengerWeight + forwardCargo + aftCargo
-const zfw = selectedAircraft.basicWeight + passengerWeight + forwardCargo + aftCargo 
-const rw = zfw + fuel
-const fuelData = calculateFuel(fuel,taxiFuel,tripFuel)
-console.log(fuelData)
-const {
-  mainCargo,
-  lowerCargo,
-  totalCargo,
-  cargoZfw,
-  availablePayload,
-  mainDeckIndex,
-  lowerDeckIndex,
-  totalCargoIndex,
-  mainDeckMoment,
-  lowerDeckMoment,
-  totalCargoMoment,
-  zfwArm,
-towArm
-} = calculateCargoBalance(
+  const payload =
+
+passengerWeight +
+
+forwardCargo +
+
+aftCargo
+ const zfw =
+
+  selectedAircraft.basicWeight +
+
+  passengerWeight +
+
+  forwardCargo +
+
+  aftCargo 
+  
+const rw =
+
+zfw +
+
+fuel
+const mainCargo =
+getMainCargo(
   selectedCargoAircraft,
-  cargoWeights,
-  fuelData.takeoffFuel
+  cargoWeights
+)
+const lowerCargo =
+getLowerCargo(
+  selectedCargoAircraft,
+  cargoWeights
+)
+const lowerDeckIndex =
+getLowerDeckIndex(
+  selectedCargoAircraft,
+  cargoWeights
 )
 
-const weightData = calculateWeight(
-  cargoZfw,
-  fuel,
-  fuelData.takeoffFuel,
-  fuelData.remainingFuel
-)
-console.log(weightData)
+function getMainIndex(
 
-const rampWeight = cargoZfw + fuel
-const basicArm = selectedAircraft.lemac + (selectedAircraft.mac *22) /100
+position,
 
-const basicMoment =(selectedAircraft.basicWeight || 0) * basicArm
+weight
 
-const passengerMoment = selectedSeats.reduce((total,seat)=>{
+){
 
-const row = Math.ceil(seat /6)
-console.log({seat,row,selectedAircraft})
-let rowArm = selectedAircraft.seatArmMid 
-if (row <= 8) {rowArm = selectedAircraft.seatArmFwd}
-else if (row <= 18) {rowArm =selectedAircraft.seatArmMid}
-else {rowArm = selectedAircraft.seatArmAft}
-return (total + calculateMoment(84,rowArm))}, 0)
-const fwdPax = selectedSeats.filter(seat => Math.ceil(seat / 6) <= 8).length
-const midPax = selectedSeats.filter(seat => Math.ceil(seat / 6) > 8 && Math.ceil(seat / 6 ) <= 18).length
-const aftPax = selectedSeats.filter(seat => Math.ceil(seat / 6) > 18).length
-const paxIndex = (fwdPax * -0.15) + (aftPax * 0.15)
-const FuelMoment = calculateMoment(fuel,selectedAircraft.FuelArm)
-const forwardCargoMoment = forwardCargo * selectedAircraft.forwardCargoArm
-const aftCargoMoment = aftCargo * selectedAircraft.aftCargoArm
-const totalMoment = basicMoment + passengerMoment + FuelMoment + forwardCargoMoment + aftCargoMoment
-const tow = weightData.takeoffWeight
-const lw = weightData.landingWeight
-const ldw = tow - tripFuel
-const arm = tow > 0? (totalMoment / tow) : 0
-const cg = arm > 0 ? (( arm - selectedAircraft.lemac) / selectedAircraft.mac) * 100 : 0
-const [extraCrew,setExtraCrew] = useState(0)
-const [ catering,setCatering] = useState( 0 )
-const dow = selectedAircraft.basicWeight
-const cateringWeight = catering ? 250 :0
-const effectiveBasicWeight = dow + (extraCrew *85) + cateringWeight
-const crewConfiguration = extraCrew > 0 ? `2/${4 + extraCrew}` : selectedAircraft.basicConfig
-const basicWeightDelta = effectiveBasicWeight - selectedAircraft.basicWeight
-const effectiveBasicMoment = (extraCrew * 85 * 360) + (catering ? 250 * 420 : 0)
-const doi = selectedAircraft.basicIndex + (extraCrew * 0.1)
-const cargoDow = selectedCargoAircraft.basicWeight
+if(
 
-const cargoDoi =
-  selectedCargoAircraft.basicIndex + (extraCrew * 0.1)
+!
 
-const cargoEffectiveBasicIndex =
-  cargoDoi +
-  (extraCrew * 0.1) +
-  (catering ? 0.2 : 0)
+mainDeckTables[
 
-const cargoZfwIndex = getZeroFuelIndex(
-  cargoEffectiveBasicIndex,
-  totalCargoIndex
+position
+
+]
+
 )
 
-const cargoFuelIndex = getCargoFuelIndex(
-  fuelData.takeoffFuel
+return 0
+
+const row=
+
+mainDeckTables[
+
+position
+
+]
+
+.find(
+
+v=>
+
+v.kg===
+
+weight
+
 )
 
-const cargoTripFuelIndex = getCargoFuelIndex(
-  fuelData.tripFuel
+return row
+
+?
+
+row.index
+
+:
+
+0
+
+}
+const mainDeckIndex =
+
+(
+
+selectedCargoAircraft
+
+?.cargoConfig
+
+?.mainDeck
+
+?.reduce(
+
+(
+
+total,
+
+position
+
+)=>
+
+{
+
+const weight=
+
+cargoWeights[
+
+position.id
+
+]
+
+||
+
+0
+
+const index=
+
+getMainIndex(
+
+position.id,
+
+weight
+
 )
 
-const cargoTowIndex = getTakeoffIndex(
-  cargoZfwIndex,
-  cargoFuelIndex
+console.log(
+
+position.id,
+
+weight,
+
+index
+
 )
 
-const cargoLandingIndex = getLandingIndex(
-  cargoTowIndex,
-  cargoTripFuelIndex
+return (
+
+total
+
++
+
+index
+
 )
 
-const cargoZfwArm = indexToArm(
-  cargoZfwIndex,
-  cargoZfw,
-  selectedCargoAircraft.indexReferenceArm,
-  selectedCargoAircraft.indexConstant,
-  selectedCargoAircraft.indexOffset
+},
+
+0
+
 )
 
-const cargoTowArm = indexToArm(
-  cargoTowIndex,
-  weightData.takeoffWeight,
-  selectedCargoAircraft.indexReferenceArm,
-  selectedCargoAircraft.indexConstant,
-  selectedCargoAircraft.indexOffset
+||
+
+0
+
+)
+console.log(
+
+'MAIN INDEX',
+
+mainDeckIndex
+
+)
+const totalCargoIndex =
+getTotalCargoIndex(
+  mainDeckIndex,
+  lowerDeckIndex
+)
+const totalCargo =
+getTotalCargo(
+  mainCargo,
+  lowerCargo
+)
+const cargoZfw =
+getCargoZfw(
+  selectedCargoAircraft,
+  totalCargo
 )
 
-const cargoLandingArm = indexToArm(
-  cargoLandingIndex,
-  weightData.landingWeight,
-  selectedCargoAircraft.indexReferenceArm,
-  selectedCargoAircraft.indexConstant,
-  selectedCargoAircraft.indexOffset
+const availablePayload =
+getAvailablePayload(
+  selectedCargoAircraft,
+  cargoZfw
+)
+const cargoData = calculateCargoBalance(
+  selectedCargoAircraft,
+  cargoWeights
+)
+console.log(cargoData)
+const fuelWeight =
+  fuel
+
+const basicArm =
+
+selectedAircraft.lemac +
+
+(
+
+selectedAircraft.mac *
+
+22
+
 )
 
-const cargoZfwCg = getCG(
-  cargoZfwArm,
-  selectedCargoAircraft.lemac,
-  selectedCargoAircraft.mac
+/
+
+100
+
+const basicMoment =
+
+(
+
+selectedAircraft.basicWeight || 0
+
 )
 
-const cargoTowCg = getCG(
-  cargoTowArm,
-  selectedCargoAircraft.lemac,
-  selectedCargoAircraft.mac
+*
+
+basicArm
+
+const passengerMoment =
+
+selectedSeats.reduce(
+
+(
+
+total,
+
+seat
+
+)=>{
+
+const row =
+
+Math.ceil(
+
+seat /
+
+6
+
 )
 
-const cargoLandingCg = getCG(
-  cargoLandingArm,
-  selectedCargoAircraft.lemac,
-  selectedCargoAircraft.mac
-)
-console.log("CARGO CG TEST", {
-  cargoZfw,
-  cargoZfwIndex,
-  cargoZfwCg,
+console.log({
 
-  takeoffWeight: weightData.takeoffWeight,
-  cargoTowIndex,
-  cargoTowCg,
+seat,
 
-  landingWeight: weightData.landingWeight,
-  cargoLandingIndex,
-  cargoLandingCg
+row,
+
+selectedAircraft
+
 })
 
-console.log("Cargo TOW Arm:", cargoTowArm)
-const index = Number.isFinite(totalMoment) ? calculateIndex(totalMoment) :0
-const effectiveBasicIndex = doi + (extraCrew *0.1) + (catering? 0.2 : 0)
-const cargoIndex = (forwardCargo /1000) * (-9) + (aftCargo /1000) * (7)
-const zfi = effectiveBasicIndex + paxIndex + cargoIndex
-const zfiDebug = effectiveBasicIndex + cargoIndex
-const FuelIndex = getFuelIndex(fuel)
-const toi = zfi + FuelIndex
-const tripFuelIndex = getFuelIndex(tripFuel)
-const li = toi - tripFuelIndex
+let rowArm =
 
-const trim = 5.5 - (cg - 15) * 0.12
-function getNearestCg(index){
-const minIndex=25
-const maxIndex=90
-const minCg=21
-const maxCg=34 
-return (18+(index-35)*0.235)
+selectedAircraft.seatArmMid
+
+
+if (
+
+row <= 8
+
+)
+
+{
+
+rowArm =
+
+selectedAircraft.seatArmFwd
+
 }
- function getCgFromEnvelope(index,weight){return Number(getNearestCg(index).toFixed(1))}
-const zfCg = 0
-const toCg = 0
-const lwCg = 0
-const toWithinEnvelope = toCg >= 18 && toCg <= 32 && tow <= selectedAircraft.maxTOW
-function isInsideEnvelope(x, y){
+
+else if (
+
+row <= 18
+
+)
+
+{
+
+rowArm =
+
+selectedAircraft.seatArmMid
+
+}
+
+else
+
+{
+
+rowArm =
+
+selectedAircraft.seatArmAft
+
+}
+
+
+return (
+
+total +
+
+calculateMoment(
+
+84,
+
+rowArm
+
+)
+
+)
+
+},
+
+0
+
+)
+const fwdPax =
+
+selectedSeats.filter(
+
+seat =>
+
+Math.ceil(
+
+seat / 6
+
+) <= 8
+
+).length
+
+
+const midPax =
+
+selectedSeats.filter(
+
+seat =>
+
+Math.ceil(
+
+seat / 6
+
+) > 8 &&
+
+Math.ceil(
+
+seat / 6
+
+) <= 18
+
+).length
+
+
+const aftPax =
+
+selectedSeats.filter(
+
+seat =>
+
+Math.ceil(
+
+seat / 6
+
+) > 18
+
+).length
+
+const paxIndex =
+
+(
+
+fwdPax *
+
+-0.15
+
+)
+
++
+
+(
+
+aftPax *
+
+0.15
+
+)
+
+ const fuelMoment =
+
+  calculateMoment(
+
+    fuel,
+
+    selectedAircraft.fuelArm
+
+  )
+
+
+const forwardCargoMoment =
+  forwardCargo * selectedAircraft.forwardCargoArm
+
+const aftCargoMoment =
+  aftCargo * selectedAircraft.aftCargoArm
+  
+const totalMoment =
+
+  basicMoment +
+
+  passengerMoment +
+
+  fuelMoment +
+
+  forwardCargoMoment +
+
+  aftCargoMoment
+
+  
+ const tow =
+
+rw -
+
+taxiFuel
+const ldw = tow - tripFuel
+const arm =
+
+tow > 0
+
+?
+
+(
+
+totalMoment /
+
+tow
+
+)
+
+:
+
+0
+
+const cg =
+
+arm > 0
+
+?
+
+(
+
+(
+
+arm -
+
+selectedAircraft.lemac
+
+)
+
+/
+
+selectedAircraft.mac
+
+)
+
+*
+
+100
+
+:
+
+0
+
+const [
+
+extraCrew,
+
+setExtraCrew
+
+]
+
+=
+
+useState(
+
+0
+
+)
+const [
+
+catering,
+
+setCatering
+
+]
+
+=
+
+useState(
+
+0
+
+)
+const dow =
+
+selectedAircraft.basicWeight
+const cateringWeight =
+
+catering
+
+?
+
+250
+
+:
+
+0
+
+
+const effectiveBasicWeight =
+
+dow +
+
+(
+
+extraCrew *
+
+85
+
+)
+
++
+
+cateringWeight
+
+const crewConfiguration =
+
+extraCrew > 0
+
+?
+
+`2/${4 + extraCrew}`
+
+:
+
+selectedAircraft.basicConfig
+const basicWeightDelta =
+
+effectiveBasicWeight -
+
+selectedAircraft.basicWeight
+const effectiveBasicMoment =
+
+(
+
+extraCrew *
+
+85 *
+
+360
+
+)
+
++
+
+(
+
+catering
+
+?
+
+250 * 420
+
+:
+
+0
+
+)
+const doi =
+
+selectedAircraft.basicIndex +
+
+(
+
+extraCrew *
+
+0.1
+
+)
+const index =
+
+Number.isFinite(
+
+totalMoment
+
+)
+
+?
+
+calculateIndex(
+
+totalMoment
+
+)
+
+:
+
+0
+const effectiveBasicIndex =
+
+doi +
+
+(
+
+extraCrew *
+
+0.1
+
+)
+
++
+
+(
+
+catering
+
+?
+
+0.2
+
+:
+
+0
+
+)
+const cargoIndex =
+
+(
+
+forwardCargo /
+
+1000
+
+)
+
+*
+
+(
+
+-9
+
+)
+
++
+
+(
+
+aftCargo /
+
+1000
+
+)
+
+*
+
+(
+
+7
+)
+
+const zfi =
+
+effectiveBasicIndex +
+
+paxIndex +
+
+cargoIndex
+const zfiDebug =
+
+effectiveBasicIndex +
+
+cargoIndex
+const fuelIndex =
+
+getFuelIndex(
+
+fuel
+)
+const toi =
+
+zfi +
+
+fuelIndex
+const tripFuelIndex =
+
+getFuelIndex(
+
+tripFuel
+
+)
+
+
+const li =
+
+toi -
+
+tripFuelIndex
+const trim =
+
+5.5 -
+
+(
+
+cg -
+
+15
+
+)
+
+*
+
+0.12
+function getFuelIndex(
+
+fuel
+
+){
+if (
+
+fuel <= 0
+
+)
+
+return 0
+const table = [
+
+[4000,1],
+
+[4900,2],
+
+[5500,3],
+
+[6000,4],
+
+[6500,5],
+
+[6800,6],
+
+[7200,7],
+
+[7500,8],
+
+[8300,9],
+
+[8700,10],
+
+[9200,11],
+
+[9700,12],
+
+[10800,14],
+
+[11400,15],
+
+[12800,16],
+
+[13600,17],
+
+[14200,18],
+
+[15000,19],
+
+[15700,20],
+
+[17250,22],
+
+[18000,23],
+
+[18600,24],
+
+[19250,25],
+
+[19900,26],
+
+[20400,28]
+
+]
+
+for (
+
+const [
+
+limit,
+
+index
+
+]
+
+of table
+
+){
+
+if (
+
+fuel <= limit
+
+){
+
+return index
+
+}
+
+}
+
+return 28
+
+}
+
+function getNearestCg(
+
+index
+
+){
+
+const minIndex=25
+
+const maxIndex=90
+
+const minCg=21
+
+const maxCg=34
+
+
+return (18+(index-35)*0.235
+
+)
+
+}
+
+
+function getCgFromEnvelope(index,weight){
+
+return Number(
+
+getNearestCg(index).toFixed(1))
+
+}
+
+const zfCg =getCgFromEnvelope(
+
+zfi,
+zfw
+
+)
+
+
+const toCg =
+
+getCgFromEnvelope(
+
+toi,
+tow
+
+)
+
+
+const lwCg =
+
+getCgFromEnvelope(
+
+li,
+ldw
+
+)
+const toWithinEnvelope =
+
+toCg >= 18 &&
+
+toCg <= 32 &&
+
+tow <= selectedAircraft.maxTOW
+function isInsideEnvelope(
+
+x,
+
+y
+
+){
+
 const polygon=[
 
 [100,50],
@@ -539,8 +1284,19 @@ const polygon=[
 
 ]
 
-let inside=false 
-for( let i=0, j=polygon.length-1; i<polygon.length; j=i++){
+let inside=false
+
+for(
+
+let i=0,
+
+j=polygon.length-1;
+
+i<polygon.length;
+
+j=i++
+
+){
 
 const xi=polygon[i][0]
 
@@ -552,29 +1308,141 @@ const yj=polygon[j][1]
 
 const intersect=
 
-(( yi>y ) !== ( yj>y )) && (x< (xj-xi) * (y-yi) / (yj-yi) + xi)
+(
 
-if(intersect) inside=!inside
+(
+
+yi>y
+
+)
+
+!==
+
+(
+
+yj>y
+
+)
+
+)
+
+&&
+
+(
+
+x<
+
+(
+
+xj-xi
+
+)
+
+*
+
+(
+
+y-yi
+
+)
+
+/
+
+(
+
+yj-yi
+
+)
+
++
+
+xi
+
+)
+
+if(
+
+intersect
+
+)
+
+inside=!inside
+
 }
 
 return inside
+
 }
 
-const zfWithinEnvelope = zfw <= selectedAircraft.maxZFW && zfCg >= 18 && zfCg <= 34
-const trimLabel = trim < 4 ? 'NOSE UP' : trim > 7 ? 'NOSE DOWN' : 'SET'
-const loadStatus = 'READY FOR DISPATCH'
-const cgStatus = true
-const cgLabel = cg < 18 ? 'FORWARD' : cg > 32 ? 'AFT' : 'NORMAL'
-const zfwStatus = zfw <= selectedAircraft.maxZFW
-const towStatus = tow <= selectedAircraft.maxTOW
-const [weatherAirport,setWeatherAirport]=useState("")
+const zfWithinEnvelope =
+
+zfw <= selectedAircraft.maxZFW &&
+
+zfCg >= 18 &&
+
+zfCg <= 34
+
+
+const trimLabel =
+
+  trim < 4
+
+    ? 'NOSE UP'
+
+    : trim > 7
+
+      ? 'NOSE DOWN'
+
+      : 'SET'
+      
+     const loadStatus =
+'READY FOR DISPATCH'
+const cgStatus =
+true
+ const cgLabel =
+
+  cg < 18
+
+    ? 'FORWARD'
+
+    : cg > 32
+
+      ? 'AFT'
+
+      : 'NORMAL'
+      
+
+  const zfwStatus =
+    zfw <= selectedAircraft.maxZFW
+
+  const towStatus =
+    tow <= selectedAircraft.maxTOW
+    const [weatherAirport,setWeatherAirport]=useState("")
+
 const [searchMetar,setSearchMetar]=useState(null)
+
 const [searchTaf,setSearchTaf]=useState(null)
-function toggleSeat(seat) {if (selectedSeats.includes(seat)) {setSelectedSeats(selectedSeats.filter(s => s !== seat))
-  } else {setSelectedSeats( [...selectedSeats, seat])
-}
+  function toggleSeat(seat) {
+
+  if (selectedSeats.includes(seat)) {
+
+    setSelectedSeats(
+      selectedSeats.filter(
+        s => s !== seat
+      )
+    )
+
+  } else {
+
+    setSelectedSeats(
+      [...selectedSeats, seat]
+    )
+
+  }
+
 }
 function loadCabins(){
+
 const seats=[]
 
 for(
@@ -1316,9 +2184,13 @@ gap:'12px'
 
 {
 
-selectedCargoAircraft?.cargoConfig?.mainDeck?.map((position ) => (
+selectedCargoAircraft?.cargoConfig?.mainDeck?.map(
 
-<div key={position.id}
+(position)=>(
+
+<div
+
+key={position.id}
 
 style={{
 
@@ -1654,25 +2526,30 @@ margin:'0 auto'
 selectedCargoAircraft
 ?.cargoConfig
 ?.lowerDeck
+
 ?.map(
 
 (position)=>(
 
-<div
-key={position.id}
->
+<div>
 
 <div
 style={{
+
 fontWeight:'700',
+
 fontSize:'22px',
+
 marginBottom:'18px'
+
 }}
+
 >
 
 {position.id}
 
 </div>
+
 <input
 
 type="number"
@@ -2060,7 +2937,7 @@ style={{
 
 display:'flex',
 
-gap:'25px',
+gap:'8px',
 
 alignItems:'center',
 
@@ -2069,7 +2946,6 @@ marginBottom:'10px'
 }}
 
 >
-  
 <span>
 
 BASIC WEIGHT
@@ -2078,7 +2954,13 @@ BASIC WEIGHT
 
 <strong>
 
-{selectedCargoAircraft.basicWeight} kg
+{
+
+selectedCargoAircraft.basicWeight
+
+}
+
+kg
 
 </strong>
 
@@ -2086,7 +2968,17 @@ BASIC WEIGHT
 
 <div
 
-style={{ display:'flex', gap:'130px', alignItems:'center', marginBottom:'10px'}}
+style={{
+
+display:'flex',
+
+gap:'8px',
+
+alignItems:'center',
+
+marginBottom:'10px'
+
+}}
 
 >
 <span>
@@ -2097,402 +2989,13 @@ MAIN
 
 <strong>
 
-{mainCargo} kg
-
-</strong>
-
-</div>
-
-<div
-
-style={{ display:'flex', gap:'120px', alignItems:'center', marginBottom:'10px'}}
->
-<span>
-LOWER
-</span>
-<strong>
-{lowerCargo} kg
-
-</strong>
-
-</div>
-
-<div
-style={{display:'flex', gap:'70px', alignItems:'center', marginBottom:'10px'}}
->
-
-<span>
-TRAFFIC LOAD
-</span>
-
-<strong>
-{totalCargo} kg
-</strong>
- 
-</div>
-<div
-style={{
-
-display:'flex',
-
-gap:'100px',
-
-alignItems:'center',
-
-marginBottom:'10px'
-
-}}
->
-
-<span>
-
-ZFW
-
-</span>
-
-<div
-style={{
-
-display:'flex',
-
-gap:'50px',
-
-alignItems:'center'
-
-}}
->
-
-<strong>
-
-{cargoZfw} kg
-
-</strong>
-
-<strong
-style={{
-
-color:
-
-cargoZfw >
-
-selectedCargoAircraft.maxZFW
-
-?
-
-'#ff4444'
-
-:
-
-'#00ff88'
-
-}}
->
-
 {
 
-cargoZfw >
-
-selectedCargoAircraft.maxZFW
-
-?
-
-'🔴 LIMIT EXCEEDED'
-
-:
-
-'🟢 OK'
-
-}
-
-</strong>
-
-</div>
-
-</div>
-<div
-style={{
-
-display:'flex',
-
-gap:'80px',
-
-alignItems:'center',
-
-marginBottom:'10px'
-
-}}
->
-<span>
-BLOCK FUEL
-</span>
-<strong>
-{fuel} kg
-</strong>
-
-</div>
-<div
-style={{
-
-display:'flex',
-
-gap:'30px',
-
-alignItems:'center',
-
-marginBottom:'10px'
-
-}}
->
-
-<span>
-
-RAMP WEIGHT
-
-</span>
-
-<strong>
-
-{
-
-rampWeight
+mainCargo
 
 }
 
 kg
-
-</strong>
-
-</div>
-<div
-style={{
-
-display:'flex',
-
-gap:'100px',
-
-alignItems:'center',
-
-marginBottom:'10px'
-
-}}
->
-
-<span>
-
-TAXI FUEL
-
-</span>
-
-<strong>
-
-{
-
-taxiFuel
-
-}
-
-kg
-
-</strong>
-
-</div>
-<div
-style={{
-  display:'flex',
-  alignItems:'center',
-  marginBottom:'10px'
-}}
->
-
-<span
-style={{
-  width:'140px'
-}}
->
-
-TAKEOFF WEIGHT
-
-</span>
-
-<strong
-style={{
-  width:'110px'
-}}
->
-
-{weightData.takeoffWeight} kg
-
-</strong>
-
-<strong
-style={{
-
-color:
-
-weightData.takeoffWeight >
-
-selectedCargoAircraft.maxTOW
-
-?
-
-'#ff4444'
-
-:
-
-'#00ff88'
-
-}}
->
-
-{
-
-weightData.takeoffWeight >
-
-selectedCargoAircraft.maxTOW
-
-?
-
-'🔴 LIMIT EXCEEDED'
-
-:
-
-'🟢 OK'
-
-}
-
-</strong>
-
-</div>
-<div
-style={{
-
-display:'flex',
-
-gap:'100px',
-
-alignItems:'center',
-
-marginBottom:'10px'
-
-}}
->
-
-<span>
-
-TRIP FUEL
-
-</span>
-
-<strong>
-
-{tripFuel}
-
-kg
-
-</strong>
-
-</div>
-<div
-style={{
-  display:'flex',
-  alignItems:'center',
-  marginBottom:'10px'
-}}
->
-
-<span
-style={{
-  width:'140px'
-}}
->
-
-LANDING WEIGHT
-
-</span>
-
-<strong
-style={{
-  width:'110px'
-}}
->
-
-{weightData.landingWeight} kg
-
-</strong>
-
-<strong
-style={{
-
-color:
-
-weightData.landingWeight >
-
-selectedCargoAircraft.maxLW
-
-?
-
-'#ff4444'
-
-:
-
-'#00ff88'
-
-}}
->
-
-{
-
-weightData.landingWeight >
-
-selectedCargoAircraft.maxLW
-
-?
-
-'🔴 LIMIT EXCEEDED'
-
-:
-
-'🟢 OK'
-
-}
-
-</strong>
-
-</div>
-
-<div
-style={{
-  fontSize:'18px',
-  fontWeight:'700',
-  marginBottom:'15px',
-  marginTop:'10px'
-}}
->
-
-LOAD INDEX
-
-</div>
-<div
-style={{
-  display:'flex',
-  alignItems:'center',
-  marginBottom:'10px'
-}}
->
-
-<span
-style={{
-  width:'100px'
-}}
->
-
-BASIC INDEX
-
-</span>
-
-<strong>
-
-{cargoEffectiveBasicIndex.toFixed(2)}
 
 </strong>
 
@@ -2516,7 +3019,174 @@ marginBottom:'10px'
 
 <span>
 
-LOWER DECK INDEX
+LOWER
+
+</span>
+
+<strong>
+
+{
+
+lowerCargo
+
+}
+
+kg
+
+</strong>
+
+</div>
+
+<div
+
+style={{
+
+display:'flex',
+
+gap:'8px',
+
+alignItems:'center',
+
+marginBottom:'10px'
+
+}}
+
+>
+
+<span>
+
+TOTAL
+
+</span>
+
+<strong>
+
+{
+
+totalCargo
+
+}
+
+kg
+
+</strong>
+
+</div>
+<div
+
+style={{
+
+display:'flex',
+
+gap:'8px',
+
+alignItems:'center',
+
+marginBottom:'10px'
+
+}}
+
+>
+
+<span>
+
+CARGO ZFW
+
+</span>
+
+<strong>
+
+{
+
+cargoZfw
+
+}
+
+kg
+
+</strong>
+
+</div>
+<div
+
+style={{
+
+display:'flex',
+
+gap:'8px',
+
+alignItems:'center',
+
+marginBottom:'10px',
+
+color:
+
+cargoZfw
+
+>
+
+selectedCargoAircraft.maxZFW
+
+?
+
+'#ff4444'
+
+:
+
+'#00ff88'
+
+}}
+
+>
+
+<span>
+
+ZFW STATUS
+
+</span>
+
+<strong>
+
+{
+
+cargoZfw
+
+>
+
+selectedCargoAircraft.maxZFW
+
+?
+
+'LIMIT EXCEEDED'
+
+:
+
+'OK'
+
+}
+
+</strong>
+
+</div>
+<div
+
+style={{
+
+display:'flex',
+
+gap:'8px',
+
+alignItems:'center',
+
+marginBottom:'10px'
+
+}}
+
+>
+
+<span>
+
+LOWER INDEX
 
 </span>
 
@@ -2549,7 +3219,7 @@ marginBottom:'10px'
 
 <span>
 
-MAIN DECK INDEX
+MAIN INDEX
 
 </span>
 
@@ -2574,7 +3244,6 @@ mainDeckIndex
 </strong>
 
 </div>
-
 <div
   style={{
 
@@ -2587,83 +3256,43 @@ alignItems:'center',
 marginBottom:'10px'
   }}
 >
-  <span>TOTAL DECK INDEX</span>
+  <span>TOTAL INDEX</span>
 
   <strong>
     {totalCargoIndex.toFixed(2)}
   </strong>
 </div>
 <div
+
 style={{
-  display:'flex',
-  alignItems:'center',
-  marginBottom:'10px'
+
+display:'flex',
+
+gap:'8px',
+
+alignItems:'center',
+
+marginBottom:'10px'
+
 }}
+
 >
 
-<span
-style={{
-  width:'85px'
-}}
->
+<span>
 
-ZFW INDEX
+AVAILABLE
 
 </span>
 
 <strong>
 
-{cargoZfwIndex.toFixed(2)}
+{
 
-</strong>
+availablePayload
 
-</div>
-<div
-style={{
-  display:'flex',
-  alignItems:'center',
-  marginBottom:'10px'
-}}
->
+}
 
-<span
-style={{
-  width:'120px'
-}}
->
-
-TAKEOFF INDEX
-
-</span>
-
-<strong>
-
-{cargoTowIndex.toFixed(2)}
-
-</strong>
-
-</div>
-<div
-style={{
-  display:'flex',
-  alignItems:'center',
-  marginBottom:'10px'
-}}
->
-
-<span
-style={{
-  width:'120px'
-}}
->
-
-LANDING INDEX
-
-</span>
-
-<strong>
-
-{cargoLandingIndex.toFixed(2)}
+kg
 
 </strong>
 
@@ -2678,7 +3307,25 @@ gap:'8px',
 
 alignItems:'center',
 
-marginBottom:'10px'
+marginTop:'16px',
+
+fontSize:'18px',
+
+color:
+
+totalCargo
+
+>
+
+availablePayload
+
+?
+
+'#ff4444'
+
+:
+
+'#00ff88'
 
 }}
 
@@ -2802,58 +3449,6 @@ availablePayload
 ></div>
 
 </div>
-<span>
-
-AVAILABLE PAYLOAD
-
-</span>
-
-<strong>
-
-{
-
-availablePayload
-
-}
-
-kg
-
-</strong>
-
-</div>
-<div
-
-style={{
-
-display:'flex',
-
-gap:'8px',
-
-alignItems:'center',
-
-marginTop:'16px',
-
-fontSize:'18px',
-
-color:
-
-totalCargo
-
->
-
-availablePayload
-
-?
-
-'#ff4444'
-
-:
-
-'#00ff88'
-
-}}
-
->
 
 <div
 
@@ -3949,17 +4544,6 @@ status={true}
 />
 <StatusCard
 
-title="BLOCK FUEL"
-
-value={fuel}
-
-unit="kg"
-
-status={true}
-
-/>
-<StatusCard
-
 title="RW"
 
 value={
@@ -4076,7 +4660,7 @@ title="FUEL INDEX"
 
 value={
 
-FuelIndex
+fuelIndex
 
 }
 
@@ -4908,7 +5492,7 @@ CATERING
 
     >
 
-      fuel:
+      Fuel:
       <strong>
         {' '}
         {fuel} KG
@@ -4984,7 +5568,7 @@ loadStatus
 
 <label>
 
-Block Fuel (kg)
+Total Fuel (kg)
 
 </label>
 
@@ -4993,11 +5577,26 @@ Block Fuel (kg)
   value={fuel}
   onChange={(e)=>{
 
-const value= parseInt(e.target.value)||0
+const value=
 
-setFuel(Math.min(value,20598
+parseInt(
+
+e.target.value
+
+)||0
+
+setFuel(
+
+Math.min(
+
+value,
+
+20598
+
 )
+
 )
+
 }}
 
 ></input>
@@ -5006,7 +5605,13 @@ setFuel(Math.min(value,20598
 
 <div
 
-style={{marginTop:'25px',marginBottom:'20px'}}
+style={{
+
+marginTop:'25px',
+
+marginBottom:'20px'
+
+}}
 
 >
 
@@ -5020,30 +5625,31 @@ Taxi Fuel (kg)
   type="number"
   value={taxiFuel}
   onChange={(e)=>{
-    setTaxiFuel(parseInt(e.target.value)||0)
-  }}
-/>
 
-<div
-style={{
-  marginTop:'20px',
-  marginBottom:'20px'
+setTaxiFuel(
+
+parseInt(
+
+e.target.value
+
+)||0
+
+)
+
 }}
+
+></input>
+<div
+
+style={{
+
+marginTop:'20px',
+
+marginBottom:'20px'
+
+}}
+
 >
-
-<label>
-
-Takeoff Fuel (kg)
-
-</label>
-
-<input
-  type="number"
-  value={fuelData.takeoffFuel}
-  readOnly
-/>
-
-</div>
 
 <label>
 
@@ -5052,12 +5658,28 @@ Trip Fuel (kg)
 </label>
 
 <input
-  type="number"
-  value={tripFuel}
-  onChange={(e)=>{
-    setTripFuel(parseInt(e.target.value)||0)
-  }}
-/>
+
+type="number"
+
+value={tripFuel}
+
+onChange={(e)=>{
+
+setTripFuel(
+
+parseInt(
+
+e.target.value
+
+)||0
+
+)
+
+}}
+
+></input>
+
+</div>
 
 </div>
 <div style={{ marginBottom: '25px' }}>

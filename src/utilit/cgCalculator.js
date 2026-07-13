@@ -1,39 +1,42 @@
-
-
-import {
-  calculateCG,
-  calculateTrim,
-  indexToArm,
-  armToIndex
-} from './calculations'
-
 export function getPayloadIndex(
   passengerIndex,
   cargoIndex
 ) {
+
   return passengerIndex + cargoIndex
+
 }
 
+
 export function getZeroFuelIndex(
-    basicIndex,
-    loadIndex
-){
-    return basicIndex + loadIndex
+  basicIndex,
+  loadIndex
+) {
+
+  return basicIndex + loadIndex
+
 }
+
 
 export function getTakeoffIndex(
   zeroFuelIndex,
   fuelIndex
 ) {
+
   return zeroFuelIndex + fuelIndex
+
 }
+
 
 export function getLandingIndex(
   takeoffIndex,
   tripFuelIndex
 ) {
+
   return takeoffIndex - tripFuelIndex
+
 }
+
 
 export function getCG(
   arm,
@@ -48,6 +51,7 @@ export function getCG(
   )
 
 }
+
 
 export function calculateBalanceCG({
 
@@ -68,50 +72,49 @@ export function calculateBalanceCG({
 }) {
 
   const payloadIndex = getPayloadIndex(
-  passengerIndex,
-  cargoIndex
-)
-const zeroFuelIndex = getZeroFuelIndex(
-  effectiveBasicIndex,
-  payloadIndex
-)
-const cargoZfwIndex = getZeroFuelIndex(
-  cargoEffectiveBasicIndex,
-  totalCargoIndex
-)
-const takeoffIndex = getTakeoffIndex(
-  zeroFuelIndex,
-  fuelIndex
-)
-const landingIndex = getLandingIndex(
-  takeoffIndex,
-  tripFuelIndex
-)
+    passengerIndex,
+    cargoIndex
+  )
 
-return {
+  const zeroFuelIndex = getZeroFuelIndex(
+    effectiveBasicIndex,
+    payloadIndex
+  )
 
-  payloadIndex,
+  const takeoffIndex = getTakeoffIndex(
+    zeroFuelIndex,
+    fuelIndex
+  )
 
-  zeroFuelIndex,
+  const landingIndex = getLandingIndex(
+    takeoffIndex,
+    tripFuelIndex
+  )
 
-takeoffIndex,
+  return {
 
-landingIndex,
+    payloadIndex,
 
-  effectiveBasicIndex,
+    zeroFuelIndex,
 
-  passengerIndex,
+    takeoffIndex,
 
-  cargoIndex,
+    landingIndex,
 
-  fuelIndex,
+    effectiveBasicIndex,
 
-  tripFuelIndex,
+    passengerIndex,
 
-  totalMoment,
+    cargoIndex,
 
-  totalWeight
+    fuelIndex,
 
-}
+    tripFuelIndex,
+
+    totalMoment,
+
+    totalWeight
+
+  }
 
 }
