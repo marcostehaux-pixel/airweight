@@ -11,6 +11,7 @@ import {getAvailablePayload} from './utilit/cargoCalculator'
 import {getTotalCargo} from './utilit/cargoCalculator'
 import {calculateCargoBalance} from './utilit/cargoCalculator'
 import {getZeroFuelIndex,getTakeoffIndex,getLandingIndex,getCG} from './utilit/cgCalculator'
+import { getCgFromIndex } from './utilit/indexToCG'
 import { calculateWeight } from './utilit/weightCalculator'
 import {getTotalMoment, getArm} from './utilit/passengerMomentCalculator.js'
 import { useState, useEffect } from 'react'
@@ -362,23 +363,7 @@ towArm
   cargoWeights,
   fuelData.takeoffFuel
 )
-const cargoZfwCg = getCG(
-  zfwArm,
-  selectedCargoAircraft.lemac,
-  selectedCargoAircraft.mac
-)
 
-const cargoTowCg = getCG(
-  towArm,
-  selectedCargoAircraft.lemac,
-  selectedCargoAircraft.mac
-)
-console.log({
-  zfwArm,
-  towArm,
-  cargoZfwCg,
-  cargoTowCg
-})
 const weightData = calculateWeight(
   cargoZfw,
   fuel,
@@ -424,16 +409,65 @@ const basicWeightDelta = effectiveBasicWeight - selectedAircraft.basicWeight
 const effectiveBasicMoment = (extraCrew * 85 * 360) + (catering ? 250 * 420 : 0)
 const doi = selectedAircraft.basicIndex + (extraCrew * 0.1)
 const cargoDow = selectedCargoAircraft.basicWeight
-const cargoDoi = selectedCargoAircraft.basicIndex + (extraCrew * 0.1)
-const cargoEffectiveBasicIndex = cargoDoi + (extraCrew * 0.1) + (catering ? 0.2 : 0)
-const cargoZfwIndex = getZeroFuelIndex(cargoEffectiveBasicIndex,totalCargoIndex)
-const cargoFuelIndex = getCargoFuelIndex(fuelData.takeoffFuel)
 
-const cargoTripFuelIndex = getCargoFuelIndex(fuelData.tripFuel)
+const cargoDoi =
+  selectedCargoAircraft.basicIndex + (extraCrew * 0.1)
+
+const cargoEffectiveBasicIndex =
+  cargoDoi +
+  (extraCrew * 0.1) +
+  (catering ? 0.2 : 0)
+
+const cargoZfwIndex = getZeroFuelIndex(
+  cargoEffectiveBasicIndex,
+  totalCargoIndex
+)
+
+const cargoFuelIndex = getCargoFuelIndex(
+  fuelData.takeoffFuel
+)
+
+const cargoTripFuelIndex = getCargoFuelIndex(
+  fuelData.tripFuel
+)
+
 const cargoTowIndex = getTakeoffIndex(
   cargoZfwIndex,
   cargoFuelIndex
 )
+
+const cargoLandingIndex = getLandingIndex(
+  cargoTowIndex,
+  cargoTripFuelIndex
+)
+
+const cargoZfwCg = getCgFromIndex(
+  cargoZfwIndex,
+  cargoZfw
+)
+
+const cargoTowCg = getCgFromIndex(
+  cargoTowIndex,
+  weightData.takeoffWeight
+)
+
+const cargoLandingCg = getCgFromIndex(
+  cargoLandingIndex,
+  weightData.landingWeight
+)
+console.log("CARGO CG TEST", {
+  cargoZfw,
+  cargoZfwIndex,
+  cargoZfwCg,
+
+  takeoffWeight: weightData.takeoffWeight,
+  cargoTowIndex,
+  cargoTowCg,
+
+  landingWeight: weightData.landingWeight,
+  cargoLandingIndex,
+  cargoLandingCg
+})
 const cargoTowArm = indexToArm(
   cargoTowIndex,
   weightData.takeoffWeight,
@@ -443,11 +477,6 @@ const cargoTowArm = indexToArm(
 )
 
 console.log("Cargo TOW Arm:", cargoTowArm)
-const cargoLandingIndex = getLandingIndex(
-  cargoTowIndex,
-  cargoTripFuelIndex
-)
-const cargoCg = getCG(arm,selectedCargoAircraft.lemac,selectedCargoAircraft.mac)
 const index = Number.isFinite(totalMoment) ? calculateIndex(totalMoment) :0
 const effectiveBasicIndex = doi + (extraCrew *0.1) + (catering? 0.2 : 0)
 const cargoIndex = (forwardCargo /1000) * (-9) + (aftCargo /1000) * (7)

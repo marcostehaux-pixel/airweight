@@ -118,12 +118,29 @@ export function getCargoZfw(selectedCargoAircraft, totalCargo) {
 }
 export function getBasicMoment(selectedCargoAircraft) {
 
+  const basicArm =
+
+    (
+      (
+        (
+          selectedCargoAircraft.basicIndex -
+          selectedCargoAircraft.indexOffset
+        ) *
+        selectedCargoAircraft.indexConstant
+      ) /
+      selectedCargoAircraft.basicWeight
+    ) +
+    selectedCargoAircraft.indexReferenceArm
+
   return (
+
     selectedCargoAircraft.basicWeight *
-    selectedCargoAircraft.lemac
+    basicArm
+
   )
 
 }
+
 export function getZfwArm(
   zfwMoment,
   cargoZfw
