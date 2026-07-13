@@ -516,9 +516,63 @@ const maxCg=34
 return (18+(index-35)*0.235)
 }
  function getCgFromEnvelope(index,weight){return Number(getNearestCg(index).toFixed(1))}
-const zfCg = 0
-const toCg = 0
-const lwCg = 0
+const paxZfwArm = indexToArm(
+  zfi,
+  zfw,
+  selectedAircraft.indexReferenceArm,
+  selectedAircraft.indexConstant,
+  selectedAircraft.indexOffset
+)
+
+const paxTakeoffArm = indexToArm(
+  toi,
+  tow,
+  selectedAircraft.indexReferenceArm,
+  selectedAircraft.indexConstant,
+  selectedAircraft.indexOffset
+)
+
+const paxLandingArm = indexToArm(
+  li,
+  ldw,
+  selectedAircraft.indexReferenceArm,
+  selectedAircraft.indexConstant,
+  selectedAircraft.indexOffset
+)
+
+const zfCg = getCG(
+  paxZfwArm,
+  selectedAircraft.lemac,
+  selectedAircraft.mac
+)
+
+const toCg = getCG(
+  paxTakeoffArm,
+  selectedAircraft.lemac,
+  selectedAircraft.mac
+)
+
+const lwCg = getCG(
+  paxLandingArm,
+  selectedAircraft.lemac,
+  selectedAircraft.mac
+)
+console.log("PASSENGER CG TEST", {
+  zfw,
+  zfi,
+  paxZfwArm,
+  zfCg,
+
+  tow,
+  toi,
+  paxTakeoffArm,
+  toCg,
+
+  ldw,
+  li,
+  paxLandingArm,
+  lwCg
+})
 const toWithinEnvelope = toCg >= 18 && toCg <= 32 && tow <= selectedAircraft.maxTOW
 function isInsideEnvelope(x, y){
 const polygon=[
