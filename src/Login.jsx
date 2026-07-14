@@ -1,169 +1,681 @@
 import { useState } from 'react'
 
-export default function Login({
+import loginAircraft from './assets/login-aircraft.png'
+import airweightLogo from './assets/airweight-logo.png'
 
-onLogin
+export default function Login({ onLogin }) {
 
-}){
+  const [user, setUser] = useState('')
 
-const [
+  const [password, setPassword] = useState('')
 
-user,
+  function login() {
 
-setUser
+    const expiration = new Date('2026-07-30')
 
-]=useState('')
+    if (new Date() > expiration) {
 
-const [
+      alert('Trial expired')
 
-password,
+      return
 
-setPassword
+    }
 
-]=useState('')
+    if (
+      user === 'Alumno2' &&
+      password === 'airweight20'
+    ) {
 
-function login(){
+      onLogin()
 
-const expiration =
+    } else {
 
-new Date(
+      alert('Invalid credentials')
 
-'2026-07-30'
+    }
 
-)
+  }
 
-if(
 
-new Date()
+  return (
 
->
+    <div
 
-expiration
+      style={{
 
-){
+        width: '100vw',
 
-alert(
+        height: '100vh',
 
-'Trial expired'
+        display: 'flex',
 
-)
+        overflow: 'hidden',
 
-return
+        background: '#111827'
 
-}
+      }}
 
-if(
+    >
 
-user==='Alumno2'
 
-&&
+      {/* =====================================================
+          LEFT PANEL
+      ===================================================== */}
 
-password==='airweight20'
+      <div
 
-){
+        style={{
 
-onLogin()
+          width: '64%',
 
-}
+          height: '100%',
 
-else{
+          position: 'relative',
 
-alert(
+          backgroundImage:
+            `linear-gradient(
+              rgba(5,15,25,0.15),
+              rgba(5,15,25,0.35)
+            ),
+            url(${loginAircraft})`,
 
-'Invalid credentials'
+          backgroundSize: 'cover',
 
-)
+          backgroundPosition: 'center',
 
-}
+          color: 'white'
 
-}
+        }}
 
-return(
+      >
 
+
+        <div
+
+          style={{
+
+            position: 'absolute',
+
+            top: '7%',
+
+            left: '8%'
+
+          }}
+
+        >
+
+          <div
+
+            style={{
+
+              display: 'flex',
+
+              alignItems: 'center',
+
+              gap: '22px'
+
+            }}
+
+          >
+
+            <img
+
+              src={airweightLogo}
+
+              alt="AirWeight"
+
+              style={{
+
+                width: '95px',
+
+                height: 'auto'
+
+              }}
+
+            />
+
+
+            <h1
+
+              style={{
+
+                margin: 0,
+
+                fontSize: '56px',
+
+                letterSpacing: '16px',
+
+                fontWeight: '600'
+
+              }}
+
+            >
+
+              AIRWEIGHT
+
+            </h1>
+
+          </div>
+
+
+          <div
+
+            style={{
+
+              marginLeft: '120px',
+
+              marginTop: '8px',
+
+              fontSize: '20px',
+
+              letterSpacing: '3px',
+
+              color: '#c7a77a'
+
+            }}
+
+          >
+
+            AIRCRAFT WEIGHT & BALANCE PLATFORM
+
+          </div>
+
+
+          <div
+
+            style={{
+
+              width: '80px',
+
+              height: '2px',
+
+              marginLeft: '120px',
+
+              marginTop: '28px',
+
+              background: '#c7a77a'
+
+            }}
+
+          />
+
+
+          <p
+
+            style={{
+
+              marginLeft: '120px',
+
+              marginTop: '28px',
+
+              width: '430px',
+
+              fontSize: '18px',
+
+              lineHeight: '1.6',
+
+              color: 'rgba(255,255,255,0.88)'
+
+            }}
+
+          >
+
+            Professional load control, weight & balance
+            calculation and operational training in a
+            modern digital environment.
+
+          </p>
 <div
-
-style={{
-
-height:'100vh',
-
-display:'flex',
-
-flexDirection:'column',
-
-justifyContent:'center',
-
-alignItems:'center',
-
-gap:'15px',
-
-background:'#111827',
-
-color:'white'
-
-}}
-
+  style={{
+    marginLeft: '120px',
+    marginTop: '300px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '28px'
+  }}
 >
 
-<h1>
+  <div
+    style={{
+      textAlign: 'center'
+    }}
+  >
+    <div
+      style={{
+        fontSize: '13px',
+        letterSpacing: '1px',
+        color: '#c7a77a'
+      }}
+    >
+      LOAD CONTROL
+    </div>
+  </div>
 
-AIRWEIGHT
 
-</h1>
+  <div
+    style={{
+      width: '1px',
+      height: '45px',
+      background: 'rgba(255,255,255,0.25)'
+    }}
+  />
 
-<input
 
-placeholder='User'
+  <div
+    style={{
+      textAlign: 'center'
+    }}
+  >
+    <div
+      style={{
+        fontSize: '13px',
+        letterSpacing: '1px',
+        color: '#c7a77a'
+      }}
+    >
+      WEIGHT & BALANCE
+    </div>
+  </div>
 
-value={user}
 
-onChange={
+  <div
+    style={{
+      width: '1px',
+      height: '45px',
+      background: 'rgba(255,255,255,0.25)'
+    }}
+  />
 
-e=>
 
-setUser(
-
-e.target.value
-
-)
-
-}
-
-/>
-
-<input
-
-type='password'
-
-placeholder='Password'
-
-value={password}
-
-onChange={
-
-e=>
-
-setPassword(
-
-e.target.value
-
-)
-
-}
-
-/>
-
-<button
-
-onClick={login}
-
->
-
-ACCESS
-
-</button>
+  <div
+    style={{
+      textAlign: 'center'
+    }}
+  >
+    <div
+      style={{
+        fontSize: '13px',
+        letterSpacing: '1px',
+        color: '#c7a77a'
+      }}
+    >
+      OPERATIONAL TRAINING
+    </div>
+  </div>
 
 </div>
+        </div>
 
-)
+
+        {/* FOOTER */}
+
+        <div
+
+          style={{
+
+            position: 'absolute',
+
+            bottom: '5%',
+
+            left: '8%',
+
+            display: 'flex',
+
+            alignItems: 'center',
+
+            gap: '18px'
+
+          }}
+
+        >
+
+          <span
+
+            style={{
+
+              fontSize: '14px',
+
+              opacity: 0.7
+
+            }}
+
+          >
+
+            Developed by
+
+          </span>
+
+
+          <strong
+
+            style={{
+
+              letterSpacing: '3px',
+
+              fontSize: '16px'
+
+            }}
+
+          >
+
+            NG ENTRENAMIENTO AERONÁUTICO
+
+          </strong>
+
+        </div>
+
+      </div>
+
+
+
+      {/* =====================================================
+          RIGHT LOGIN PANEL
+      ===================================================== */}
+
+      <div
+
+        style={{
+
+          width: '36%',
+
+          height: '100%',
+
+          background: '#f4f1ed',
+
+          display: 'flex',
+
+          justifyContent: 'center',
+
+          alignItems: 'center',
+
+          color: '#242424'
+
+        }}
+
+      >
+
+
+        <div
+
+          style={{
+
+            width: '70%',
+
+            maxWidth: '430px'
+
+          }}
+
+        >
+
+          <div
+
+            style={{
+
+              fontSize: '38px',
+
+              marginBottom: '4px'
+
+            }}
+
+          >
+
+            Welcome to
+
+          </div>
+
+
+          <h1
+
+            style={{
+
+              margin: 0,
+
+              fontSize: '48px',
+
+              letterSpacing: '8px',
+
+              fontWeight: '600'
+
+            }}
+
+          >
+
+            AIRWEIGHT
+
+          </h1>
+
+
+          <div
+
+            style={{
+
+              width: '75px',
+
+              height: '2px',
+
+              background: '#b8996b',
+
+              marginTop: '25px',
+
+              marginBottom: '28px'
+
+            }}
+
+          />
+
+
+          <p
+
+            style={{
+
+              fontSize: '18px',
+
+              color: '#666',
+
+              marginBottom: '40px'
+
+            }}
+
+          >
+
+            Access your operational workspace
+
+          </p>
+
+
+          {/* USER */}
+
+          <label
+
+            style={{
+
+              display: 'block',
+
+              marginBottom: '8px',
+
+              fontSize: '14px',
+
+              fontWeight: '600'
+
+            }}
+
+          >
+
+            Email or Username
+
+          </label>
+
+
+          <input
+
+            placeholder="Enter your email or username"
+
+            value={user}
+
+            onChange={(e) =>
+              setUser(e.target.value)
+            }
+
+            style={{
+
+              width: '100%',
+
+              boxSizing: 'border-box',
+
+              padding: '16px',
+
+              marginBottom: '25px',
+
+              borderRadius: '5px',
+
+              border: '1px solid #aaa',
+
+              background: 'transparent',
+
+              fontSize: '15px',
+
+              outline: 'none'
+
+            }}
+
+          />
+
+
+          {/* PASSWORD */}
+
+          <label
+
+            style={{
+
+              display: 'block',
+
+              marginBottom: '8px',
+
+              fontSize: '14px',
+
+              fontWeight: '600'
+
+            }}
+
+          >
+
+            Password
+
+          </label>
+
+
+          <input
+
+            type="password"
+
+            placeholder="Enter your password"
+
+            value={password}
+
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
+
+            onKeyDown={(e) => {
+
+              if (e.key === 'Enter') {
+
+                login()
+
+              }
+
+            }}
+
+            style={{
+
+              width: '100%',
+
+              boxSizing: 'border-box',
+
+              padding: '16px',
+
+              marginBottom: '30px',
+
+              borderRadius: '5px',
+
+              border: '1px solid #aaa',
+
+              background: 'transparent',
+
+              fontSize: '15px',
+
+              outline: 'none'
+
+            }}
+
+          />
+
+
+          {/* ACCESS BUTTON */}
+
+          <button
+
+            onClick={login}
+
+            style={{
+
+              width: '100%',
+
+              padding: '18px',
+
+              border: 'none',
+
+              borderRadius: '5px',
+
+              background: '#252525',
+
+              color: 'white',
+
+              fontSize: '15px',
+
+              letterSpacing: '2px',
+
+              cursor: 'pointer'
+
+            }}
+
+          >
+
+            SIGN IN
+
+          </button>
+
+
+          <div
+
+            style={{
+
+              marginTop: '35px',
+
+              paddingTop: '25px',
+
+              borderTop: '1px solid rgba(0,0,0,0.12)',
+
+              textAlign: 'center',
+
+              color: '#777',
+
+              fontSize: '14px'
+
+            }}
+
+          >
+
+            Secure access to AirWeight Platform
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  )
 
 }

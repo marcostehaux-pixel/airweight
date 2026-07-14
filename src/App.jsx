@@ -2794,6 +2794,113 @@ LANDING INDEX
 
 </div>
 <div
+  style={{
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '15px',
+    marginTop: '25px',
+    paddingTop: '20px',
+    borderTop: '1px solid rgba(255,255,255,0.08)'
+  }}
+>
+
+  <div
+    style={{
+      minWidth: '110px',
+      padding: '14px 18px',
+      textAlign: 'center',
+      borderRadius: '12px',
+      background: 'rgba(255,255,255,0.03)',
+      border: '1px solid rgba(255,255,255,0.08)'
+    }}
+  >
+
+    <div
+      style={{
+        fontSize: '12px',
+        opacity: 0.6,
+        marginBottom: '8px'
+      }}
+    >
+      ZFW CG
+    </div>
+
+    <strong
+      style={{
+        fontSize: '20px'
+      }}
+    >
+      {cargoZfwCg.toFixed(2)} %
+    </strong>
+
+  </div>
+
+
+  <div
+    style={{
+      minWidth: '110px',
+      padding: '14px 18px',
+      textAlign: 'center',
+      borderRadius: '12px',
+      background: 'rgba(255,255,255,0.03)',
+      border: '1px solid rgba(255,255,255,0.08)'
+    }}
+  >
+
+    <div
+      style={{
+        fontSize: '12px',
+        opacity: 0.6,
+        marginBottom: '8px'
+      }}
+    >
+      TOW CG
+    </div>
+
+    <strong
+      style={{
+        fontSize: '20px'
+      }}
+    >
+      {cargoTowCg.toFixed(2)} %
+    </strong>
+
+  </div>
+
+
+  <div
+    style={{
+      minWidth: '110px',
+      padding: '14px 18px',
+      textAlign: 'center',
+      borderRadius: '12px',
+      background: 'rgba(255,255,255,0.03)',
+      border: '1px solid rgba(255,255,255,0.08)'
+    }}
+  >
+
+    <div
+      style={{
+        fontSize: '12px',
+        opacity: 0.6,
+        marginBottom: '8px'
+      }}
+    >
+      LW CG
+    </div>
+
+    <strong
+      style={{
+        fontSize: '20px'
+      }}
+    >
+      {cargoLandingCg.toFixed(2)} %
+    </strong>
+
+  </div>
+
+</div>
+<div
 
 style={{
 
