@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import loginAircraft from './assets/login-aircraft.png'
-import airweightLogo from './assets/airweight-logo.png'
+import airweightLogo from './assets/airweight-Logo.png'
 
 export default function Login({ onLogin }) {
 
