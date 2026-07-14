@@ -22,6 +22,8 @@ import a320Perfil from './assets/A320 perfil.png'
 import b737cfPerfil from './assets/b737cfPerfil.png'
 import b737Perfil from './assets/b737 perfil.png'
 import EnvelopeChart from './components/EnvelopeChart'
+import { generateFreighterLoadsheet } from './utilit/generateFreighterLoadsheet'
+import { generateWeatherPdf } from './utilit/generateWeatherPdf'
 import {lowerDeckFactors,mainDeckTables} from './utilit/cargoIndexTables'
 function getMainIndex(position,weight){
 if(!mainDeckTables[position])
@@ -73,6 +75,7 @@ import SeatMap from './components/SeatMap'
 
 import CargoPanel from './components/CargoPanel'
 import generateLoadsheet from './utils/generateLoadsheet'
+
 import logo from './assets/logo.png'
 import aircraftImage from './assets/a320.png'
 function App() {
@@ -2901,6 +2904,125 @@ LANDING INDEX
 
 </div>
 <div
+  style={{
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: '25px',
+    marginBottom: '20px'
+  }}
+>
+
+  <button
+    onClick={() => {
+
+  generateFreighterLoadsheet({
+
+    registration:
+      selectedCargoAircraft.registration,
+basicWeight:
+  selectedCargoAircraft.basicWeight,
+  basicWeight:
+  selectedCargoAircraft.basicWeight,
+
+basicIndex:
+  selectedCargoAircraft.basicIndex,
+
+maxZFW:
+  selectedCargoAircraft.maxZFW,
+
+maxTOW:
+  selectedCargoAircraft.maxTOW,
+
+maxLW:
+  selectedCargoAircraft.maxLW,
+    mainCargo,
+
+    lowerCargo,
+
+    totalCargo,
+
+    cargoZfw,
+
+    rampWeight,
+
+    takeoffWeight:
+      weightData.takeoffWeight,
+
+    landingWeight:
+      weightData.landingWeight,
+
+    mainDeckIndex,
+
+    lowerDeckIndex,
+
+    totalCargoIndex,
+
+    cargoZfwIndex,
+
+    cargoTowIndex,
+
+    cargoLandingIndex,
+
+    cargoZfwCg,
+
+    cargoTowCg,
+
+    cargoLandingCg,
+
+    blockFuel: fuel,
+
+    taxiFuel,
+
+    takeoffFuel:
+      fuelData.takeoffFuel,
+
+    tripFuel,
+
+    remainingFuel:
+      fuelData.remainingFuel,
+
+    cargoWeights
+
+  })
+
+}}
+
+    style={{
+      padding: '14px 28px',
+      borderRadius: '10px',
+      border: '1px solid rgba(0,255,140,0.25)',
+      background: 'rgba(0,255,140,0.10)',
+      color: 'white',
+      fontSize: '14px',
+      fontWeight: '600',
+      letterSpacing: '1px',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease'
+    }}
+
+    onMouseEnter={(e) => {
+      e.currentTarget.style.background =
+        'rgba(0,255,140,0.18)'
+
+      e.currentTarget.style.boxShadow =
+        '0 0 20px rgba(0,255,140,0.15)'
+    }}
+
+    onMouseLeave={(e) => {
+      e.currentTarget.style.background =
+        'rgba(0,255,140,0.10)'
+
+      e.currentTarget.style.boxShadow =
+        'none'
+    }}
+  >
+
+    GENERATE FREIGHTER LOADSHEET
+
+  </button>
+
+</div>
+<div
 
 style={{
 
@@ -4801,7 +4923,23 @@ SEARCH
 </button>
 
 </div>
+<button
+  onClick={() => {
 
+  generateWeatherPdf({
+
+    icao: weatherAirport,
+
+    metar: searchMetar,
+
+    taf: searchTaf
+
+  })
+
+}}
+>
+  GENERATE WEATHER PDF
+</button>
 <div className="metar-card">
 
 <div className="metar-title">
