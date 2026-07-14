@@ -8,7 +8,13 @@ export default function Login({ onLogin }) {
   const [user, setUser] = useState('')
 
   const [password, setPassword] = useState('')
+const [
 
+showPassword,
+
+setShowPassword
+
+] = useState(false)
   function login() {
 
     const expiration = new Date('2026-07-30')
@@ -537,7 +543,11 @@ className="login-right-panel"
               outline: 'none'
 
             }}
-
+style={{
+  color: '#1f2937',
+  fontSize: '16px',
+  fontWeight: '500'
+}}
           />
 
 
@@ -564,51 +574,107 @@ className="login-right-panel"
           </label>
 
 
-          <input
+          <div
 
-            type="password"
+style={{
 
-            placeholder="Enter your password"
+position:'relative',
 
-            value={password}
+width:'100%'
 
-            onChange={(e) =>
-              setPassword(e.target.value)
-            }
+}}
 
-            onKeyDown={(e) => {
+>
 
-              if (e.key === 'Enter') {
+<input
 
-                login()
+type={
 
-              }
+showPassword
 
-            }}
+? 'text'
 
-            style={{
+: 'password'
 
-              width: '100%',
+}
 
-              boxSizing: 'border-box',
+placeholder="Password"
 
-              padding: '16px',
+value={password}
 
-              marginBottom: '30px',
+onChange={(e)=>
 
-              borderRadius: '5px',
+setPassword(
 
-              border: '1px solid #aaa',
+e.target.value
 
-              background: 'transparent',
+)
 
-              fontSize: '15px',
+}
 
-              outline: 'none'
+style={{
 
-            }}
+width:'100%',
 
-          />
+paddingRight:'45px'
+
+}}
+style={{
+  color: '#1f2937',
+  fontSize: '16px',
+  fontWeight: '500'
+}}
+ />
+
+<button
+
+type="button"
+
+onClick={()=>
+
+setShowPassword(
+
+!showPassword
+
+)
+
+}
+
+style={{
+
+position:'absolute',
+
+right:'12px',
+
+top:'50%',
+
+transform:'translateY(-50%)',
+
+border:'none',
+
+background:'transparent',
+
+cursor:'pointer',
+
+fontSize:'18px'
+
+}}
+
+>
+
+{
+
+showPassword
+
+? '🙈'
+
+: '👁'
+
+}
+
+</button>
+
+</div>
 
 
           {/* ACCESS BUTTON */}
