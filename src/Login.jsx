@@ -1,5 +1,5 @@
 import { useState } from 'react'
-
+import './Login.css'
 import loginAircraft from './assets/login-aircraft.png'
 import airweightLogo from './assets/airweight-Logo.png'
 
@@ -63,7 +63,7 @@ export default function Login({ onLogin }) {
       ===================================================== */}
 
       <div
-
+ className="login-left-panel"
         style={{
 
           width: '64%',
@@ -373,7 +373,7 @@ export default function Login({ onLogin }) {
       ===================================================== */}
 
       <div
-
+className="login-right-panel"
         style={{
 
           width: '36%',
