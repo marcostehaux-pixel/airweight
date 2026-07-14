@@ -16,117 +16,335 @@ export function generateWeatherPdf(data) {
 
 
   /* ==========================================================
+     CONFIGURATION
+  ========================================================== */
+
+  const marginLeft = 15
+
+  const marginRight = 195
+
+  const textWidth = 175
+
+  const pageBottom = 278
+
+
+  /* ==========================================================
+     HELPERS
+  ========================================================== */
+
+  function addHeader() {
+
+    doc.setTextColor(0)
+
+    doc.setFont(
+      'helvetica',
+      'bold'
+    )
+
+    doc.setFontSize(15)
+
+    doc.text(
+      'AIRWEIGHT WEATHER REPORT',
+      marginLeft,
+      16
+    )
+
+
+    doc.setDrawColor(180)
+
+    doc.line(
+      marginLeft,
+      20,
+      marginRight,
+      20
+    )
+
+  }
+
+
+  function addFooter() {
+
+    doc.setFont(
+      'helvetica',
+      'normal'
+    )
+
+    doc.setFontSize(6)
+
+    doc.setTextColor(120)
+
+    doc.text(
+      'AIRWEIGHT Aviation Weather Report',
+      105,
+      288,
+      {
+        align: 'center'
+      }
+    )
+
+    doc.setTextColor(0)
+
+  }
+
+
+  function addNewPage() {
+
+    addFooter()
+
+    doc.addPage()
+
+    addHeader()
+
+    return 30
+
+  }
+
+
+  function checkPageSpace(
+    y,
+    requiredSpace
+  ) {
+
+    if (
+      y + requiredSpace >
+      pageBottom
+    ) {
+
+      return addNewPage()
+
+    }
+
+    return y
+
+  }
+
+
+  function sectionTitle(
+    title,
+    y
+  ) {
+
+    doc.setFont(
+      'helvetica',
+      'bold'
+    )
+
+    doc.setFontSize(8)
+
+    doc.text(
+      title,
+      marginLeft,
+      y
+    )
+
+
+    doc.setDrawColor(180)
+
+    doc.line(
+      marginLeft,
+      y + 2,
+      marginRight,
+      y + 2
+    )
+
+  }
+
+
+  /* ==========================================================
+     CLEAN METAR
+  ========================================================== */
+
+  function cleanMetarText(text) {
+
+    if (!text) {
+
+      return 'METAR UNAVAILABLE'
+
+    }
+
+
+    return text
+
+      .split('\n')
+
+      .map(line =>
+        line.trim()
+      )
+
+      .filter(line => {
+
+        if (!line) {
+
+          return false
+
+        }
+
+
+        /*
+        Elimina líneas que contienen
+        solamente un código ICAO
+        */
+
+        if (
+          /^[A-Z]{4}$/.test(line)
+        ) {
+
+          return false
+
+        }
+
+
+        return true
+
+      })
+
+      .join('\n')
+
+  }
+
+
+  /* ==========================================================
+     CLEAN TAF
+  ========================================================== */
+
+  function cleanTafText(text) {
+
+    if (!text) {
+
+      return 'TAF UNAVAILABLE'
+
+    }
+
+
+    return text
+
+      .split('\n')
+
+      .map(line =>
+        line.trim()
+      )
+
+      .filter(line => {
+
+        if (!line) {
+
+          return false
+
+        }
+
+
+        /*
+        Elimina líneas que contienen
+        solamente ICAO
+        */
+
+        if (
+          /^[A-Z]{4}$/.test(line)
+        ) {
+
+          return false
+
+        }
+
+
+        /*
+        Elimina fecha NOAA:
+
+        2026/07/14 12:33
+        */
+
+        if (
+          /^\d{4}\/\d{2}\/\d{2}/
+          .test(line)
+        ) {
+
+          return false
+
+        }
+
+
+        return true
+
+      })
+
+      .join('\n')
+
+  }
+
+
+  /* ==========================================================
      HEADER
   ========================================================== */
 
-  doc.setFont(
-    'helvetica',
-    'bold'
-  )
-
-  doc.setFontSize(18)
-
-  doc.text(
-    'AIRWEIGHT WEATHER REPORT',
-    15,
-    18
-  )
+  addHeader()
 
 
-  doc.setFont(
-    'helvetica',
-    'normal'
-  )
-
-  doc.setFontSize(8)
-
-  doc.text(
-    'Aviation Weather Information',
-    15,
-    24
-  )
+  let y = 30
 
 
   /* ==========================================================
      AIRPORT INFORMATION
   ========================================================== */
 
-  doc.setFont(
-    'helvetica',
-    'bold'
-  )
-
-  doc.setFontSize(9)
-
-  doc.text(
-    'AIRPORT INFORMATION',
-    15,
-    36
+  sectionTitle(
+    'AIRPORTS',
+    y
   )
 
 
-  doc.setDrawColor(180)
-
-  doc.line(
-    15,
-    38,
-    195,
-    38
-  )
+  y += 8
 
 
   doc.setFont(
     'helvetica',
-    'normal'
+    'bold'
   )
 
   doc.setFontSize(8)
 
-  doc.text(
-    'ICAO',
-    20,
-    48
-  )
 
+  const airportLines =
+    doc.splitTextToSize(
+      icao || 'N/A',
+      textWidth
+    )
 
-  doc.setFont(
-    'helvetica',
-    'bold'
-  )
-
-  doc.setFontSize(11)
 
   doc.text(
-    icao || 'N/A',
-    20,
-    55
+    airportLines,
+    marginLeft,
+    y
   )
+
+
+  y +=
+    airportLines.length * 4
+
+
+  y += 7
 
 
   /* ==========================================================
      METAR
   ========================================================== */
 
-  doc.setFont(
-    'helvetica',
-    'bold'
+  y = checkPageSpace(
+    y,
+    20
   )
 
-  doc.setFontSize(9)
 
-  doc.text(
+  sectionTitle(
     'METAR',
-    15,
-    70
+    y
   )
 
 
-  doc.line(
-    15,
-    72,
-    195,
-    72
-  )
+  y += 8
+
+
+  const cleanMetar =
+    cleanMetarText(metar)
 
 
   doc.setFont(
@@ -134,52 +352,62 @@ export function generateWeatherPdf(data) {
     'normal'
   )
 
-  doc.setFontSize(9)
+  doc.setFontSize(7.5)
 
 
   const metarLines =
     doc.splitTextToSize(
-      metar || 'METAR UNAVAILABLE',
-      170
+      cleanMetar,
+      textWidth
     )
 
 
-  doc.text(
-    metarLines,
-    20,
-    83
+  metarLines.forEach(
+    line => {
+
+      y = checkPageSpace(
+        y,
+        5
+      )
+
+
+      doc.text(
+        line,
+        marginLeft,
+        y
+      )
+
+
+      y += 4
+
+    }
   )
+
+
+  y += 7
 
 
   /* ==========================================================
      TAF
   ========================================================== */
 
-  const tafStartY =
-    95 +
-    (metarLines.length * 5)
-
-
-  doc.setFont(
-    'helvetica',
-    'bold'
+  y = checkPageSpace(
+    y,
+    20
   )
 
-  doc.setFontSize(9)
 
-  doc.text(
+  sectionTitle(
     'TAF',
-    15,
-    tafStartY
+    y
   )
 
 
-  doc.line(
-    15,
-    tafStartY + 2,
-    195,
-    tafStartY + 2
-  )
+  y += 8
+
+
+  const cleanTaf =
+    cleanTafText(taf)
 
 
   doc.setFont(
@@ -187,20 +415,35 @@ export function generateWeatherPdf(data) {
     'normal'
   )
 
-  doc.setFontSize(8)
+  doc.setFontSize(7)
 
 
   const tafLines =
     doc.splitTextToSize(
-      taf || 'TAF UNAVAILABLE',
-      170
+      cleanTaf,
+      textWidth
     )
 
 
-  doc.text(
-    tafLines,
-    20,
-    tafStartY + 13
+  tafLines.forEach(
+    line => {
+
+      y = checkPageSpace(
+        y,
+        5
+      )
+
+
+      doc.text(
+        line,
+        marginLeft,
+        y
+      )
+
+
+      y += 3.8
+
+    }
   )
 
 
@@ -208,24 +451,7 @@ export function generateWeatherPdf(data) {
      FOOTER
   ========================================================== */
 
-  doc.setFont(
-    'helvetica',
-    'normal'
-  )
-
-  doc.setFontSize(7)
-
-  doc.setTextColor(120)
-
-
-  doc.text(
-    'AIRWEIGHT Aviation Weather Report',
-    105,
-    287,
-    {
-      align: 'center'
-    }
-  )
+  addFooter()
 
 
   /* ==========================================================
