@@ -3645,61 +3645,25 @@ AIRCRAFT SUMMARY
 </h3>
 <select
 
-value={
-
-selectedAircraft.registration
-
-}
+value={selectedAircraft.registration}
 
 onChange={(e)=>{
 
 const paxAircraft =
-
 aircraftDatabase.find(
-
-a=>
-
-a.registration===
-
-e.target.value
-
+a=>a.registration===e.target.value
 )
 
 const cargoAircraft =
-
 aircraftCargoDatabase.find(
-
-a=>
-
-a.registration===
-
-e.target.value
-
+a=>a.registration===e.target.value
 )
 
-if(
+if(paxAircraft)
+setSelectedAircraft(paxAircraft)
 
-paxAircraft
-
-)
-
-setSelectedAircraft(
-
-paxAircraft
-
-)
-
-if(
-
-cargoAircraft
-
-)
-
-setSelectedAircraft(
-
-cargoAircraft
-
-)
+if(cargoAircraft)
+setSelectedCargoAircraft(cargoAircraft)
 
 }}
 
@@ -3709,7 +3673,15 @@ padding:'12px',
 
 marginBottom:'20px',
 
-borderRadius:'10px'
+borderRadius:'10px',
+
+background:'#1f2937',
+
+color:'white',
+
+border:'1px solid #374151',
+
+outline:'none'
 
 }}
 
@@ -3723,11 +3695,7 @@ borderRadius:'10px'
 
 ...aircraftCargoDatabase
 
-]
-
-.map(
-
-a=>(
+].map(a=>(
 
 <option
 
@@ -3735,19 +3703,21 @@ key={a.registration}
 
 value={a.registration}
 
+style={{
+
+background:'#1f2937',
+
+color:'white'
+
+}}
+
 >
 
-{
-
-a.registration
-
-}
+{a.registration}
 
 </option>
 
-)
-
-)
+))
 
 }
 
