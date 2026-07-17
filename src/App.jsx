@@ -30,7 +30,7 @@ if(!mainDeckTables[position])
 return 0
 
 const row= mainDeckTables[position].find(v=> Number(weight)<=v.kg)
-console.log(position,weight,row)
+
 return row
 ?row.index:0
 }
@@ -344,9 +344,10 @@ const paxMoment =
   )
   const payload = passengerWeight + forwardCargo + aftCargo
 const zfw = selectedAircraft.basicWeight + passengerWeight + forwardCargo + aftCargo 
+
 const rw = zfw + fuel
 const fuelData = calculateFuel(fuel,taxiFuel,tripFuel)
-console.log(fuelData)
+
 const {
   mainCargo,
   lowerCargo,
@@ -373,7 +374,7 @@ const weightData = calculateWeight(
   fuelData.takeoffFuel,
   fuelData.remainingFuel
 )
-console.log(weightData)
+
 
 const rampWeight = cargoZfw + fuel
 const basicArm = selectedAircraft.lemac + (selectedAircraft.mac *22) /100
@@ -383,16 +384,50 @@ const basicMoment =(selectedAircraft.basicWeight || 0) * basicArm
 const passengerMoment = selectedSeats.reduce((total,seat)=>{
 
 const row = Math.ceil(seat /6)
-console.log({seat,row,selectedAircraft})
+
 let rowArm = selectedAircraft.seatArmMid 
 if (row <= 8) {rowArm = selectedAircraft.seatArmFwd}
 else if (row <= 18) {rowArm =selectedAircraft.seatArmMid}
 else {rowArm = selectedAircraft.seatArmAft}
 return (total + calculateMoment(84,rowArm))}, 0)
-const fwdPax = selectedSeats.filter(seat => Math.ceil(seat / 6) <= 8).length
-const midPax = selectedSeats.filter(seat => Math.ceil(seat / 6) > 8 && Math.ceil(seat / 6 ) <= 18).length
-const aftPax = selectedSeats.filter(seat => Math.ceil(seat / 6) > 18).length
-const paxIndex = (fwdPax * -0.15) + (aftPax * 0.15)
+const fwdPax = selectedSeats.filter(seat => {
+
+  const row = Math.floor(seat / 6) + 1
+
+  return row >= 1 && row <= 11
+
+}).length
+
+const midPax = selectedSeats.filter(seat => {
+
+  const row = Math.floor(seat / 6) + 1
+
+  return row >= 12 && row <= 23
+
+}).length
+
+const aftPax = selectedSeats.filter(seat => {
+
+  const row = Math.floor(seat / 6) + 1
+
+  return row >= 24 && row <= 32
+
+}).length
+selectedSeats.forEach(seat => {
+
+  const row = Math.ceil(seat / 6)
+
+  console.log({
+
+    seat,
+
+    row
+
+  })
+
+})
+const paxIndex = (fwdPax * -0.7) + (aftPax * 0.7)
+
 const FuelMoment = calculateMoment(fuel,selectedAircraft.FuelArm)
 const forwardCargoMoment = forwardCargo * selectedAircraft.forwardCargoArm
 const aftCargoMoment = aftCargo * selectedAircraft.aftCargoArm
@@ -413,6 +448,7 @@ const crewConfiguration = extraCrew > 0 ? `2/${4 + extraCrew}` : selectedAircraf
 const basicWeightDelta = effectiveBasicWeight - selectedAircraft.basicWeight
 const effectiveBasicMoment = (extraCrew * 85 * 360) + (catering ? 250 * 420 : 0)
 const doi = selectedAircraft.basicIndex + (extraCrew * 0.1)
+
 const cargoDow = selectedCargoAircraft.basicWeight
 
 const cargoDoi =
@@ -487,28 +523,17 @@ const cargoLandingCg = getCG(
   selectedCargoAircraft.lemac,
   selectedCargoAircraft.mac
 )
-console.log("CARGO CG TEST", {
-  cargoZfw,
-  cargoZfwIndex,
-  cargoZfwCg,
 
-  takeoffWeight: weightData.takeoffWeight,
-  cargoTowIndex,
-  cargoTowCg,
 
-  landingWeight: weightData.landingWeight,
-  cargoLandingIndex,
-  cargoLandingCg
-})
-
-console.log("Cargo TOW Arm:", cargoTowArm)
 const index = Number.isFinite(totalMoment) ? calculateIndex(totalMoment) :0
 const effectiveBasicIndex = doi + (extraCrew *0.1) + (catering? 0.2 : 0)
 const cargoIndex = (forwardCargo /1000) * (-9) + (aftCargo /1000) * (7)
+
 const zfi = effectiveBasicIndex + paxIndex + cargoIndex
 const zfiDebug = effectiveBasicIndex + cargoIndex
 const FuelIndex = getFuelIndex(fuel)
 const toi = zfi + FuelIndex
+
 const tripFuelIndex = getFuelIndex(tripFuel)
 const li = toi - tripFuelIndex
 
@@ -516,6 +541,7 @@ const trim = 5.5 - (cg - 15) * 0.12
 function getNearestCg(index){
 const minIndex=25
 const maxIndex=90
+
 const minCg=21
 const maxCg=34 
 return (18+(index-35)*0.235)
@@ -562,22 +588,7 @@ const lwCg = getCG(
   selectedAircraft.lemac,
   selectedAircraft.mac
 )
-console.log("PASSENGER CG TEST", {
-  zfw,
-  zfi,
-  paxZfwArm,
-  zfCg,
 
-  tow,
-  toi,
-  paxTakeoffArm,
-  toCg,
-
-  ldw,
-  li,
-  paxLandingArm,
-  lwCg
-})
 const toWithinEnvelope = toCg >= 18 && toCg <= 32 && tow <= selectedAircraft.maxTOW
 function isInsideEnvelope(x, y){
 const polygon=[
@@ -636,21 +647,9 @@ function toggleSeat(seat) {if (selectedSeats.includes(seat)) {setSelectedSeats(s
 function loadCabins(){
 const seats=[]
 
-for(
+for (let i = 0; i < Math.min(fwdCabinPax, 60); i++)
 
-let i=0;
-
-i<Math.min(
-
-fwdCabinPax,
-
-60
-
-);
-
-i++
-
-){
+{
 
 seats.push(
 
@@ -660,23 +659,7 @@ i
 
 }
 
-for(
-
-let i=60;
-
-i<60+
-
-Math.min(
-
-midCabinPax,
-
-60
-
-);
-
-i++
-
-){
+for (let i = 66; i < 66 + Math.min(midCabinPax, 64); i++){
 
 seats.push(
 
@@ -686,23 +669,7 @@ i
 
 }
 
-for(
-
-let i=120;
-
-i<120+
-
-Math.min(
-
-aftCabinPax,
-
-60
-
-);
-
-i++
-
-){
+for (let i = 138; i < 138 + Math.min(aftCabinPax, 50); i++){
 
 seats.push(
 
@@ -719,6 +686,12 @@ seats
 )
 
 }
+console.log({
+  fwdPax,
+  midPax,
+  aftPax,
+  paxIndex
+})
 if(
 
 !logged

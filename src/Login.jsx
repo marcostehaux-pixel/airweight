@@ -231,6 +231,8 @@ setShowPassword
             modern digital environment.
 
           </p>
+
+          
 <div
   style={{
     marginLeft: '120px',
@@ -282,9 +284,7 @@ setShowPassword
       WEIGHT & BALANCE
     </div>
   </div>
-
-
-  <div
+<div
     style={{
       width: '1px',
       height: '45px',
@@ -305,7 +305,32 @@ setShowPassword
         color: '#c7a77a'
       }}
     >
-      OPERATIONAL TRAINING
+      WEIGHT & BALANCE
+    </div>
+  </div>
+
+  <div
+    style={{
+      width: '1px',
+      height: '70px',
+      background: 'rgba(255,255,255,0.25)'
+    }}
+  />
+
+
+  <div
+    style={{
+      textAlign: 'center'
+    }}
+  >
+    <div
+      style={{
+        fontSize: '13px',
+        letterSpacing: '1px',
+        color: '#c7a77a'
+      }}
+    >
+      WEATHER SERVICES
     </div>
   </div>
 

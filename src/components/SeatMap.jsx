@@ -1,60 +1,30 @@
 function SeatMap(props) {
 
-  const seats =
-  Array.from(
+  const seats = Array.from(
+    { length: 180 },
+    (_, index) => index
+  )
 
-{
+  function getSeatZone(seat) {
 
-length:180
+    if (seat < 72) {
+      return 'FWD'
+    }
 
-},
+    if (seat < 132) {
+      return 'MID'
+    }
 
-(_,
+    return 'AFT'
 
-index
-
-)=>
-
-index
-
-)
-
-function getSeatZone(
-
-seat
-
-){
-
-if(
-
-seat<72
-
-){
-
-return 'FWD'
-
-}
-
-if(
-
-seat<132
-
-){
-
-return 'MID'
-
-}
-
-return 'AFT'
-
-}
+  }
 
   return (
 
     <div
       style={{
         backgroundColor: '#1f1f1f',
-        position:'relative',
+        position: 'relative',
         padding: '20px',
         borderRadius: '15px',
         marginTop: '40px',
