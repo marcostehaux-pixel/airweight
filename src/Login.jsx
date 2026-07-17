@@ -236,7 +236,7 @@ setShowPassword
 <div
   style={{
     marginLeft: '120px',
-    marginTop: '300px',
+    marginTop: '310px',
     display: 'flex',
     alignItems: 'center',
     gap: '28px'
@@ -250,7 +250,7 @@ setShowPassword
   >
     <div
       style={{
-        fontSize: '13px',
+        fontSize: '15px',
         letterSpacing: '1px',
         color: '#c7a77a'
       }}
