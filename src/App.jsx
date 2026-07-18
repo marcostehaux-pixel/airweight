@@ -302,10 +302,29 @@ useState(0)
 
 const [aftCabinPax, setAftCabinPax] =
 useState(0)
+// FWD CABIN
+const [fwdAdults, setFwdAdults] = useState(0)
+const [fwdChildren, setFwdChildren] = useState(0)
+const [fwdInfants, setFwdInfants] = useState(0)
+
+// MID CABIN
+const [midAdults, setMidAdults] = useState(0)
+const [midChildren, setMidChildren] = useState(0)
+const [midInfants, setMidInfants] = useState(0)
+
+// AFT CABIN
+const [aftAdults, setAftAdults] = useState(0)
+const [aftChildren, setAftChildren] = useState(0)
+const [aftInfants, setAftInfants] = useState(0)
    const [activeMenu, setActiveMenu] =
   useState('Dashboard') 
  const passengerWeight =
-  selectedSeats.length * 84
+
+(fwdAdults + midAdults + aftAdults) * 84 +
+
+(fwdChildren + midChildren + aftChildren) * 42 +
+
+(fwdInfants + midInfants + aftInfants) * 20
   const forwardSeats =
 
 selectedSeats.filter(
@@ -342,6 +361,9 @@ const paxMoment =
     selectedAircraft.seatArmMid
 
   )
+  const calculatedFwdCabinPax = fwdAdults + fwdChildren
+const calculatedMidCabinPax = midAdults + midChildren
+const calculatedAftCabinPax = aftAdults + aftChildren
   const payload = passengerWeight + forwardCargo + aftCargo
 const zfw = selectedAircraft.basicWeight + passengerWeight + forwardCargo + aftCargo 
 
@@ -647,7 +669,7 @@ function toggleSeat(seat) {if (selectedSeats.includes(seat)) {setSelectedSeats(s
 function loadCabins(){
 const seats=[]
 
-for (let i = 0; i < Math.min(fwdCabinPax, 60); i++)
+for (let i = 0; i < Math.min(calculatedFwdCabinPax, 60); i++)
 
 {
 
@@ -659,7 +681,7 @@ i
 
 }
 
-for (let i = 66; i < 66 + Math.min(midCabinPax, 64); i++){
+for (let i = 66; i < 66 + Math.min(calculatedMidCabinPax, 64); i++){
 
 seats.push(
 
@@ -669,7 +691,7 @@ i
 
 }
 
-for (let i = 138; i < 138 + Math.min(aftCabinPax, 50); i++){
+for (let i = 138; i < 138 + Math.min(calculatedAftCabinPax, 50); i++){
 
 seats.push(
 
@@ -3306,121 +3328,123 @@ LOAD CABINS
 </div>
 
 <div
-
-style={{
-
-display:'flex',
-
-justifyContent:'flex-end',
-
-gap:'25px',
-
-marginBottom:'15px',
-
-alignItems:'flex-start'
-
-
-}}
-
+  style={{
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '6px',
+    minWidth: '120px',
+    padding: '10px',
+    border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: '10px',
+    background: 'rgba(255,255,255,0.02)'
+  }}
 >
 FWD CABIN
 
+<div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
 
-<input
+  AD
+  <input
+    type="number"
+    value={fwdAdults}
+    onChange={(e) =>
+      setFwdAdults(parseInt(e.target.value) || 0)
+    }
+    style={{ width: '55px' }}
+  />
 
-type="number"
+  CH
+  <input
+    type="number"
+    value={fwdChildren}
+    onChange={(e) =>
+      setFwdChildren(parseInt(e.target.value) || 0)
+    }
+    style={{ width: '55px' }}
+  />
 
-placeholder="FWD PAX"
+  INF
+  <input
+    type="number"
+    value={fwdInfants}
+    onChange={(e) =>
+      setFwdInfants(parseInt(e.target.value) || 0)
+    }
+    style={{ width: '55px' }}
+  />
 
-value={fwdCabinPax}
-
-onChange={(e)=>
-
-setFwdCabinPax(
-
-parseInt(
-
-e.target.value
-
-)||0
-
-)
-
-}
-
-style={{
-
-width:'70px'
-
-}}
-
->
-
-</input>
+</div>
 MID CABIN
-<input
 
-type="number"
+<div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
 
-placeholder="MID PAX"
+  AD
+  <input
+    type="number"
+    value={midAdults}
+    onChange={(e) =>
+      setMidAdults(parseInt(e.target.value) || 0)
+    }
+    style={{ width: '55px' }}
+  />
 
-value={midCabinPax}
+  CH
+  <input
+    type="number"
+    value={midChildren}
+    onChange={(e) =>
+      setMidChildren(parseInt(e.target.value) || 0)
+    }
+    style={{ width: '55px' }}
+  />
 
-onChange={(e)=>
+  INF
+  <input
+    type="number"
+    value={midInfants}
+    onChange={(e) =>
+      setMidInfants(parseInt(e.target.value) || 0)
+    }
+    style={{ width: '55px' }}
+  />
 
-setMidCabinPax(
-
-parseInt(
-
-e.target.value
-
-)||0
-
-)
-
-}
-
-style={{
-
-width:'70px'
-
-}}
-
->
-
-</input>
+</div>
 AFT CABIN
-<input
 
-type="number"
+<div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
 
-placeholder="AFT PAX"
+  AD
+  <input
+    type="number"
+    value={aftAdults}
+    onChange={(e) =>
+      setAftAdults(parseInt(e.target.value) || 0)
+    }
+    style={{ width: '55px' }}
+  />
 
-value={aftCabinPax}
+  CH
+  <input
+    type="number"
+    value={aftChildren}
+    onChange={(e) =>
+      setAftChildren(parseInt(e.target.value) || 0)
+    }
+    style={{ width: '55px' }}
+  />
 
-onChange={(e)=>
+  INF
+  <input
+    type="number"
+    value={aftInfants}
+    onChange={(e) =>
+      setAftInfants(parseInt(e.target.value) || 0)
+    }
+    style={{ width: '55px' }}
+  />
 
-setAftCabinPax(
-
-parseInt(
-
-e.target.value
-
-)||0
-
-)
-
-}
-
-style={{
-
-width:'70px'
-
-}}
-
->
-
-</input>
+</div>
 
 </div>
 
