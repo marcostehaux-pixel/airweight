@@ -36,6 +36,17 @@ forwardSeats,
 midSeats,
 
 aftSeats,
+fwdAdults,
+fwdChildren,
+fwdInfants,
+
+midAdults,
+midChildren,
+midInfants,
+
+aftAdults,
+aftChildren,
+aftInfants,
 flightFrom,
 flightTo,
 
@@ -44,7 +55,19 @@ flightNumber,
 crewConfiguration
 
 }){
+const totalAdults =
+  fwdAdults + midAdults + aftAdults
 
+const totalChildren =
+  fwdChildren + midChildren + aftChildren
+
+const totalInfants =
+  fwdInfants + midInfants + aftInfants
+
+const totalPassengers =
+  totalAdults +
+  totalChildren +
+  totalInfants
  const doc = new jsPDF()
  
 const currentDate = new Date()
@@ -272,6 +295,47 @@ doc.text(
 35
 
 )
+doc.setFontSize(8)
+
+doc.setTextColor(20)
+
+doc.text(
+'AD',
+110,
+40
+)
+
+doc.text(
+'CH',
+135,
+40
+)
+
+doc.text(
+'INF',
+160,
+40
+)
+
+doc.setTextColor(30)
+
+doc.text(
+`${totalAdults}`,
+110,
+45
+)
+
+doc.text(
+`${totalChildren}`,
+135,
+45
+)
+
+doc.text(
+`${totalInfants}`,
+160,
+45
+)
 doc.setFontSize(
 
 8
@@ -290,7 +354,7 @@ doc.text(
 
 175,
 
-30
+40
 
 )
 
@@ -308,11 +372,11 @@ doc.setTextColor(
 
 doc.text(
 
-`${selectedSeats.length}`,
+`${totalPassengers}`,
 
 180,
 
-35
+45
 
 )
 
@@ -334,7 +398,7 @@ doc.text(
 
 110,
 
-40
+50
 
 )
 
@@ -356,7 +420,7 @@ doc.text(
 
 110,
 
-45
+55
 
 )
 
@@ -366,7 +430,7 @@ doc.text(
 
 140,
 
-45
+55
 
 )
 
@@ -388,7 +452,7 @@ doc.text(
 
 175,
 
-40
+50
 
 )
 
@@ -416,7 +480,7 @@ aftCargo
 
 175,
 
-45
+55
 
 )
 doc.setFontSize(

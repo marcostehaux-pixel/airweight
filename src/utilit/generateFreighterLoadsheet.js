@@ -7,7 +7,9 @@ export function generateFreighterLoadsheet(data) {
   const {
 
     registration,
-
+cargoFlightFrom,
+cargoFlightTo,
+cargoFlightNumber,
     basicWeight,
 
     mainCargo,
@@ -103,7 +105,14 @@ maxLW,
     15,
     22
   )
+doc.text('FROM',20,38)
+doc.text(cargoFlightFrom || '',32,38)
 
+doc.text('TO',45,38)
+doc.text(cargoFlightTo || '',55,38)
+
+doc.text('FLIGHT',70,38)
+doc.text(cargoFlightNumber || '',85,38)
 
   /* ==========================================================
      AIRCRAFT INFORMATION
@@ -123,7 +132,7 @@ maxLW,
   doc.text(
     'REGISTRATION',
     20,
-    42
+    44
   )
 
 
@@ -132,7 +141,7 @@ maxLW,
   doc.text(
     registration,
     20,
-    48
+    50
   )
 
 
@@ -141,7 +150,7 @@ maxLW,
   doc.text(
     'AIRCRAFT TYPE',
     90,
-    42
+    44
   )
 
 
@@ -150,7 +159,7 @@ maxLW,
   doc.text(
     'B737-800CF',
     90,
-    48
+    50
   )
 
 

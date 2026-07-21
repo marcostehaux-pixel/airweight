@@ -545,7 +545,14 @@ const cargoLandingCg = getCG(
   selectedCargoAircraft.lemac,
   selectedCargoAircraft.mac
 )
+const [cargoFlightFrom, setCargoFlightFrom] =
+useState('')
 
+const [cargoFlightTo, setCargoFlightTo] =
+useState('')
+
+const [cargoFlightNumber, setCargoFlightNumber] =
+useState('')
 
 const index = Number.isFinite(totalMoment) ? calculateIndex(totalMoment) :0
 const effectiveBasicIndex = doi + (extraCrew *0.1) + (catering? 0.2 : 0)
@@ -848,7 +855,7 @@ transform:
 
 >
 
-  Dashboard
+  Passenger
 
 </div>
 <div
@@ -1421,7 +1428,144 @@ marginBottom:'30px'
 Cargo Weight & Balance Module
 
 </div>
+<div
+style={{
 
+display:'flex',
+
+justifyContent:'center',
+
+gap:'40px',
+
+marginBottom:'25px',
+
+fontSize:'15px',
+
+color:'#b8c0cc',
+
+flexWrap:'wrap'
+
+}}
+
+>
+
+<div>
+
+<b>FROM</b><br/>
+
+<input
+
+value={cargoFlightFrom}
+
+onChange={(e)=>
+
+setCargoFlightFrom(
+
+e.target.value.toUpperCase()
+
+)
+
+}
+
+style={{
+
+width:'80px',
+
+textAlign:'center',
+
+padding:'6px',
+
+borderRadius:'6px'
+
+}}
+
+ />
+
+</div>
+
+<div>
+
+<b>TO</b><br/>
+
+<input
+
+value={cargoFlightTo}
+
+onChange={(e)=>
+
+setCargoFlightTo(
+
+e.target.value.toUpperCase()
+
+)
+
+}
+
+style={{
+
+width:'80px',
+
+textAlign:'center',
+
+padding:'6px',
+
+borderRadius:'6px'
+
+}}
+
+ />
+
+</div>
+
+<div>
+
+<b>FLIGHT</b><br/>
+
+<input
+
+value={cargoFlightNumber}
+
+onChange={(e)=>
+
+setCargoFlightNumber(
+
+e.target.value.toUpperCase()
+
+)
+
+}
+
+style={{
+
+width:'100px',
+
+textAlign:'center',
+
+padding:'6px',
+
+borderRadius:'6px'
+
+}}
+
+ />
+
+</div>
+
+<div>
+<b>UTC</b><br/>
+{
+new Date().toLocaleTimeString(
+'en-GB',
+{
+timeZone:'UTC',
+hour:'2-digit',
+minute:'2-digit'
+}
+) + 'Z'
+}
+</div>
+
+</div>
 <div
 style={{
 
@@ -2914,10 +3058,12 @@ LANDING INDEX
 
     registration:
       selectedCargoAircraft.registration,
+      cargoFlightFrom,
+cargoFlightTo,
+cargoFlightNumber,
 basicWeight:
   selectedCargoAircraft.basicWeight,
-  basicWeight:
-  selectedCargoAircraft.basicWeight,
+
 
 basicIndex:
   selectedCargoAircraft.basicIndex,
@@ -4591,7 +4737,9 @@ activeMenu !== 'Freighter'
   }}
 
 >
+{activeMenu === 'Dashboard' && (
 
+<div>
   <h3>
 
     FUEL PREDICTION
@@ -4835,10 +4983,14 @@ TO · {flightTo}
 </div>
 
 </div>
+
 </div>
 
 )
 }
+</div>
+
+)}
 {activeMenu === 'Settings' && (
 
 <div
@@ -5478,6 +5630,7 @@ metarTo,
           tripFuel,
           ldw,
 payload,
+
           zfw,
 rw,
           tow,
@@ -5501,7 +5654,18 @@ effectiveBasicIndex,
 forwardSeats,
 midSeats,
 
-aftSeats
+aftSeats,
+fwdAdults,
+fwdChildren,
+fwdInfants,
+
+midAdults,
+midChildren,
+midInfants,
+
+aftAdults,
+aftChildren,
+aftInfants
         })
 
       }
