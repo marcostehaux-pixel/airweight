@@ -94,7 +94,39 @@ maxLW,
     15,
     16
   )
+const currentDate = new Date()
 
+const formattedDate =
+currentDate.toLocaleDateString(
+'en-GB',
+{
+timeZone:'UTC'
+}
+)
+
+const formattedTime =
+currentDate.toLocaleTimeString(
+'en-GB',
+{
+timeZone:'UTC',
+hour:'2-digit',
+minute:'2-digit'
+}
+)
+
+doc.setFontSize(8)
+
+doc.text(
+`DATE UTC: ${formattedDate}`,
+150,
+16
+)
+
+doc.text(
+`TIME UTC: ${formattedTime}Z`,
+150,
+22
+)
 
   doc.setFont('helvetica', 'normal')
 
