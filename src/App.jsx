@@ -25,6 +25,7 @@ import EnvelopeChart from './components/EnvelopeChart'
 import { generateFreighterLoadsheet } from './utilit/generateFreighterLoadsheet'
 import { generateWeatherPdf } from './utilit/generateWeatherPdf'
 import {lowerDeckFactors,mainDeckTables} from './utilit/cargoIndexTables'
+import { calculatePassengerTrim } from './utilit/trimCalculator'
 function getMainIndex(position,weight){
 if(!mainDeckTables[position])
 return 0
@@ -566,7 +567,6 @@ const toi = zfi + FuelIndex
 const tripFuelIndex = getFuelIndex(tripFuel)
 const li = toi - tripFuelIndex
 
-const trim = 5.5 - (cg - 15) * 0.12
 function getNearestCg(index){
 const minIndex=25
 const maxIndex=90
@@ -611,7 +611,10 @@ const toCg = getCG(
   selectedAircraft.lemac,
   selectedAircraft.mac
 )
-
+const trim = calculatePassengerTrim(
+  tow,
+  toCg
+)
 const lwCg = getCG(
   paxLandingArm,
   selectedAircraft.lemac,
