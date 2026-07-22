@@ -340,17 +340,14 @@ selectedSeats.filter(
 
 seat =>
 
-seat > 60 &&
+seat > 59 &&
 
-seat <= 120
+seat <= 129
 
 ).length
 
-const aftSeats =
-
-selectedSeats.filter(
-
-seat => seat > 119
+const aftSeats = selectedSeats.filter(
+  seat => seat > 129 && seat <= 180
 
 ).length
 const paxMoment =
@@ -415,7 +412,7 @@ else {rowArm = selectedAircraft.seatArmAft}
 return (total + calculateMoment(84,rowArm))}, 0)
 const fwdPax = selectedSeats.filter(seat => {
 
-  const row = Math.floor(seat / 6) + 1
+  const row = Math.floor(seat / 6)
 
   return row >= 1 && row <= 11
 
@@ -423,7 +420,7 @@ const fwdPax = selectedSeats.filter(seat => {
 
 const midPax = selectedSeats.filter(seat => {
 
-  const row = Math.floor(seat / 6) + 1
+  const row = Math.floor(seat / 6)
 
   return row >= 12 && row <= 23
 
@@ -431,9 +428,9 @@ const midPax = selectedSeats.filter(seat => {
 
 const aftPax = selectedSeats.filter(seat => {
 
-  const row = Math.floor(seat / 6) + 1
+  const row = Math.floor(seat / 6)
 
-  return row >= 24 && row <= 32
+  return row >= 24 && row <= 30
 
 }).length
 selectedSeats.forEach(seat => {
@@ -691,7 +688,7 @@ i
 
 }
 
-for (let i = 66; i < 66 + Math.min(calculatedMidCabinPax, 64); i++){
+for (let i = 60; i < 60 + Math.min(calculatedMidCabinPax, 70); i++){
 
 seats.push(
 
@@ -701,7 +698,7 @@ i
 
 }
 
-for (let i = 138; i < 138 + Math.min(calculatedAftCabinPax, 50); i++){
+for (let i = 130; i < 130 + Math.min(calculatedAftCabinPax, 50); i++){
 
 seats.push(
 
@@ -3496,7 +3493,7 @@ FWD CABIN
   AD
   <input
     type="number"
-    value={fwdAdults}
+    value={fwdAdults === 0 ? '' : fwdAdults}
     onChange={(e) =>
       setFwdAdults(parseInt(e.target.value) || 0)
     }
@@ -3506,7 +3503,7 @@ FWD CABIN
   CH
   <input
     type="number"
-    value={fwdChildren}
+    value={fwdChildren === 0 ? '' : fwdChildren}
     onChange={(e) =>
       setFwdChildren(parseInt(e.target.value) || 0)
     }
@@ -3516,7 +3513,7 @@ FWD CABIN
   INF
   <input
     type="number"
-    value={fwdInfants}
+    value={fwdInfants === 0 ? '' : fwdInfants}
     onChange={(e) =>
       setFwdInfants(parseInt(e.target.value) || 0)
     }
@@ -3531,7 +3528,7 @@ MID CABIN
   AD
   <input
     type="number"
-    value={midAdults}
+    value={midAdults === 0 ? '' : midAdults}
     onChange={(e) =>
       setMidAdults(parseInt(e.target.value) || 0)
     }
@@ -3541,7 +3538,7 @@ MID CABIN
   CH
   <input
     type="number"
-    value={midChildren}
+    value={midChildren === 0 ? '' : midChildren}
     onChange={(e) =>
       setMidChildren(parseInt(e.target.value) || 0)
     }
@@ -3551,7 +3548,7 @@ MID CABIN
   INF
   <input
     type="number"
-    value={midInfants}
+    value={midInfants === 0 ? '' : midInfants}
     onChange={(e) =>
       setMidInfants(parseInt(e.target.value) || 0)
     }
@@ -3566,7 +3563,7 @@ AFT CABIN
   AD
   <input
     type="number"
-    value={aftAdults}
+    value={aftAdults === 0 ? '' : aftAdults}
     onChange={(e) =>
       setAftAdults(parseInt(e.target.value) || 0)
     }
@@ -3576,7 +3573,7 @@ AFT CABIN
   CH
   <input
     type="number"
-    value={aftChildren}
+    value={aftChildren === 0 ? '' : aftChildren}
     onChange={(e) =>
       setAftChildren(parseInt(e.target.value) || 0)
     }
@@ -3586,7 +3583,7 @@ AFT CABIN
   INF
   <input
     type="number"
-    value={aftInfants}
+    value={aftInfants === 0 ? '' : aftInfants}
     onChange={(e) =>
       setAftInfants(parseInt(e.target.value) || 0)
     }
@@ -5486,7 +5483,7 @@ loadStatus
 
     type="number"
 
-    value={forwardCargo}
+    value={forwardCargo === 0 ? '' : forwardCargo}
 
     onChange={(e)=>{
 
@@ -5544,7 +5541,7 @@ value,
 
     type="number"
 
-    value={aftCargo}
+    value={aftCargo === 0 ? '' : aftCargo}
 
     onChange={(e)=>{
 
@@ -5754,7 +5751,7 @@ aftInfants
 
         type="number"
 
-        value={fuel}
+        value={fuel === 0 ? '' : fuel}
 
         onChange={(e) => {
 
@@ -5799,7 +5796,7 @@ aftInfants
 
         type="number"
 
-        value={taxiFuel}
+        value={taxiFuel === 0 ? '' : taxiFuel}
 
         onChange={(e) => {
 
@@ -5836,7 +5833,7 @@ aftInfants
 
           type="number"
 
-          value={fuelData.takeoffFuel}
+          value={fuelData.takeoffFuel === 0 ? '' : fuelData.takeoffFuel}
 
           readOnly
 
@@ -5855,7 +5852,7 @@ aftInfants
 
         type="number"
 
-        value={tripFuel}
+        value={tripFuel === 0 ? '' : tripFuel}
 
         onChange={(e) => {
 

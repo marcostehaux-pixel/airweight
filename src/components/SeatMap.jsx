@@ -7,11 +7,11 @@ function SeatMap(props) {
 
   function getSeatZone(seat) {
 
-    if (seat < 72) {
+    if (seat < 60) {
       return 'FWD'
     }
 
-    if (seat < 132) {
+    if (seat < 130) {
       return 'MID'
     }
 
