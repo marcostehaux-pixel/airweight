@@ -112,7 +112,15 @@ flightFrom
 ){
 
 setMetar(null)
+console.log(
+  'selectedAircraft',
+  selectedAircraft?.registration
+)
 
+console.log(
+  'selectedCargoAircraft',
+  selectedCargoAircraft?.registration
+)
 return
 
 }
@@ -412,30 +420,30 @@ else {rowArm = selectedAircraft.seatArmAft}
 return (total + calculateMoment(84,rowArm))}, 0)
 const fwdPax = selectedSeats.filter(seat => {
 
-  const row = Math.floor(seat / 6)
+  const row = Math.ceil((seat + 1) / 6)
 
-  return row >= 1 && row <= 11
+  return row >= 1 && row <= 10
 
 }).length
 
 const midPax = selectedSeats.filter(seat => {
 
-  const row = Math.floor(seat / 6)
+  const row = Math.ceil((seat + 1) / 6)
 
-  return row >= 12 && row <= 23
+  return row >= 11 && row <= 22
 
 }).length
 
 const aftPax = selectedSeats.filter(seat => {
 
-  const row = Math.floor(seat / 6)
+  const row = Math.ceil((seat + 1) / 6)
 
-  return row >= 24 && row <= 30
+  return row >= 23 && row <= 30
 
 }).length
 selectedSeats.forEach(seat => {
 
-  const row = Math.ceil(seat / 6)
+  const row = Math.ceil((seat + 1) / 6)
 
   console.log({
 
@@ -447,7 +455,12 @@ selectedSeats.forEach(seat => {
 
 })
 const paxIndex = (fwdPax * -0.7) + (aftPax * 0.7)
-
+console.log({
+  fwdPax,
+  midPax,
+  aftPax,
+  paxIndex
+})
 const FuelMoment = calculateMoment(fuel,selectedAircraft.FuelArm)
 const forwardCargoMoment = forwardCargo * selectedAircraft.forwardCargoArm
 const aftCargoMoment = aftCargo * selectedAircraft.aftCargoArm
@@ -563,7 +576,13 @@ const toi = zfi + FuelIndex
 
 const tripFuelIndex = getFuelIndex(tripFuel)
 const li = toi - tripFuelIndex
-
+console.log({
+  effectiveBasicIndex,
+  paxIndex,
+  cargoIndex,
+  zfi,
+  toi
+})
 function getNearestCg(index){
 const minIndex=25
 const maxIndex=90
@@ -3786,6 +3805,7 @@ maxWidth:'620px'
 AIRCRAFT SUMMARY
 
 </h3>
+
 <select
 
 value={selectedAircraft.registration}
@@ -3801,7 +3821,8 @@ const cargoAircraft =
 aircraftCargoDatabase.find(
 a=>a.registration===e.target.value
 )
-
+console.log('PAX', paxAircraft)
+console.log('CARGO', cargoAircraft)
 if(paxAircraft)
 setSelectedAircraft(paxAircraft)
 
