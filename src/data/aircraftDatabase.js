@@ -234,9 +234,9 @@ mac:155.8,
 
 lemac:627.1,
 
-basicWeight:42275,
+basicWeight:41858,
 
-basicIndex:54,
+basicIndex:52.3,
 indexReferenceArm: 658.3,
 
 indexConstant: 35000,
@@ -308,9 +308,9 @@ mac:155.8,
 
 lemac:627.1,
 
-basicWeight:42245,
+basicWeight:41739,
 
-basicIndex:53,
+basicIndex:53.6,
 indexReferenceArm: 658.3,
 
 indexConstant: 35000,

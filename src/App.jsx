@@ -25,6 +25,10 @@ import EnvelopeChart from './components/EnvelopeChart'
 import { generateFreighterLoadsheet } from './utilit/generateFreighterLoadsheet'
 import { generateWeatherPdf } from './utilit/generateWeatherPdf'
 import {lowerDeckFactors,mainDeckTables} from './utilit/cargoIndexTables'
+import {
+  getForwardBagIndex,
+  getAftBagIndex
+} from './utilit/bagIndexCalculator'
 import { calculatePassengerTrim } from './utilit/trimCalculator'
 function getMainIndex(position,weight){
 if(!mainDeckTables[position])
@@ -329,9 +333,9 @@ const [aftInfants, setAftInfants] = useState(0)
   useState('Dashboard') 
  const passengerWeight =
 
-(fwdAdults + midAdults + aftAdults) * 84 +
+(fwdAdults + midAdults + aftAdults) * 80 +
 
-(fwdChildren + midChildren + aftChildren) * 42 +
+(fwdChildren + midChildren + aftChildren) * 40 +
 
 (fwdInfants + midInfants + aftInfants) * 20
   const forwardSeats =
@@ -567,8 +571,17 @@ useState('')
 
 const index = Number.isFinite(totalMoment) ? calculateIndex(totalMoment) :0
 const effectiveBasicIndex = doi + (extraCrew *0.1) + (catering? 0.2 : 0)
-const cargoIndex = (forwardCargo /1000) * (-9) + (aftCargo /1000) * (7)
+const cargoIndex =
+  getForwardBagIndex(forwardCargo) +
+  getAftBagIndex(aftCargo)
 
+console.log({
+  forwardCargo,
+  aftCargo,
+  forwardIndex: getForwardBagIndex(forwardCargo),
+  aftIndex: getAftBagIndex(aftCargo),
+  cargoIndex
+})
 const zfi = effectiveBasicIndex + paxIndex + cargoIndex
 const zfiDebug = effectiveBasicIndex + cargoIndex
 const FuelIndex = getFuelIndex(fuel)
@@ -592,6 +605,12 @@ const maxCg=34
 return (18+(index-35)*0.235)
 }
  function getCgFromEnvelope(index,weight){return Number(getNearestCg(index).toFixed(1))}
+ const aircraftSummary =
+  selectedCargoAircraft &&
+  selectedCargoAircraft.registration ===
+    selectedAircraft.registration
+    ? selectedCargoAircraft
+    : selectedAircraft;
 const paxZfwArm = indexToArm(
   zfi,
   zfw,
@@ -901,7 +920,7 @@ cursor:'pointer'
 }}
 >
 
-Freighter
+Freighter Loadheet
 
 </div>
 <div
@@ -1040,7 +1059,7 @@ transform:
 
 >
 
-  Fuel
+  Fuel Load
 
 </div>
 <div
@@ -3823,6 +3842,7 @@ a=>a.registration===e.target.value
 )
 console.log('PAX', paxAircraft)
 console.log('CARGO', cargoAircraft)
+
 if(paxAircraft)
 setSelectedAircraft(paxAircraft)
 
@@ -3903,21 +3923,9 @@ marginBottom:'25px'
 <img
 
 src={
-
-selectedAircraft.type.includes(
-
-'CF'
-
-)
-
-?
-
-b737cfPerfil
-
-:
-
-b737Perfil
-
+  aircraftSummary.type.includes('CF')
+    ? b737cfPerfil
+    : b737Perfil
 }
 
 style={{
@@ -3957,7 +3965,7 @@ REG<br/>
 
 <strong>
 
-{selectedAircraft.registration}
+{aircraftSummary.registration}
 
 </strong>
 
@@ -3971,7 +3979,7 @@ TYPE<br/>
 
 <strong>
 
-{selectedAircraft.type}
+{aircraftSummary.type}
 
 </strong>
 
@@ -4026,7 +4034,7 @@ MRW<br/>
 
 {
 
-selectedAircraft.maxRW
+aircraftSummary.maxRW
 
 }
 
@@ -4044,7 +4052,7 @@ MTOW<br/>
 
 {
 
-selectedAircraft.maxTOW
+aircraftSummary.maxTOW
 
 }
 
@@ -4063,7 +4071,7 @@ MLW<br/>
 
 {
 
-selectedAircraft.maxLW
+aircraftSummary.maxLW
 
 }
 
@@ -4082,7 +4090,7 @@ MZFW<br/>
 
 {
 
-selectedAircraft.maxZFW
+aircraftSummary.maxZFW
 
 }
 
@@ -4161,7 +4169,7 @@ kg
 
         >
 
-          {selectedAircraft.registration}
+          {aircraftSummary.registration}
 
         </h1>
 
@@ -4177,7 +4185,7 @@ kg
 
         >
 
-          {selectedAircraft.type}
+          {aircraftSummary.type}
 
         </p>
 <div
@@ -4298,7 +4306,7 @@ width:'120px'
 />
       <select
 
-        value={selectedAircraft.registration}
+        value={aircraftSummary.registration}
 
         onChange={(e) => {
 
