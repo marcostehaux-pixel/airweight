@@ -263,7 +263,7 @@ setShowPassword
   >
     <div
       style={{
-        fontSize: '20px',
+        fontSize: '18px',
         letterSpacing: '1px',
         color: '#c7a77a'
       }}
@@ -289,7 +289,7 @@ setShowPassword
   >
     <div
       style={{
-        fontSize: '20px',
+        fontSize: '18px',
         letterSpacing: '1px',
         color: '#c7a77a'
       }}
@@ -313,7 +313,7 @@ setShowPassword
   >
     <div
       style={{
-        fontSize: '20px',
+        fontSize: '18px',
         letterSpacing: '1px',
         color: '#c7a77a'
       }}
@@ -338,7 +338,7 @@ setShowPassword
   >
     <div
       style={{
-        fontSize: '20px',
+        fontSize: '18px',
         letterSpacing: '1px',
         color: '#c7a77a'
       }}
