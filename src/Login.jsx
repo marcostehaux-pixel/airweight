@@ -263,7 +263,7 @@ setShowPassword
   >
     <div
       style={{
-        fontSize: '15px',
+        fontSize: '20px',
         letterSpacing: '1px',
         color: '#c7a77a'
       }}
@@ -289,12 +289,12 @@ setShowPassword
   >
     <div
       style={{
-        fontSize: '13px',
+        fontSize: '20px',
         letterSpacing: '1px',
         color: '#c7a77a'
       }}
     >
-      WEIGHT & BALANCE
+      CARGO & PASSENGER OPERATIONS
     </div>
   </div>
 <div
@@ -313,7 +313,7 @@ setShowPassword
   >
     <div
       style={{
-        fontSize: '13px',
+        fontSize: '20px',
         letterSpacing: '1px',
         color: '#c7a77a'
       }}
@@ -338,7 +338,7 @@ setShowPassword
   >
     <div
       style={{
-        fontSize: '13px',
+        fontSize: '20px',
         letterSpacing: '1px',
         color: '#c7a77a'
       }}
