@@ -85,21 +85,16 @@ import logo from './assets/logo.png'
 import aircraftImage from './assets/a320.png'
 function App() {
 const [logged,setLogged]=useState(false)
+const [userRole, setUserRole] = useState(null)
 const [tripFuel, setTripFuel] = useState(0)
 const [taxiFuel,setTaxiFuel ]= useState(0)
 const [fuel, setFuel] = useState(0)
 const [selectedAircraft,setSelectedAircraft] = useState(aircraftDatabase[0])
 const [selectedCargoAircraft,setSelectedCargoAircraft] = useState(aircraftCargoDatabase[0]
-
 )
-function clearCargo(){
-
-setCargoWeights(
-
+function clearCargo(){setCargoWeights(
 {}
-
 )
-
 }
 const [flightFrom, setFlightFrom] = useState('')
 const [flightTo, setFlightTo] = useState('')
@@ -329,8 +324,8 @@ const [midInfants, setMidInfants] = useState(0)
 const [aftAdults, setAftAdults] = useState(0)
 const [aftChildren, setAftChildren] = useState(0)
 const [aftInfants, setAftInfants] = useState(0)
-   const [activeMenu, setActiveMenu] =
-  useState('Dashboard') 
+const [activeMenu, setActiveMenu] =
+  useState(userRole === 'freighter' ? 'Freighter' : 'Dashboard')
  const passengerWeight =
 
 (fwdAdults + midAdults + aftAdults) * 80 +
@@ -768,19 +763,15 @@ if(
 return(
 
 <Login
+  onLogin={(role) => {
+    setUserRole(role)
 
-onLogin={
+    if (role === 'freighter') {
+      setActiveMenu('Freighter')
+    }
 
-()=>
-
-setLogged(
-
-true
-
-)
-
-}
-
+    setLogged(true)
+  }}
 />
 
 )
@@ -847,7 +838,7 @@ borderRight:
         AIRWEIGHT
       </h1>
 
-    
+    {userRole !== 'freighter' && (
 <div
   onClick={() =>
     setActiveMenu('Dashboard')
@@ -896,6 +887,8 @@ transform:
   Passenger
 
 </div>
+)}
+{userRole !== 'student' && (
 <div
 onClick={()=>
 setActiveMenu('Freighter')
@@ -923,10 +916,12 @@ cursor:'pointer'
 Freighter Loadheet
 
 </div>
+)}
+{userRole !== 'freighter' && (
 <div
 
   onClick={() =>
-    setActiveMenu('Loadsheet')
+    setActiveMenu('Freighter')
   }
 onMouseEnter={(e) => {
 
@@ -964,17 +959,17 @@ onMouseLeave={(e) => {
     borderRadius: '12px',
 
     background:
-      activeMenu === 'Loadsheet'
+      activeMenu === 'FreighterLoadsheet'
         ? 'rgba(0,255,140,0.12)'
         : 'rgba(255,255,255,0.03)',
 
     border:
-      activeMenu === 'Loadsheet'
+      activeMenu === 'FreighterLoadsheet'
         ? '1px solid rgba(0,255,140,0.25)'
         : '1px solid transparent',
 
     boxShadow:
-      activeMenu === 'Loadsheet'
+      activeMenu === 'FreighterLoadsheet'
         ? '0 0 25px rgba(0,255,140,0.15)'
         : 'none',
 
@@ -993,6 +988,7 @@ transform:
   Passenger Loadsheet
 
 </div>
+)}
 <div
 
   onClick={() =>
@@ -1062,6 +1058,7 @@ transform:
   Fuel Load
 
 </div>
+{userRole !== 'freighter' && (
 <div
 
   onClick={() =>
@@ -1129,6 +1126,8 @@ onMouseLeave={(e) => {
   Aircraft Data
 
 </div>
+)}
+{userRole !== 'freighter' && (
 <div
 
   onClick={() =>
@@ -1196,7 +1195,7 @@ onMouseLeave={(e) => {
   Seat Map
 
 </div>
-
+)}
 <div
 
   onClick={() =>

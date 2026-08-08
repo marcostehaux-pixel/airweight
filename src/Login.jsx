@@ -17,31 +17,44 @@ setShowPassword
 ] = useState(false)
   function login() {
 
-    const expiration = new Date('2026-08-20')
+  const expiration = new Date('2026-08-20')
 
-    if (new Date() > expiration) {
+  if (new Date() > expiration) {
 
-      alert('Trial expired')
+    alert('Trial expired')
 
-      return
-
-    }
-
-    if (
-      user === 'Alumno2' &&
-      password === 'airweight20'
-    ) {
-
-      onLogin()
-
-    } else {
-
-      alert('Invalid credentials')
-
-    }
+    return
 
   }
 
+  if (
+    user === 'Alumno2' &&
+    password === 'airweight20'
+  ) {
+
+    onLogin('freighter')
+
+  } else if (
+    user === 'Admin' &&
+    password === 'airweight20'
+  ) {
+
+    onLogin('admin')
+
+  } else if (
+    user === 'Alumno1' &&
+    password === 'airweight20'
+  ) {
+
+    onLogin('student')
+
+  } else {
+
+    alert('Invalid credentials')
+
+  }
+
+}
 
   return (
 
