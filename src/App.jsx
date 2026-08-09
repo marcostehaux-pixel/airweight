@@ -326,6 +326,7 @@ const [aftChildren, setAftChildren] = useState(0)
 const [aftInfants, setAftInfants] = useState(0)
 const [activeMenu, setActiveMenu] =
   useState(userRole === 'freighter' ? 'Freighter' : 'Dashboard')
+  console.log('ACTIVE MENU:', activeMenu)
  const passengerWeight =
 
 (fwdAdults + midAdults + aftAdults) * 80 +
@@ -767,7 +768,7 @@ return(
     setUserRole(role)
 
     if (role === 'freighter') {
-      setActiveMenu('Freighter')
+      setActiveMenu('FreighterLoadsheet')
     }
 
     setLogged(true)
@@ -891,7 +892,7 @@ transform:
 {userRole !== 'student' && (
 <div
 onClick={()=>
-setActiveMenu('Freighter')
+setActiveMenu('FreighterLoadsheet')
 }
 
 style={{
@@ -900,12 +901,12 @@ padding:'12px 16px',
 borderRadius:'12px',
 
 background:
-activeMenu==='Freighter'
+activeMenu==='FreighterLoadsheet'
 ? 'rgba(0,255,140,0.12)'
 : 'rgba(255,255,255,0.03)',
 
 border:
-activeMenu==='Freighter'
+activeMenu==='FreighterLoadsheet'
 ? '1px solid rgba(0,255,140,0.25)'
 : '1px solid transparent',
 
@@ -921,7 +922,7 @@ Freighter Loadheet
 <div
 
   onClick={() =>
-    setActiveMenu('Freighter')
+    setActiveMenu('Loadsheet')
   }
 onMouseEnter={(e) => {
 
@@ -959,17 +960,17 @@ onMouseLeave={(e) => {
     borderRadius: '12px',
 
     background:
-      activeMenu === 'FreighterLoadsheet'
+      activeMenu === 'Loadsheet'
         ? 'rgba(0,255,140,0.12)'
         : 'rgba(255,255,255,0.03)',
 
     border:
-      activeMenu === 'FreighterLoadsheet'
+      activeMenu === 'Loadsheet'
         ? '1px solid rgba(0,255,140,0.25)'
         : '1px solid transparent',
 
     boxShadow:
-      activeMenu === 'FreighterLoadsheet'
+      activeMenu === 'Loadsheet'
         ? '0 0 25px rgba(0,255,140,0.15)'
         : 'none',
 
@@ -1310,7 +1311,7 @@ Sign Out
 </div>
 {/* MAIN CONTENT */}
 {
-activeMenu === 'Freighter'
+activeMenu === 'FreighterLoadsheet'
 && (
 
 <div
@@ -5138,13 +5139,7 @@ searchTaf ||
 
   <div
 
-    style={{
-
-      flex: 1,
-
-      padding: '40px'
-
-    }}
+    style={{flex: 1, padding: '40px'}}
 
   >
 
