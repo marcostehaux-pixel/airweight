@@ -395,7 +395,13 @@ towArm
   cargoWeights,
   fuelData.takeoffFuel
 )
+const payloadCapacity =
+  totalCargo + availablePayload
 
+const loadedPercent =
+  payloadCapacity > 0
+    ? (totalCargo / payloadCapacity) * 100
+    : 0
 const weightData = calculateWeight(
   cargoZfw,
   fuel,
@@ -3288,6 +3294,7 @@ maxLW:
   </button>
 
 </div>
+
 <div
 
 style={{
@@ -3303,7 +3310,7 @@ marginBottom:'10px'
 }}
 
 >
-
+  
 <span>
 
 Loaded
@@ -3314,25 +3321,7 @@ Loaded
 
 {
 
-(
-
-totalCargo
-
-/
-
-availablePayload
-
-*
-
-100
-
-)
-
-.toFixed(
-
-1
-
-)
+loadedPercent.toFixed(1)
 
 }
 
@@ -3374,48 +3363,21 @@ overflow:'hidden'
 style={{
 
 width:
-
-`${
-
-Math.min(
-
-(
-
-totalCargo
-
-/
-
-availablePayload
-
-)
-
-*
-
-100,
-
-100
-
-)
-
-}%`,
+`${Math.min(
+  loadedPercent,
+  100
+)}%`,
 
 height:'100%',
 
 background:
-
-totalCargo
-
->
-
-availablePayload
-
-?
-
-'#ff4444'
-
-:
-
-'#00ff88'
+  totalCargo
+  >
+  payloadCapacity
+  ?
+  '#ff4444'
+  :
+  '#00ff88'
 
 }}
 
@@ -3461,7 +3423,7 @@ totalCargo
 
 >
 
-availablePayload
+payloadCapacity
 
 ?
 
@@ -3489,25 +3451,7 @@ fontSize:'14px'
 
 {
 
-(
-
-totalCargo
-
-/
-
-availablePayload
-
-*
-
-100
-
-)
-
-.toFixed(
-
-1
-
-)
+loadedPercent.toFixed(1)
 
 }
 
