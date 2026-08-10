@@ -564,7 +564,53 @@ useState('')
 
 const [cargoFlightNumber, setCargoFlightNumber] =
 useState('')
+const [cargoMetarFrom, setCargoMetarFrom] = useState(null)
+const [cargoMetarTo, setCargoMetarTo] = useState(null)
 
+useEffect(() => {
+
+  async function loadCargoMetarFrom() {
+
+    if (
+      cargoFlightFrom.trim().length !== 4
+    ) {
+      setCargoMetarFrom(null)
+      return
+    }
+
+    const result = await getMetar(
+      cargoFlightFrom.toUpperCase()
+    )
+
+    setCargoMetarFrom(result)
+  }
+
+  loadCargoMetarFrom()
+
+}, [cargoFlightFrom])
+
+
+useEffect(() => {
+
+  async function loadCargoMetarTo() {
+
+    if (
+      cargoFlightTo.trim().length !== 4
+    ) {
+      setCargoMetarTo(null)
+      return
+    }
+
+    const result = await getMetar(
+      cargoFlightTo.toUpperCase()
+    )
+
+    setCargoMetarTo(result)
+  }
+
+  loadCargoMetarTo()
+
+}, [cargoFlightTo])
 const index = Number.isFinite(totalMoment) ? calculateIndex(totalMoment) :0
 const effectiveBasicIndex = doi + (extraCrew *0.1) + (catering? 0.2 : 0)
 const cargoIndex =
@@ -1588,7 +1634,46 @@ borderRadius:'6px'
  />
 
 </div>
+<div
+  style={{
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    minWidth: '300px',
+    maxWidth: '420px',
+    fontSize: '14px',
+    lineHeight: '1.35'
+  }}
+>
+  <div>
+    <span
+      style={{
+        color: '#00ff88',
+        fontWeight: '700'
+      }}
+    >
+      DEP {cargoFlightFrom || '----'}:
+    </span>{' '}
+    <span style={{color:'#b8c0cc'}}>
+      {cargoMetarFrom || '---'}
+    </span>
+  </div>
 
+  <div style={{marginTop:'4px'}}>
+    <span
+      style={{
+        color: '#00ff88',
+        fontWeight: '700'
+      }}
+    >
+      ARR {cargoFlightTo || '----'}:
+    </span>{' '}
+    <span style={{color:'#b8c0cc'}}>
+      {cargoMetarTo || '---'}
+    </span>
+  </div>
+</div>
 <div>
 <b>UTC</b><br/>
 {
@@ -3099,6 +3184,8 @@ LANDING INDEX
       cargoFlightFrom,
 cargoFlightTo,
 cargoFlightNumber,
+cargoMetarFrom,
+  cargoMetarTo,
 basicWeight:
   selectedCargoAircraft.basicWeight,
 

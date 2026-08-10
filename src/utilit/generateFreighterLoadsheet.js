@@ -10,7 +10,9 @@ export function generateFreighterLoadsheet(data) {
 cargoFlightFrom,
 cargoFlightTo,
 cargoFlightNumber,
-    basicWeight,
+cargoMetarFrom,
+cargoMetarTo,
+basicWeight,
 
     mainCargo,
 
@@ -137,6 +139,20 @@ doc.text(
     15,
     22
   )
+  doc.setFont('helvetica', 'normal')
+doc.setFontSize(6)
+
+doc.text(
+  `DEP ${cargoFlightFrom || '----'}: ${cargoMetarFrom || '---'}`,
+  140,
+  28
+)
+
+doc.text(
+  `ARR ${cargoFlightTo || '----'}: ${cargoMetarTo || '---'}`,
+  140,
+  33
+)
 doc.text('FROM',20,38)
 doc.text(cargoFlightFrom || '',32,38)
 
@@ -145,6 +161,8 @@ doc.text(cargoFlightTo || '',55,38)
 
 doc.text('FLIGHT',70,38)
 doc.text(cargoFlightNumber || '',85,38)
+
+
 
   /* ==========================================================
      AIRCRAFT INFORMATION
@@ -754,7 +772,7 @@ doc.text(cargoFlightNumber || '',85,38)
 
 
   doc.text(
-    'AIRWEIGHT Dispatch System v1.0',
+    'AIRWEIGHT Dispatch System v1.0', 
     105,
     287,
     {
