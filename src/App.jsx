@@ -41,6 +41,7 @@ return row
 }
 
 import { getMetar } from "./api/metar"
+import { Analytics } from '@vercel/analytics/react'
 async function getTaf(icao){
 
 try{
@@ -5925,6 +5926,8 @@ aftInfants
   </div>
 
 )}
+
+<Analytics />
 
 </div>
 
