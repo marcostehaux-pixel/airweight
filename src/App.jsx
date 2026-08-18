@@ -25,6 +25,8 @@ import EnvelopeChart from './components/EnvelopeChart'
 import { generateFreighterLoadsheet } from './utilit/generateFreighterLoadsheet'
 import { generateWeatherPdf } from './utilit/generateWeatherPdf'
 import {lowerDeckFactors,mainDeckTables} from './utilit/cargoIndexTables'
+import FreighterEnvelope from './components/FreighterEnvelope'
+
 import {
   getForwardBagIndex,
   getAftBagIndex
@@ -502,7 +504,12 @@ const cargoZfwIndex = getZeroFuelIndex(
   cargoEffectiveBasicIndex,
   totalCargoIndex
 )
-
+console.log(
+  'ZFW INDEX DEBUG:',
+  cargoEffectiveBasicIndex,
+  totalCargoIndex,
+  cargoZfwIndex
+)
 const cargoFuelIndex = getCargoFuelIndex(
   fuelData.takeoffFuel
 )
@@ -545,23 +552,44 @@ const cargoLandingArm = indexToArm(
   selectedCargoAircraft.indexOffset
 )
 
-const cargoZfwCg = getCG(
-  cargoZfwArm,
-  selectedCargoAircraft.lemac,
-  selectedCargoAircraft.mac
+const cargoZfwCg = getCgFromIndex(
+  cargoZfwIndex,
+  cargoZfw
+)
+console.log(
+  'ZFW CG DEBUG:',
+  {
+    cargoZfwIndex,
+    cargoZfwArm,
+    cargoZfwCg
+  }
+)
+const cargoTowCg = getCgFromIndex(
+  cargoTowIndex,
+  weightData.takeoffWeight
 )
 
-const cargoTowCg = getCG(
-  cargoTowArm,
-  selectedCargoAircraft.lemac,
-  selectedCargoAircraft.mac
+const cargoLandingCg = getCgFromIndex(
+  cargoLandingIndex,
+  weightData.landingWeight
 )
-
-const cargoLandingCg = getCG(
-  cargoLandingArm,
-  selectedCargoAircraft.lemac,
-  selectedCargoAircraft.mac
-)
+console.log('CARGO CG TABLE DEBUG', {
+  zfw: {
+    weight: cargoZfw,
+    index: cargoZfwIndex,
+    cg: cargoZfwCg
+  },
+  tow: {
+    weight: weightData.takeoffWeight,
+    index: cargoTowIndex,
+    cg: cargoTowCg
+  },
+  lw: {
+    weight: weightData.landingWeight,
+    index: cargoLandingIndex,
+    cg: cargoLandingCg
+  }
+})
 const [cargoFlightFrom, setCargoFlightFrom] =
 useState('')
 
@@ -3458,7 +3486,19 @@ loadedPercent.toFixed(1)
 %
 
 </div>
+<FreighterEnvelope
+  zfw={cargoZfw}
+  zfwCg={cargoZfwCg}
+  zfwIndex={cargoZfwIndex}
 
+  tow={weightData.takeoffWeight}
+  towCg={cargoTowCg}
+  towIndex={cargoTowIndex}
+
+  lw={weightData.landingWeight}
+  lwCg={cargoLandingCg}
+  lwIndex={cargoLandingIndex}
+/>
 </div>
 </div>
 </div>

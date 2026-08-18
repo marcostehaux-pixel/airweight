@@ -5,19 +5,67 @@ import { lowerDeckFactors, mainDeckTables } from './cargoIndexTables'
 =========================================================== */
 
 function getMainIndex(position, weight) {
+  const table = mainDeckTables[position]
 
-  if (!mainDeckTables[position]) return 0
+  if (!table) return 0
 
   const value = Number(weight)
 
   if (!value || value <= 0) return 0
 
-  const row = mainDeckTables[position].find(
-    entry => value <= entry.kg
+  // Ordenamos por seguridad
+  const rows = [...table].sort(
+    (a, b) => a.kg - b.kg
   )
 
-  return row ? row.index : 0
+  // Si coincide exactamente con un valor de tabla
+  const exact = rows.find(
+    entry => value === Number(entry.kg)
+  )
 
+  if (exact) {
+    return Number(exact.index)
+  }
+
+  // Por debajo del primer valor
+  if (value < rows[0].kg) {
+    return Number(rows[0].index)
+  }
+
+  // Por encima del último valor
+  if (value > rows[rows.length - 1].kg) {
+    return Number(
+      rows[rows.length - 1].index
+    )
+  }
+
+  // Buscamos los dos puntos que contienen el peso
+  for (let i = 0; i < rows.length - 1; i++) {
+
+    const lower = rows[i]
+    const upper = rows[i + 1]
+
+    if (
+      value > lower.kg &&
+      value < upper.kg
+    ) {
+
+      const ratio =
+        (value - lower.kg) /
+        (upper.kg - lower.kg)
+
+      return (
+        Number(lower.index) +
+        ratio *
+        (
+          Number(upper.index) -
+          Number(lower.index)
+        )
+      )
+    }
+  }
+
+  return 0
 }
 
 /* ===========================================================
