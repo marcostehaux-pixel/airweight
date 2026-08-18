@@ -779,7 +779,415 @@ doc.text(cargoFlightNumber || '',85,38)
       align: 'center'
     }
   )
+/* ==========================================================
+   PAGE 2 - FREIGHTER ENVELOPE
+========================================================== */
 
+doc.addPage()
+
+/* HEADER */
+
+doc.setTextColor(0)
+
+doc.setFont('helvetica', 'bold')
+doc.setFontSize(16)
+
+doc.text(
+  'FREIGHTER WEIGHT & BALANCE ENVELOPE',
+  105,
+  18,
+  { align: 'center' }
+)
+
+doc.setFont('helvetica', 'normal')
+doc.setFontSize(8)
+
+doc.text(
+  `REGISTRATION: ${registration || '----'}`,
+  20,
+  28
+)
+
+doc.text(
+  `FLIGHT: ${cargoFlightNumber || '----'}`,
+  80,
+  28
+)
+
+doc.text(
+  `${cargoFlightFrom || '----'} - ${cargoFlightTo || '----'}`,
+  145,
+  28
+)
+
+
+/* ==========================================================
+   ENVELOPE CONFIGURATION
+========================================================== */
+
+const envelopePdf = [
+  { index: 29.5, weight: 36200 },
+  { index: 28.5, weight: 40000 },
+  { index: 28.5, weight: 78000 },
+  { index: 48.0, weight: 79000 },
+  { index: 74.0, weight: 78200 },
+  { index: 82.0, weight: 73500 },
+  { index: 47.5, weight: 36200 }
+]
+
+const minIndexPdf = 10
+const maxIndexPdf = 90
+
+const minWeightPdf = 35000
+const maxWeightPdf = 80000
+
+const chartX = 25
+const chartY = 42
+
+const chartWidth = 160
+const chartHeight = 145
+
+
+/* ==========================================================
+   MAP FUNCTIONS
+========================================================== */
+
+const mapPdfX = (index) =>
+  chartX +
+  (
+    (index - minIndexPdf) /
+    (maxIndexPdf - minIndexPdf)
+  ) * chartWidth
+
+const mapPdfY = (weight) =>
+  chartY +
+  chartHeight -
+  (
+    (weight - minWeightPdf) /
+    (maxWeightPdf - minWeightPdf)
+  ) * chartHeight
+
+
+/* ==========================================================
+   GRID
+========================================================== */
+
+doc.setDrawColor(220)
+doc.setLineWidth(0.2)
+
+for (
+  let weight = 35000;
+  weight <= 80000;
+  weight += 5000
+) {
+
+  const y = mapPdfY(weight)
+
+  doc.line(
+    chartX,
+    y,
+    chartX + chartWidth,
+    y
+  )
+
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(6)
+  doc.setTextColor(100)
+
+  doc.text(
+    String(weight),
+    chartX - 3,
+    y + 1.5,
+    { align: 'right' }
+  )
+}
+
+
+for (
+  let index = 10;
+  index <= 90;
+  index += 10
+) {
+
+  const x = mapPdfX(index)
+
+  doc.line(
+    x,
+    chartY,
+    x,
+    chartY + chartHeight
+  )
+
+  doc.setFontSize(6)
+
+  doc.text(
+    String(index),
+    x,
+    chartY + chartHeight + 5,
+    { align: 'center' }
+  )
+}
+
+
+/* ==========================================================
+   ENVELOPE POLYGON
+========================================================== */
+
+doc.setDrawColor(30)
+doc.setLineWidth(0.8)
+
+for (
+  let i = 0;
+  i < envelopePdf.length;
+  i++
+) {
+
+  const current = envelopePdf[i]
+
+  const next =
+    envelopePdf[
+      (i + 1) %
+      envelopePdf.length
+    ]
+
+  doc.line(
+    mapPdfX(current.index),
+    mapPdfY(current.weight),
+    mapPdfX(next.index),
+    mapPdfY(next.weight)
+  )
+}
+
+
+/* ==========================================================
+   AXIS TITLES
+========================================================== */
+
+doc.setTextColor(70)
+doc.setFont('helvetica', 'bold')
+doc.setFontSize(7)
+
+doc.text(
+  'MOMENT INDEX',
+  chartX + chartWidth / 2,
+  chartY + chartHeight + 12,
+  { align: 'center' }
+)
+
+doc.text(
+  'WEIGHT (kg)',
+  10,
+  chartY + chartHeight / 2,
+  {
+    angle: 90,
+    align: 'center'
+  }
+)
+
+
+/* ==========================================================
+   POINT DRAWING FUNCTION
+========================================================== */
+
+function drawEnvelopePoint(
+  index,
+  weight,
+  label
+) {
+
+  if (
+    !Number.isFinite(Number(index)) ||
+    !Number.isFinite(Number(weight))
+  ) {
+    return
+  }
+
+  const x = mapPdfX(Number(index))
+  const y = mapPdfY(Number(weight))
+
+  doc.setFillColor(220, 40, 40)
+
+  doc.circle(
+    x,
+    y,
+    2.2,
+    'F'
+  )
+
+  doc.setTextColor(0)
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(7)
+
+  doc.text(
+    label,
+    x + 3,
+    y - 2
+  )
+}
+
+
+/* ==========================================================
+   ZFW / TOW / LW POINTS
+========================================================== */
+
+drawEnvelopePoint(
+  cargoZfwIndex,
+  cargoZfw,
+  'ZFW'
+)
+
+drawEnvelopePoint(
+  cargoTowIndex,
+  takeoffWeight,
+  'TOW'
+)
+
+drawEnvelopePoint(
+  cargoLandingIndex,
+  landingWeight,
+  'LW'
+)
+
+
+/* ==========================================================
+   CONDITION DATA
+========================================================== */
+
+const dataY = 218
+
+doc.setTextColor(0)
+
+doc.setFont(
+  'helvetica',
+  'bold'
+)
+
+doc.setFontSize(9)
+
+doc.text(
+  'LOAD CONDITION DATA',
+  20,
+  dataY
+)
+
+doc.setDrawColor(150)
+
+doc.line(
+  20,
+  dataY + 2,
+  190,
+  dataY + 2
+)
+
+
+/* HEADERS */
+
+doc.setFontSize(7)
+
+doc.text('CONDITION', 25, dataY + 12)
+doc.text('WEIGHT', 70, dataY + 12)
+doc.text('INDEX', 115, dataY + 12)
+doc.text('CG %MAC', 155, dataY + 12)
+
+
+/* ZFW */
+
+doc.setFont('helvetica', 'normal')
+
+doc.text(
+  'ZFW',
+  25,
+  dataY + 22
+)
+
+doc.text(
+  formatWeight(cargoZfw),
+  70,
+  dataY + 22
+)
+
+doc.text(
+  Number(cargoZfwIndex).toFixed(2),
+  115,
+  dataY + 22
+)
+
+doc.text(
+  Number(cargoZfwCg).toFixed(2),
+  155,
+  dataY + 22
+)
+
+
+/* TOW */
+
+doc.text(
+  'TOW',
+  25,
+  dataY + 32
+)
+
+doc.text(
+  formatWeight(takeoffWeight),
+  70,
+  dataY + 32
+)
+
+doc.text(
+  Number(cargoTowIndex).toFixed(2),
+  115,
+  dataY + 32
+)
+
+doc.text(
+  Number(cargoTowCg).toFixed(2),
+  155,
+  dataY + 32
+)
+
+
+/* LW */
+
+doc.text(
+  'LW',
+  25,
+  dataY + 42
+)
+
+doc.text(
+  formatWeight(landingWeight),
+  70,
+  dataY + 42
+)
+
+doc.text(
+  Number(cargoLandingIndex).toFixed(2),
+  115,
+  dataY + 42
+)
+
+doc.text(
+  Number(cargoLandingCg).toFixed(2),
+  155,
+  dataY + 42
+)
+
+
+/* ==========================================================
+   PAGE 2 FOOTER
+========================================================== */
+
+doc.setFontSize(7)
+doc.setTextColor(120)
+
+doc.text(
+  'AIRWEIGHT Dispatch System v1.0',
+  105,
+  287,
+  {
+    align: 'center'
+  }
+)
 
   /* ==========================================================
      SAVE PDF

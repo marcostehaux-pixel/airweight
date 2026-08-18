@@ -504,12 +504,6 @@ const cargoZfwIndex = getZeroFuelIndex(
   cargoEffectiveBasicIndex,
   totalCargoIndex
 )
-console.log(
-  'ZFW INDEX DEBUG:',
-  cargoEffectiveBasicIndex,
-  totalCargoIndex,
-  cargoZfwIndex
-)
 const cargoFuelIndex = getCargoFuelIndex(
   fuelData.takeoffFuel
 )
@@ -590,6 +584,93 @@ console.log('CARGO CG TABLE DEBUG', {
     cg: cargoLandingCg
   }
 })
+function isInsideFreighterEnvelope(
+  index,
+  weight
+) {
+
+  const polygon = [
+    { index: 29.5, weight: 36200 },
+    { index: 28.5, weight: 40000 },
+    { index: 28.5, weight: 78000 },
+    { index: 48.0, weight: 79000 },
+    { index: 74.0, weight: 78200 },
+    { index: 82.0, weight: 73500 },
+    { index: 47.5, weight: 36200 }
+  ]
+
+  let inside = false
+
+  for (
+    let i = 0, j = polygon.length - 1;
+    i < polygon.length;
+    j = i++
+  ) {
+
+    const xi = polygon[i].index
+    const yi = polygon[i].weight
+
+    const xj = polygon[j].index
+    const yj = polygon[j].weight
+
+    const intersect =
+      ((yi > weight) !== (yj > weight)) &&
+      (
+        index <
+        ((xj - xi) * (weight - yi)) /
+        (yj - yi) +
+        xi
+      )
+
+    if (intersect) {
+      inside = !inside
+    }
+  }
+
+  return inside
+}
+const cargoZfwInsideEnvelope =
+  isInsideFreighterEnvelope(
+    cargoZfwIndex,
+    cargoZfw
+  )
+
+const cargoTowInsideEnvelope =
+  isInsideFreighterEnvelope(
+    cargoTowIndex,
+    weightData.takeoffWeight
+  )
+
+const cargoLwInsideEnvelope =
+  isInsideFreighterEnvelope(
+    cargoLandingIndex,
+    weightData.landingWeight
+  )
+  const cargoPositionOverLimit = [
+
+  ...selectedCargoAircraft.cargoConfig.mainDeck,
+
+  ...selectedCargoAircraft.cargoConfig.lowerDeck
+
+].find(position => {
+
+  const loaded =
+    Number(
+      cargoWeights[position.id] || 0
+    )
+
+  return loaded > position.max
+})
+const freighterPrintValid =
+  !cargoPositionOverLimit &&
+  cargoZfw <= selectedCargoAircraft.maxZFW &&
+  weightData.takeoffWeight <=
+    selectedCargoAircraft.maxTOW &&
+  weightData.landingWeight <=
+    selectedCargoAircraft.maxLW &&
+  cargoZfwInsideEnvelope &&
+  cargoTowInsideEnvelope &&
+  cargoLwInsideEnvelope
 const [cargoFlightFrom, setCargoFlightFrom] =
 useState('')
 
@@ -3210,7 +3291,67 @@ LANDING INDEX
 
   <button
     onClick={() => {
+if (!freighterPrintValid) {
 
+  let message =
+    'LOADSHEET CANNOT BE GENERATED\n\n'
+
+  if (cargoPositionOverLimit) {
+
+    message +=
+      `${cargoPositionOverLimit.id} LOAD LIMIT EXCEEDED\n`
+
+  }
+
+  if (
+    cargoZfw >
+    selectedCargoAircraft.maxZFW
+  ) {
+
+    message +=
+      'MAXIMUM ZFW EXCEEDED\n'
+  }
+
+  if (
+    weightData.takeoffWeight >
+    selectedCargoAircraft.maxTOW
+  ) {
+
+    message +=
+      'MAXIMUM TOW EXCEEDED\n'
+  }
+
+  if (
+    weightData.landingWeight >
+    selectedCargoAircraft.maxLW
+  ) {
+
+    message +=
+      'MAXIMUM LANDING WEIGHT EXCEEDED\n'
+  }
+
+  if (!cargoZfwInsideEnvelope) {
+
+    message +=
+      'ZFW CG OUT OF ENVELOPE\n'
+  }
+
+  if (!cargoTowInsideEnvelope) {
+
+    message +=
+      'TOW CG OUT OF ENVELOPE\n'
+  }
+
+  if (!cargoLwInsideEnvelope) {
+
+    message +=
+      'LW CG OUT OF ENVELOPE\n'
+  }
+
+  alert(message)
+
+  return
+}
   generateFreighterLoadsheet({
 
     registration:
