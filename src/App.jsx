@@ -297,6 +297,83 @@ useState(
 ''
 
 )
+function closeFreighterFlight(id) {
+
+  setCargoFlightRecords(
+    previous =>
+      previous.map(flight =>
+
+        flight.id === id
+          ? {
+              ...flight,
+
+              status: 'CLOSED',
+
+              closedAt:
+                new Date().toISOString()
+            }
+
+          : flight
+      )
+  )
+
+  if (
+    id === activeFreighterFlightId
+  ) {
+
+    setActiveFreighterFlightId(null)
+
+  }
+}
+function openFreighterFlight(flight) {
+
+  if (flight.status !== 'OPEN') {
+    return
+  }
+
+  // Identifica este vuelo como el vuelo activo
+  setActiveFreighterFlightId(
+    flight.id
+  )
+
+  // Datos del vuelo
+  setCargoFlightNumber(
+    flight.flightNumber || ''
+  )
+
+  setCargoFlightFrom(
+    flight.from || ''
+  )
+
+  setCargoFlightTo(
+    flight.to || ''
+  )
+
+  // Recupera distribución de carga
+  setCargoWeights({
+    ...flight.cargoWeights
+  })
+
+  // Recupera combustible
+  setFuelData(previous => ({
+    ...previous,
+
+    blockFuel:
+      flight.blockFuel || 0,
+
+    taxiFuel:
+      flight.taxiFuel || 0,
+
+    takeoffFuel:
+      flight.takeoffFuel || 0,
+
+    tripFuel:
+      flight.tripFuel || 0
+  }))
+
+  // Volver al Freighter
+  setActiveMenu('FreighterLoadsheet')
+}
   const [forwardCargo, setForwardCargo] =
   useState(0)
 
@@ -327,7 +404,7 @@ const [aftAdults, setAftAdults] = useState(0)
 const [aftChildren, setAftChildren] = useState(0)
 const [aftInfants, setAftInfants] = useState(0)
 const [activeMenu, setActiveMenu] =
-  useState(userRole === 'freighter' ? 'Freighter' : 'Dashboard')
+  useState(userRole === 'freighter' ? 'FreighterLoadsheet' : 'Dashboard')
   console.log('ACTIVE MENU:', activeMenu)
  const passengerWeight =
 
@@ -679,6 +756,28 @@ useState('')
 
 const [cargoFlightNumber, setCargoFlightNumber] =
 useState('')
+const [cargoFlightRecords, setCargoFlightRecords] =
+  useState(() => {
+
+    const saved =
+      localStorage.getItem(
+        'airweightFreighterFlights'
+      )
+
+    return saved
+      ? JSON.parse(saved)
+      : []
+  })
+  useEffect(() => {
+
+  localStorage.setItem(
+    'airweightFreighterFlights',
+    JSON.stringify(cargoFlightRecords)
+  )
+
+}, [cargoFlightRecords])
+const [activeFreighterFlightId, setActiveFreighterFlightId] =
+  useState(null)
 const [cargoMetarFrom, setCargoMetarFrom] = useState(null)
 const [cargoMetarTo, setCargoMetarTo] = useState(null)
 
@@ -939,6 +1038,123 @@ return(
 )
 
 }
+function saveCurrentFreighterFlight() {
+
+  const now =
+    new Date().toISOString()
+
+  const flightData = {
+
+    status: 'OPEN',
+
+    updatedAt: now,
+
+    flightNumber:
+      cargoFlightNumber || '----',
+
+    from:
+      cargoFlightFrom || '----',
+
+    to:
+      cargoFlightTo || '----',
+
+    registration:
+      selectedCargoAircraft.registration,
+
+    cargoWeights: {
+      ...cargoWeights
+    },
+
+    blockFuel:
+      fuelData.blockFuel,
+
+    taxiFuel:
+      fuelData.taxiFuel,
+
+    takeoffFuel:
+      fuelData.takeoffFuel,
+
+    tripFuel:
+      fuelData.tripFuel,
+
+    zfw:
+      cargoZfw,
+
+    tow:
+      weightData.takeoffWeight,
+
+    lw:
+      weightData.landingWeight,
+
+    zfwIndex:
+      cargoZfwIndex,
+
+    towIndex:
+      cargoTowIndex,
+
+    lwIndex:
+      cargoLandingIndex,
+
+    zfwCg:
+      cargoZfwCg,
+
+    towCg:
+      cargoTowCg,
+
+    lwCg:
+      cargoLandingCg
+  }
+
+  if (activeFreighterFlightId) {
+
+    setCargoFlightRecords(
+      previous =>
+        previous.map(flight =>
+
+          flight.id === activeFreighterFlightId &&
+          flight.status === 'OPEN'
+
+            ? {
+                ...flight,
+                ...flightData
+              }
+
+            : flight
+        )
+    )
+
+    alert('Flight updated')
+
+    return
+  }
+
+  const newFlight = {
+
+    id: Date.now(),
+
+    createdAt: now,
+
+    ...flightData
+  }
+
+  setCargoFlightRecords(
+    previous => {
+
+      const updated = [
+        newFlight,
+        ...previous
+      ]
+
+      return updated.slice(0, 10)
+    }
+  )
+
+  setActiveFreighterFlightId(
+    newFlight.id
+  )
+
+  alert('Flight saved as OPEN')
+}
 return (
 
   <div
@@ -1050,6 +1266,67 @@ transform:
 
 </div>
 )}
+{(userRole === 'freighter' || userRole === 'admin') && (
+
+  <div
+    onClick={() =>
+      setActiveMenu('Flight Records')
+    }
+
+    onMouseEnter={(e) => {
+
+      if (activeMenu !== 'Flight Records') {
+
+        e.currentTarget.style.transform =
+          'translateX(4px)'
+
+        e.currentTarget.style.boxShadow =
+          '0 0 18px rgba(255,255,255,0.08)'
+      }
+
+    }}
+
+    onMouseLeave={(e) => {
+
+      if (activeMenu !== 'Flight Records') {
+
+        e.currentTarget.style.transform =
+          'translateX(0px)'
+
+        e.currentTarget.style.boxShadow =
+          'none'
+      }
+
+    }}
+
+    style={{
+      marginBottom: '20px',
+      padding: '12px 16px',
+      borderRadius: '12px',
+
+      background:
+        activeMenu === 'Flight Records'
+          ? 'rgba(0,255,140,0.12)'
+          : 'rgba(255,255,255,0.03)',
+
+      border:
+        activeMenu === 'Flight Records'
+          ? '1px solid rgba(0,255,140,0.25)'
+          : '1px solid transparent',
+
+      boxShadow:
+        activeMenu === 'Flight Records'
+          ? '0 0 25px rgba(0,255,140,0.15)'
+          : 'none',
+
+      transition: 'all 0.3s ease',
+      cursor: 'pointer'
+    }}
+  >
+    Flight Records
+  </div>
+
+)}
 {userRole !== 'student' && (
 <div
 onClick={()=>
@@ -1073,13 +1350,17 @@ activeMenu==='FreighterLoadsheet'
 
 cursor:'pointer'
 }}
+
 >
 
 Freighter Loadheet
 
 </div>
+
 )}
+
 {userRole !== 'freighter' && (
+  
 <div
 
   onClick={() =>
@@ -1150,7 +1431,9 @@ transform:
   Passenger Loadsheet
 
 </div>
+
 )}
+
 <div
 
   onClick={() =>
@@ -1220,6 +1503,7 @@ transform:
   Fuel Load
 
 </div>
+
 {userRole !== 'freighter' && (
 <div
 
@@ -1627,6 +1911,7 @@ marginBottom:'30px'
 Cargo Weight & Balance Module
 
 </div>
+
 <div
 style={{
 
@@ -1790,6 +2075,45 @@ borderRadius:'6px'
   </div>
 </div>
 <div>
+<div
+  style={{
+    display: 'flex',
+    justifyContent: 'center',
+    marginBottom: '25px'
+  }}
+>
+
+  <button
+    onClick={saveCurrentFreighterFlight}
+
+    style={{
+      padding: '10px 22px',
+
+      borderRadius: '10px',
+
+      border:
+        '1px solid rgba(0,255,140,0.35)',
+
+      background:
+        'rgba(0,255,140,0.10)',
+
+      color: '#00ff88',
+
+      fontWeight: '700',
+
+      cursor: 'pointer',
+
+      letterSpacing: '0.5px'
+    }}
+  >
+
+    {activeFreighterFlightId
+      ? 'UPDATE FLIGHT'
+      : 'SAVE FLIGHT'}
+
+  </button>
+
+</div>
 <b>UTC</b><br/>
 {
 new Date().toLocaleTimeString(
@@ -5939,6 +6263,243 @@ aftInfants
   </div>
 
 
+
+)}
+{(userRole === 'freighter' || userRole === 'admin') &&
+ activeMenu === 'Flight Records' && (
+
+  <div
+    style={{
+      flex: 1,
+      padding: '40px'
+    }}
+  >
+
+    <h1
+      style={{
+        fontSize: '38px',
+        marginBottom: '5px'
+      }}
+    >
+      FLIGHT RECORDS
+    </h1>
+
+    <p
+      style={{
+        color: '#b8c0cc',
+        marginBottom: '30px'
+      }}
+    >
+      Last 10 Freighter operations
+    </p>
+
+    {cargoFlightRecords.length === 0 && (
+
+      <div
+        style={{
+          padding: '30px',
+          borderRadius: '16px',
+          background:
+            'rgba(255,255,255,0.03)',
+          color: '#777',
+          textAlign: 'center'
+        }}
+      >
+        No flight records
+      </div>
+
+    )}
+
+    {cargoFlightRecords.map(
+      flight => (
+
+        <div
+          key={flight.id}
+          style={{
+            marginBottom: '14px',
+            padding: '18px',
+
+            borderRadius: '14px',
+
+            background:
+              'rgba(255,255,255,0.04)',
+
+            border:
+              '1px solid rgba(255,255,255,0.08)'
+          }}
+        >
+
+          <div
+            style={{
+              display: 'flex',
+              justifyContent:
+                'space-between',
+              alignItems: 'center'
+            }}
+          >
+
+            <div>
+
+              <strong
+                style={{
+                  fontSize: '18px'
+                }}
+              >
+                {flight.flightNumber}
+              </strong>
+
+              <div
+                style={{
+                  color: '#b8c0cc',
+                  marginTop: '4px'
+                }}
+              >
+                {flight.from}
+                {' → '}
+                {flight.to}
+                {' · '}
+                {flight.registration}
+              </div>
+
+            </div>
+
+            <div
+              style={{
+                color:
+                  flight.status === 'OPEN'
+                    ? '#00ff88'
+                    : '#888',
+
+                fontWeight: '700'
+              }}
+            >
+              {flight.status}
+            </div>
+
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+
+              gridTemplateColumns:
+                'repeat(3,1fr)',
+
+              gap: '12px',
+
+              marginTop: '18px',
+
+              fontSize: '13px'
+            }}
+          >
+
+            <div>
+              ZFW
+              <strong>
+                {' '}
+                {Number(
+                  flight.zfw
+                ).toFixed(0)} kg
+              </strong>
+            </div>
+
+            <div>
+              TOW
+              <strong>
+                {' '}
+                {Number(
+                  flight.tow
+                ).toFixed(0)} kg
+              </strong>
+            </div>
+
+            <div>
+              LW
+              <strong>
+                {' '}
+                {Number(
+                  flight.lw
+                ).toFixed(0)} kg
+              </strong>
+            </div>
+
+          </div>
+
+          {flight.status === 'OPEN' && (
+
+  <div
+    style={{
+      display: 'flex',
+      gap: '10px',
+      marginTop: '18px'
+    }}
+  >
+
+    <button
+      onClick={() =>
+        openFreighterFlight(flight)
+      }
+
+      style={{
+        padding: '8px 14px',
+
+        borderRadius: '8px',
+
+        border:
+          '1px solid rgba(0,255,140,0.35)',
+
+        background:
+          'rgba(0,255,140,0.10)',
+
+        color: '#00ff88',
+
+        fontWeight: '700',
+
+        cursor: 'pointer'
+      }}
+    >
+      OPEN FLIGHT
+    </button>
+
+
+    <button
+      onClick={() =>
+        closeFreighterFlight(
+          flight.id
+        )
+      }
+
+      style={{
+        padding: '8px 14px',
+
+        borderRadius: '8px',
+
+        border:
+          '1px solid rgba(255,255,255,0.15)',
+
+        background:
+          'rgba(255,255,255,0.04)',
+
+        color: '#b8c0cc',
+
+        fontWeight: '700',
+
+        cursor: 'pointer'
+      }}
+    >
+      CLOSE FLIGHT
+    </button>
+
+  </div>
+
+)}
+
+        </div>
+
+      )
+    )}
+
+  </div>
 
 )}
 {activeMenu === 'Fuel' && (
