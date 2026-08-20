@@ -325,18 +325,37 @@ function closeFreighterFlight(id) {
 
   }
 }
-function openFreighterFlight(flight) {
+function openFreighterFlight(id) {
+
+  const flight =
+    cargoFlightRecords.find(
+      item => item.id === id
+    )
+
+  if (!flight) {
+    console.log(
+      'Flight not found:',
+      id
+    )
+    return
+  }
 
   if (flight.status !== 'OPEN') {
     return
   }
 
-  // Identifica este vuelo como el vuelo activo
+  console.log(
+    'OPENING FLIGHT:',
+    flight.id,
+    flight.flightNumber
+  )
+
+  // Este pasa a ser el vuelo activo
   setActiveFreighterFlightId(
     flight.id
   )
 
-  // Datos del vuelo
+  // Flight data
   setCargoFlightNumber(
     flight.flightNumber || ''
   )
@@ -349,39 +368,50 @@ function openFreighterFlight(flight) {
     flight.to || ''
   )
 
-  // Recupera distribución de carga
+  // Cargo distribution
   setCargoWeights({
-    ...flight.cargoWeights
+    ...(flight.cargoWeights || {})
   })
 
-  // Recupera combustible
-  setFuelData(previous => ({
-    ...previous,
+  // Fuel
+  setFuel(
+  Number(
+    flight.rampFuel ??
+    flight.blockFuel
+  ) || 0
+)
+  setTaxiFuel(
+    Number(flight.taxiFuel) || 0
+  )
 
-    blockFuel:
-      flight.blockFuel || 0,
+  setTripFuel(
+    Number(flight.tripFuel) || 0
+  )
 
-    taxiFuel:
-      flight.taxiFuel || 0,
+  // Go to Freighter
+  setActiveMenu(
+    'FreighterLoadsheet'
+  )
+}
 
-    takeoffFuel:
-      flight.takeoffFuel || 0,
 
-    tripFuel:
-      flight.tripFuel || 0
-  }))
+function newFreighterFlight() {
 
-  // Volver al Freighter
+  setActiveFreighterFlightId(null)
+
+  setCargoFlightNumber('')
+  setCargoFlightFrom('')
+  setCargoFlightTo('')
+
+  setCargoWeights({})
+
+setFuel(0)
+setTaxiFuel(0)
+setTripFuel(0)
+
   setActiveMenu('FreighterLoadsheet')
 }
-function openFreighterFlight(flight) {
 
-  // ...todo lo demás...
-
-  console.log('Changing menu to FreighterLoadsheet')
-
-  setActiveMenu('FreighterLoadsheet')
-}
   const [forwardCargo, setForwardCargo] =
   useState(0)
 
@@ -1073,8 +1103,8 @@ function saveCurrentFreighterFlight() {
       ...cargoWeights
     },
 
-    blockFuel:
-      fuelData.blockFuel,
+    rampFuel:
+      fuel,
 
     taxiFuel:
       fuelData.taxiFuel,
@@ -2120,8 +2150,32 @@ borderRadius:'6px'
       : 'SAVE FLIGHT'}
 
   </button>
+<button
+  onClick={newFreighterFlight}
 
+  style={{
+    padding: '10px 22px',
+    borderRadius: '10px',
+
+    border:
+      '1px solid rgba(255,255,255,0.18)',
+
+    background:
+      'rgba(255,255,255,0.05)',
+
+    color: '#b8c0cc',
+
+    fontWeight: '700',
+
+    cursor: 'pointer',
+
+    letterSpacing: '0.5px'
+  }}
+>
+  NEW FLIGHT
+</button>
 </div>
+
 <b>UTC</b><br/>
 {
 new Date().toLocaleTimeString(
@@ -3060,7 +3114,7 @@ marginBottom:'10px'
 }}
 >
 <span>
-BLOCK FUEL
+RAMP FUEL
 </span>
 <strong>
 {fuel} kg
@@ -3134,6 +3188,27 @@ kg
 
 </div>
 <div
+  style={{
+    display:'flex',
+    gap:'100px',
+    alignItems:'center',
+    marginBottom:'10px'
+  }}
+>
+
+  <span>
+    TAKEOFF FUEL
+  </span>
+
+  <strong>
+    {Number(
+      fuelData.takeoffFuel || 0
+    ).toFixed(0)}
+    kg
+  </strong>
+
+</div>
+<div
 style={{
   display:'flex',
   alignItems:'center',
@@ -3145,6 +3220,7 @@ style={{
 style={{
   width:'140px'
 }}
+
 >
 
 TAKEOFF WEIGHT
@@ -6444,9 +6520,9 @@ aftInfants
   >
 
     <button
-      onClick={() =>
-        openFreighterFlight(flight)
-      }
+     onClick={() =>
+  openFreighterFlight(flight.id)
+}
 
       style={{
         padding: '8px 14px',
@@ -6547,7 +6623,7 @@ aftInfants
 
       <label>
 
-        Block Fuel (kg)
+        Ramp Fuel (kg)
 
       </label>
 
