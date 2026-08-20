@@ -43,7 +43,7 @@ basicWeight,
     blockFuel,
 
     taxiFuel,
-
+    takeoffFuel,
     tripFuel,
 basicIndex,
 
@@ -450,7 +450,7 @@ doc.text(cargoFlightNumber || '',85,38)
   )
 
 
-  const balanceData = [
+const balanceData = [
 
   {
     label: 'BASIC WT',
@@ -474,7 +474,6 @@ doc.text(cargoFlightNumber || '',85,38)
     y: 157
   },
 
-
   {
     label: 'ZFW',
     value: cargoZfw,
@@ -484,7 +483,7 @@ doc.text(cargoFlightNumber || '',85,38)
   },
 
   {
-    label: 'BLOCK FUEL',
+    label: 'RAMP FUEL',
     value: blockFuel,
     x: 75,
     y: 174
@@ -499,35 +498,41 @@ doc.text(cargoFlightNumber || '',85,38)
 
 
   {
-    label: 'TAXI FUEL',
-    value: taxiFuel,
-    x: 20,
-    y: 191
-  },
+  label: 'TAXI FUEL',
+  value: taxiFuel,
+  x: 20,
+  y: 191
+},
 
-  {
-    label: 'TOW',
-    value: takeoffWeight,
-    max: maxTOW,
-    x: 75,
-    y: 191
-  },
+{
+  label: 'TAKEOFF FUEL',
+  value: takeoffFuel,
+  x: 75,
+  y: 191
+},
 
-  {
-    label: 'TRIP FUEL',
-    value: tripFuel,
-    x: 130,
-    y: 191
-  },
+{
+  label: 'TOW',
+  value: takeoffWeight,
+  max: maxTOW,
+  x: 130,
+  y: 191
+},
 
+{
+  label: 'TRIP FUEL',
+  value: tripFuel,
+  x: 20,
+  y: 208
+},
 
-  {
-    label: 'LANDING WT',
-    value: landingWeight,
-    max: maxLW,
-    x: 20,
-    y: 208
-  }
+{
+  label: 'LANDING WT',
+  value: landingWeight,
+  max: maxLW,
+  x: 75,
+  y: 208
+}
 
 ]
 
