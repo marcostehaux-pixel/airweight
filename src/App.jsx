@@ -374,6 +374,14 @@ function openFreighterFlight(flight) {
   // Volver al Freighter
   setActiveMenu('FreighterLoadsheet')
 }
+function openFreighterFlight(flight) {
+
+  // ...todo lo demás...
+
+  console.log('Changing menu to FreighterLoadsheet')
+
+  setActiveMenu('FreighterLoadsheet')
+}
   const [forwardCargo, setForwardCargo] =
   useState(0)
 
