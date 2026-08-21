@@ -393,7 +393,104 @@ function openFreighterFlight(id) {
     'FreighterLoadsheet'
   )
 }
+function printClosedFreighterFlight(flight) {
 
+  if (flight.status !== 'CLOSED') {
+    return
+  }
+
+  generateFreighterLoadsheet({
+
+    registration:
+      flight.registration,
+
+    cargoFlightFrom:
+      flight.from,
+
+    cargoFlightTo:
+      flight.to,
+
+    cargoFlightNumber:
+      flight.flightNumber,
+
+    cargoMetarFrom:
+      flight.cargoMetarFrom || '',
+
+    cargoMetarTo:
+      flight.cargoMetarTo || '',
+
+    basicWeight:
+      flight.basicWeight,
+
+    basicIndex:
+      flight.basicIndex,
+
+    maxZFW:
+      flight.maxZFW,
+
+    maxTOW:
+      flight.maxTOW,
+
+    maxLW:
+      flight.maxLW,
+
+    mainCargo:
+      flight.mainCargo,
+
+    lowerCargo:
+      flight.lowerCargo,
+
+    totalCargo:
+      flight.totalCargo,
+
+    cargoZfw:
+      flight.zfw,
+
+    rampWeight:
+      flight.rampWeight,
+
+    takeoffWeight:
+      flight.tow,
+
+    landingWeight:
+      flight.lw,
+
+    cargoZfwIndex:
+      flight.zfwIndex,
+
+    cargoTowIndex:
+      flight.towIndex,
+
+    cargoLandingIndex:
+      flight.lwIndex,
+
+    cargoZfwCg:
+      flight.zfwCg,
+
+    cargoTowCg:
+      flight.towCg,
+
+    cargoLandingCg:
+      flight.lwCg,
+
+    blockFuel:
+      flight.rampFuel ??
+      flight.blockFuel ??
+      0,
+
+    taxiFuel:
+      flight.taxiFuel,
+
+    takeoffFuel:
+      flight.takeoffFuel,
+
+    tripFuel:
+      flight.tripFuel,
+
+    cargoWeights:
+      flight.cargoWeights || {}
+  })
+}
 
 function newFreighterFlight() {
 
@@ -1140,7 +1237,36 @@ function saveCurrentFreighterFlight() {
       cargoTowCg,
 
     lwCg:
-      cargoLandingCg
+      cargoLandingCg,
+      cargoMetarFrom:
+  cargoMetarFrom || '',
+
+cargoMetarTo:
+  cargoMetarTo || '',
+
+basicWeight:
+  selectedCargoAircraft.basicWeight,
+
+basicIndex:
+  selectedCargoAircraft.basicIndex,
+
+maxZFW:
+  selectedCargoAircraft.maxZFW,
+
+maxTOW:
+  selectedCargoAircraft.maxTOW,
+
+maxLW:
+  selectedCargoAircraft.maxLW,
+
+mainCargo,
+
+lowerCargo,
+
+totalCargo,
+
+rampWeight:
+  weightData.rampWeight,
   }
 
   if (activeFreighterFlightId) {
@@ -6577,7 +6703,38 @@ aftInfants
   </div>
 
 )}
+{flight.status === 'CLOSED' && (
 
+  <button
+    onClick={() =>
+      printClosedFreighterFlight(
+        flight
+      )
+    }
+
+    style={{
+      marginTop: '18px',
+      padding: '8px 14px',
+
+      borderRadius: '8px',
+
+      border:
+        '1px solid rgba(0,255,140,0.35)',
+
+      background:
+        'rgba(0,255,140,0.10)',
+
+      color: '#00ff88',
+
+      fontWeight: '700',
+
+      cursor: 'pointer'
+    }}
+  >
+    GENERATE PDF
+  </button>
+
+)}
         </div>
 
       )
