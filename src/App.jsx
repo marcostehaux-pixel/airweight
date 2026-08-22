@@ -26,7 +26,7 @@ import { generateFreighterLoadsheet } from './utilit/generateFreighterLoadsheet'
 import { generateWeatherPdf } from './utilit/generateWeatherPdf'
 import {lowerDeckFactors,mainDeckTables} from './utilit/cargoIndexTables'
 import FreighterEnvelope from './components/FreighterEnvelope'
-
+import { generateCargoLoadOrder } from './utilit/generateCargoLoadOrder'
 import {
   getForwardBagIndex,
   getAftBagIndex
@@ -892,7 +892,7 @@ const freighterPrintValid =
   !cargoPositionOverLimit &&
   cargoZfw <= selectedCargoAircraft.maxZFW &&
   weightData.takeoffWeight <=
-    selectedCargoAircraft.maxTOW &&
+    effectiveMaxTow &&
   weightData.landingWeight <=
     selectedCargoAircraft.maxLW &&
   cargoZfwInsideEnvelope &&
@@ -2651,21 +2651,68 @@ marginTop:'40px'
 
 >
 
-<h2
-
-style={{
-
-color:'#b8c0cc',
-
-marginBottom:'20px'
-
-}}
-
+<div
+  style={{
+    display:'flex',
+    justifyContent:'space-between',
+    alignItems:'center',
+    marginBottom:'15px'
+  }}
 >
 
-LOWER DECK
+  <h2
+    style={{
+      margin:0
+    }}
+  >
+    LOWER DECK
+  </h2>
 
-</h2>
+  <button
+    onClick={() =>
+      generateCargoLoadOrder({
+
+        registration:
+          selectedCargoAircraft.registration,
+
+        cargoFlightFrom,
+
+        cargoFlightTo,
+
+        cargoFlightNumber,
+
+        cargoWeights,
+
+        mainCargo,
+
+        lowerCargo,
+
+        totalCargo
+      })
+    }
+
+    style={{
+      padding:'8px 14px',
+
+      borderRadius:'8px',
+
+      border:
+        '1px solid rgba(0,255,140,0.30)',
+
+      background:
+        'rgba(0,255,140,0.08)',
+
+      color:'#00ff88',
+
+      fontWeight:'700',
+
+      cursor:'pointer'
+    }}
+  >
+    GENERATE LOAD ORDER
+  </button>
+
+</div>
 
 <div
 
@@ -3919,14 +3966,14 @@ if (!freighterPrintValid) {
       'MAXIMUM ZFW EXCEEDED\n'
   }
 
-  if (
-    weightData.takeoffWeight >
-    effectiveMaxTow
-  ) {
+ if (
+  weightData.takeoffWeight >
+  effectiveMaxTow
+) {
 
-    message +=
-      'MAXIMUM TOW EXCEEDED\n'
-  }
+  message +=
+    `ALLOWED MAX TOW EXCEEDED - LIMIT ${effectiveMaxTow} kg\n`
+}
 
   if (
     weightData.landingWeight >
