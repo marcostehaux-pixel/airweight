@@ -367,7 +367,9 @@ function openFreighterFlight(id) {
   setCargoFlightTo(
     flight.to || ''
   )
-
+setPerformanceMaxTow(
+  flight.performanceMaxTow ?? ''
+)
   // Cargo distribution
   setCargoWeights({
     ...(flight.cargoWeights || {})
@@ -505,7 +507,7 @@ function newFreighterFlight() {
 setFuel(0)
 setTaxiFuel(0)
 setTripFuel(0)
-
+setPerformanceMaxTow('')
   setActiveMenu('FreighterLoadsheet')
 }
 
@@ -589,7 +591,10 @@ const zfw = selectedAircraft.basicWeight + passengerWeight + forwardCargo + aftC
 
 const rw = zfw + fuel
 const fuelData = calculateFuel(fuel,taxiFuel,tripFuel)
-
+const [
+  performanceMaxTow,
+  setPerformanceMaxTow
+] = useState('')
 const {
   mainCargo,
   lowerCargo,
@@ -609,6 +614,14 @@ towArm
   cargoWeights,
   fuelData.takeoffFuel
 )
+const effectiveMaxTow =
+  performanceMaxTow &&
+  Number(performanceMaxTow) > 0
+    ? Math.min(
+        selectedCargoAircraft.maxTOW,
+        Number(performanceMaxTow)
+      )
+    : selectedCargoAircraft.maxTOW
 const payloadCapacity =
   totalCargo + availablePayload
 
@@ -733,6 +746,7 @@ const cargoLandingIndex = getLandingIndex(
   cargoTowIndex,
   cargoTripFuelIndex
 )
+
 
 const cargoZfwArm = indexToArm(
   cargoZfwIndex,
@@ -873,6 +887,7 @@ const cargoLwInsideEnvelope =
 
   return loaded > position.max
 })
+
 const freighterPrintValid =
   !cargoPositionOverLimit &&
   cargoZfw <= selectedCargoAircraft.maxZFW &&
@@ -1264,7 +1279,13 @@ mainCargo,
 lowerCargo,
 
 totalCargo,
+performanceMaxTow:
+  performanceMaxTow
+    ? Number(performanceMaxTow)
+    : null,
 
+effectiveMaxTow:
+  effectiveMaxTow,
 rampWeight:
   weightData.rampWeight,
   }
@@ -3017,32 +3038,83 @@ kg
 </strong>
 
 </div>
+<div
+  style={{
+    display:'flex',
+    alignItems:'center',
+    marginBottom:'6px'
+  }}
+>
 
-<div style={{display:'flex'}}>
+  <span style={{width:'100px'}}>
+    MAX TOW
+  </span>
 
-<span style={{width:'100px'}}>
+  <strong
+    style={{
+      width:'100px'
+    }}
+  >
+    {selectedCargoAircraft.maxTOW} kg
+  </strong>
 
-MAX TOW
 
-</span>
+  <span
+    style={{
+      marginLeft:'25px',
+      marginRight:'10px'
+    }}
+  >
+    ALLOWED MAX TOW 
+  </span>
 
-<strong>
 
-{
+  <input
+    type="number"
 
-selectedCargoAircraft.maxTOW
+    value={performanceMaxTow}
 
-}
+    onChange={(e) =>
+      setPerformanceMaxTow(
+        e.target.value
+      )
+    }
 
-kg
+    placeholder="kg"
 
-</strong>
+    style={{
+      width:'90px',
+      padding:'5px 8px',
+
+      borderRadius:'6px',
+
+      border:
+        '1px solid rgba(255,255,255,0.15)',
+
+      background:
+        'rgba(255,255,255,0.05)',
+
+      color:'#ffffff',
+
+      textAlign:'center'
+    }}
+  />
+
+  <span
+    style={{
+      marginLeft:'6px'
+    }}
+  >
+    kg
+  </span>
 
 </div>
 
 <div style={{display:'flex'}}>
 
 <span style={{width:'100px'}}>
+
+
 
 MAX LW
 
@@ -3063,8 +3135,24 @@ kg
 </div>
 
 </div>
-
+<div
+  style={{
+    marginTop: '6px',
+    fontSize: '15px',
+    color: '#b8c0cc'
+  }}
+>
+  TOW LIMIT APPLIED:{' '}
+  <strong
+    style={{
+      color: '#00ff88'
+    }}
+  >
+    {effectiveMaxTow} kg
+  </strong>
 </div>
+</div>
+
 <h2>
 
 CARGO SUMMARY
@@ -3367,18 +3455,10 @@ style={{
 style={{
 
 color:
-
-weightData.takeoffWeight >
-
-selectedCargoAircraft.maxTOW
-
-?
-
-'#ff4444'
-
-:
-
-'#00ff88'
+  weightData.takeoffWeight >
+  effectiveMaxTow
+    ? '#ff4444'
+    : '#00ff88'
 
 }}
 >
@@ -3386,16 +3466,9 @@ selectedCargoAircraft.maxTOW
 {
 
 weightData.takeoffWeight >
-
-selectedCargoAircraft.maxTOW
-
-?
-
-'🔴 LIMIT EXCEEDED'
-
-:
-
-'🟢 OK'
+effectiveMaxTow
+  ? '🔴 LIMIT EXCEEDED'
+  : '🟢 OK'
 
 }
 
@@ -3848,7 +3921,7 @@ if (!freighterPrintValid) {
 
   if (
     weightData.takeoffWeight >
-    selectedCargoAircraft.maxTOW
+    effectiveMaxTow
   ) {
 
     message +=
@@ -4586,6 +4659,10 @@ const cargoAircraft =
 aircraftCargoDatabase.find(
 a=>a.registration===e.target.value
 )
+const [
+  performanceMaxTow,
+  setPerformanceMaxTow
+] = useState('')
 console.log('PAX', paxAircraft)
 console.log('CARGO', cargoAircraft)
 
