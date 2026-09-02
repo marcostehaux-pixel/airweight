@@ -493,7 +493,39 @@ function printClosedFreighterFlight(flight) {
       flight.cargoWeights || {}
   })
 }
+function printClosedLoadOrder(flight) {
 
+  if (flight.status !== 'CLOSED') {
+    return
+  }
+
+  generateCargoLoadOrder({
+
+    registration:
+      flight.registration,
+
+    cargoFlightFrom:
+      flight.from,
+
+    cargoFlightTo:
+      flight.to,
+
+    cargoFlightNumber:
+      flight.flightNumber,
+
+    cargoWeights:
+      flight.cargoWeights || {},
+
+    mainCargo:
+      flight.mainCargo || 0,
+
+    lowerCargo:
+      flight.lowerCargo || 0,
+
+    totalCargo:
+      flight.totalCargo || 0
+  })
+}
 function newFreighterFlight() {
 
   setActiveFreighterFlightId(null)
@@ -7110,54 +7142,74 @@ aftInfants
 
           {/* CLOSED FLIGHT */}
 
-          {flight.status === 'CLOSED' && (
+        {flight.status === 'CLOSED' && (
 
-            <div
-              style={{
-                marginTop: '18px',
+  <div
+    style={{
+      display: 'flex',
+      gap: '10px',
+      marginTop: '18px'
+    }}
+  >
 
-                paddingTop: '16px',
+    <button
+      onClick={() =>
+        printClosedFreighterFlight(
+          flight
+        )
+      }
 
-                borderTop:
-                  '1px solid rgba(255,255,255,0.06)'
-              }}
-            >
+      style={{
+        padding: '8px 14px',
+        borderRadius: '8px',
 
-              <button
-                onClick={() =>
-                  printClosedFreighterFlight(
-                    flight
-                  )
-                }
+        border:
+          '1px solid rgba(0,255,140,0.35)',
 
-                style={{
-                  padding: '9px 16px',
+        background:
+          'rgba(0,255,140,0.10)',
 
-                  borderRadius: '8px',
+        color: '#00ff88',
 
-                  border:
-                    '1px solid rgba(21,101,255,0.40)',
+        fontWeight: '700',
 
-                  background:
-                    'rgba(21,101,255,0.12)',
+        cursor: 'pointer'
+      }}
+    >
+      LOADSHEET PDF
+    </button>
 
-                  color: '#75a5ff',
 
-                  fontSize: '11px',
+    <button
+      onClick={() =>
+        printClosedLoadOrder(
+          flight
+        )
+      }
 
-                  letterSpacing: '0.8px',
+      style={{
+        padding: '8px 14px',
+        borderRadius: '8px',
 
-                  fontWeight: '700',
+        border:
+          '1px solid rgba(255,255,255,0.18)',
 
-                  cursor: 'pointer'
-                }}
-              >
-                GENERATE PDF
-              </button>
+        background:
+          'rgba(255,255,255,0.05)',
 
-            </div>
+        color: '#b8c0cc',
 
-          )}
+        fontWeight: '700',
+
+        cursor: 'pointer'
+      }}
+    >
+      LOAD ORDER PDF
+    </button>
+
+  </div>
+
+)}
 
         </div>
 
