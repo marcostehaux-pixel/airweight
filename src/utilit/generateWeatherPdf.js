@@ -44,7 +44,7 @@ export function generateWeatherPdf(data) {
     doc.setFontSize(15)
 
     doc.text(
-      'AIRWEIGHT WEATHER REPORT',
+      'OPERDAT WEATHER REPORT',
       marginLeft,
       16
     )
@@ -74,7 +74,7 @@ export function generateWeatherPdf(data) {
     doc.setTextColor(120)
 
     doc.text(
-      'AIRWEIGHT Aviation Weather Report',
+      'OPERDAT Aviation Weather Report',
       105,
       288,
       {
@@ -459,7 +459,7 @@ export function generateWeatherPdf(data) {
   ========================================================== */
 
   doc.save(
-    `AirWeight_Weather_${icao || 'Report'}.pdf`
+    `OPERDAT_Weather_${icao || 'Report'}.pdf`
   )
 
 }

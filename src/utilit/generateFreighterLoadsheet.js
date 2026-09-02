@@ -92,7 +92,7 @@ maxLW,
   doc.setFontSize(18)
 
   doc.text(
-    'AIRWEIGHT FREIGHTER LOADSHEET',
+    'OPERDAT FREIGHTER LOADSHEET',
     15,
     16
   )
@@ -777,7 +777,7 @@ const balanceData = [
 
 
   doc.text(
-    'AIRWEIGHT Dispatch System v1.0', 
+    'OPERDAT Dispatch System v1.0', 
     105,
     287,
     {
@@ -1186,7 +1186,7 @@ doc.setFontSize(7)
 doc.setTextColor(120)
 
 doc.text(
-  'AIRWEIGHT Dispatch System v1.0',
+  'OPERDAT Dispatch System v1.0',
   105,
   287,
   {
@@ -1199,7 +1199,7 @@ doc.text(
   ========================================================== */
 
   doc.save(
-    `AirWeight_Freighter_${registration}.pdf`
+    `OPERDAT_Freighter_${registration}.pdf`
   )
 
 }

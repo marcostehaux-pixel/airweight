@@ -199,7 +199,7 @@ doc.setTextColor(255, 255, 255)
 
 doc.setFontSize(20)
 
-doc.text('AIRWEIGHT LOADSHEET', 5, 15)
+doc.text('OPERDAT LOADSHEET', 5, 15)
 doc.setFontSize(10)
 doc.text(
  'Electronic Loadsheet System',
@@ -964,7 +964,7 @@ doc.text(
 doc.setFontSize(10)
 
 doc.text(
-  'AIRWEIGHT Dispatch System v1.0',
+  'OPERDAT Dispatch System v1.0',
   20,
   290
 )
@@ -1013,7 +1013,7 @@ metarTo || '-'
 )
 
 }
-doc.save('AIRWEIGHT_LOADSHEET.pdf')
+doc.save('OPERDAT_LOADSHEET.pdf')
 
 
 }

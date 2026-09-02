@@ -1396,15 +1396,15 @@ return (
       textAlign: 'center'
     }}
   >
-    <img
-      src={logo}
-      alt="OPERDAT Logo"
-      style={{
-        width: '185px',
-        maxWidth: '100%',
-        objectFit: 'contain'
-      }}
-    />
+   <img
+  src={logo}
+  alt="OPERDAT Logo"
+  style={{
+    width: '220px',
+    maxWidth: '100%',
+    marginBottom: '10px'
+  }}
+/>
 
     <div
       style={{

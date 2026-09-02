@@ -45,7 +45,7 @@ export function generateCargoLoadOrder(data) {
   doc.setFontSize(18)
 
   doc.text(
-    'AIRWEIGHT - CARGO LOAD ORDER',
+    'OPERDAT - CARGO LOAD ORDER',
     105,
     18,
     {
@@ -341,7 +341,7 @@ export function generateCargoLoadOrder(data) {
   doc.setTextColor(120)
 
   doc.text(
-    'AIRWEIGHT Dispatch System',
+    'OPERDAT Dispatch System',
     105,
     287,
     {
@@ -351,6 +351,6 @@ export function generateCargoLoadOrder(data) {
 
 
   doc.save(
-    `AirWeight_Load_Order_${cargoFlightNumber || registration}.pdf`
+    `OPERDAT_Load_Order_${cargoFlightNumber || registration}.pdf`
   )
 }
