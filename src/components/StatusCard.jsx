@@ -5,150 +5,153 @@ function StatusCard(props) {
   const [hovered, setHovered] =
     useState(false)
 
-  const styles = `
-
-    @keyframes pulseGreen {
-
-      0% {
-        box-shadow:
-          0 0 20px rgba(0,255,140,0.10);
-      }
-
-      50% {
-        box-shadow:
-          0 0 35px rgba(0,255,140,0.22);
-      }
-
-      100% {
-        box-shadow:
-          0 0 20px rgba(0,255,140,0.10);
-      }
-
-    }
-
-    @keyframes pulseRed {
-
-      0% {
-        box-shadow:
-          0 0 20px rgba(255,70,70,0.10);
-      }
-
-      50% {
-        box-shadow:
-          0 0 35px rgba(255,70,70,0.22);
-      }
-
-      100% {
-        box-shadow:
-          0 0 20px rgba(255,70,70,0.10);
-      }
-
-    }
-
-  `
+  const isNormal =
+    props.status !== false
 
   return (
 
-    <>
+    <div
 
-      <style>{styles}</style>
+      onMouseEnter={() =>
+        setHovered(true)
+      }
+
+      onMouseLeave={() =>
+        setHovered(false)
+      }
+
+      style={{
+
+        minWidth: '165px',
+
+        padding: '20px',
+
+        borderRadius: '16px',
+
+        background:
+          'linear-gradient(145deg, rgba(10,28,50,0.95), rgba(5,17,32,0.95))',
+
+        backdropFilter:
+          'blur(18px)',
+
+        border:
+          isNormal
+            ? '1px solid rgba(21,101,255,0.30)'
+            : '1px solid rgba(255,80,80,0.35)',
+
+        boxShadow:
+          hovered
+
+            ? (
+                isNormal
+                  ? '0 14px 35px rgba(21,101,255,0.18)'
+                  : '0 14px 35px rgba(255,70,70,0.18)'
+              )
+
+            : '0 8px 24px rgba(0,0,0,0.22)',
+
+        transition:
+          'all 0.25s ease',
+
+        transform:
+          hovered
+            ? 'translateY(-4px)'
+            : 'translateY(0px)',
+
+        cursor:
+          'default',
+
+        position:
+          'relative',
+
+        overflow:
+          'hidden'
+
+      }}
+
+    >
+
+      {/* STATUS BAR */}
+
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '3px',
+
+          background:
+            isNormal
+              ? '#1565ff'
+              : '#ff5050',
+
+          boxShadow:
+            isNormal
+              ? '0 0 12px rgba(21,101,255,0.55)'
+              : '0 0 12px rgba(255,80,80,0.55)'
+        }}
+      />
+
+
+      {/* TITLE */}
 
       <div
 
-        onMouseEnter={() =>
-          setHovered(true)
-        }
-
-        onMouseLeave={() =>
-          setHovered(false)
-        }
-
         style={{
 
-          minWidth: '160px',
+          fontSize: '12px',
 
-          padding: '20px',
+          fontWeight: '600',
 
-          borderRadius: '22px',
+          letterSpacing: '1.7px',
 
-          background:
-            'rgba(255,255,255,0.06)',
+          color: '#8fa0b7',
 
-          backdropFilter:
-            'blur(18px)',
+          marginBottom: '12px',
 
-          border:
-            props.status
-              ? '1px solid rgba(0,255,140,0.25)'
-              : '1px solid rgba(255,70,70,0.25)',
-
-          boxShadow:
-            hovered
-
-              ? (
-                  props.status
-                    ? '0 0 45px rgba(0,255,140,0.22)'
-                    : '0 0 45px rgba(255,70,70,0.22)'
-                )
-
-              : (
-                  props.status
-                    ? '0 0 25px rgba(0,255,140,0.10)'
-                    : '0 0 25px rgba(255,70,70,0.10)'
-                ),
-
-          transition:
-            'all 0.35s ease',
-
-          animation:
-            props.status
-              ? 'pulseGreen 2.5s infinite'
-              : 'pulseRed 2.5s infinite',
-
-          transform:
-
-            hovered
-
-              ? 'translateY(-6px) scale(1.02)'
-
-              : 'translateY(0px) scale(1)',
-
-          cursor:
-            'pointer'
+          textTransform: 'uppercase'
 
         }}
 
       >
 
-        <h3
+        {props.title}
+
+      </div>
+
+
+      {/* VALUE */}
+
+      <div
+
+        style={{
+
+          display: 'flex',
+
+          alignItems: 'baseline',
+
+          gap: '6px',
+
+          marginBottom: '12px'
+
+        }}
+
+      >
+
+        <div
 
           style={{
 
-            fontSize: '14px',
+            fontSize: '31px',
 
-            letterSpacing: '2px',
-
-            color: '#b8c0cc',
-
-            marginBottom: '12px'
-
-          }}
-
-        >
-
-          {props.title}
-
-        </h3>
-
-        <h2
-
-          style={{
-
-            fontSize: '34px',
+            lineHeight: '1',
 
             fontWeight: '700',
 
-            marginBottom: '10px'
+            color: '#f4f7fb',
+
+            letterSpacing: '-0.5px'
 
           }}
 
@@ -156,134 +159,198 @@ function StatusCard(props) {
 
           {props.value}
 
-{
+        </div>
 
-  props.unit &&
 
-  ` ${props.unit}`
+        {
 
-}
+          props.unit && (
 
-        </h2>
+            <span
 
-        <div>
+              style={{
 
-<div>
+                fontSize: '12px',
 
-<p
+                color: '#8696aa',
 
-style={{
+                fontWeight: '600',
 
-color:
+                textTransform: 'uppercase'
 
-props.status
+              }}
 
-?
+            >
 
-'#00ff99'
+              {props.unit}
 
-:
+            </span>
 
-'#ff5c5c',
+          )
 
-fontSize:'13px',
+        }
 
-letterSpacing:'1px',
-
-marginBottom:'6px'
-
-}}
-
->
-
-{
-
-props.status
-
-?
-
-'NORMAL'
-
-:
-
-'LIMIT EXCEEDED'
-
-}
-
-</p>
-
-{
-
-props.subtitle && (
-
-<p
-
-style={{
-
-fontSize:'11px',
-
-color:'#e5ebf0',
-
-margin:0,
-
-letterSpacing:'2px'
-
-}}
-
->
-
-{
-
-props.subtitle
-
-}
-
-</p>
-
-)
-
-}
-
-</div>
-
-{
-
-props.limit && (
-
-<p
-
-style={{
-
-fontSize:'14px',
-
-color:'#e5ebf0',
-
-margin:0
-
-}}
-
->
-
-MAX
-
-{
-
-props.limit
-
-}
-
-kg
-
-</p>
-
-)
-
-}
-
-</div>
       </div>
-    </>
+
+
+      {/* STATUS */}
+
+      <div
+
+        style={{
+
+          display: 'flex',
+
+          alignItems: 'center',
+
+          gap: '7px',
+
+          marginBottom:
+            props.subtitle || props.limit
+              ? '8px'
+              : '0'
+
+        }}
+
+      >
+
+        <div
+
+          style={{
+
+            width: '7px',
+
+            height: '7px',
+
+            borderRadius: '50%',
+
+            background:
+              isNormal
+                ? '#4f8cff'
+                : '#ff5757',
+
+            boxShadow:
+              isNormal
+                ? '0 0 8px rgba(79,140,255,0.65)'
+                : '0 0 8px rgba(255,87,87,0.65)'
+
+          }}
+
+        />
+
+        <span
+
+          style={{
+
+            fontSize: '10px',
+
+            letterSpacing: '1.3px',
+
+            fontWeight: '700',
+
+            color:
+              isNormal
+                ? '#6ea0ff'
+                : '#ff7070'
+
+          }}
+
+        >
+
+          {
+            isNormal
+              ? 'NORMAL'
+              : 'LIMIT EXCEEDED'
+          }
+
+        </span>
+
+      </div>
+
+
+      {/* SUBTITLE */}
+
+      {
+
+        props.subtitle && (
+
+          <div
+
+            style={{
+
+              fontSize: '10px',
+
+              color: '#aeb9c8',
+
+              letterSpacing: '1px',
+
+              marginTop: '6px',
+
+              lineHeight: '1.4'
+
+            }}
+
+          >
+
+            {props.subtitle}
+
+          </div>
+
+        )
+
+      }
+
+
+      {/* LIMIT */}
+
+      {
+
+        props.limit && (
+
+          <div
+
+            style={{
+
+              marginTop: '7px',
+
+              paddingTop: '7px',
+
+              borderTop:
+                '1px solid rgba(255,255,255,0.06)',
+
+              fontSize: '10px',
+
+              color: '#7f8da0',
+
+              letterSpacing: '0.8px'
+
+            }}
+
+          >
+
+            MAX&nbsp;
+
+            <span
+              style={{
+                color: '#b9c4d3',
+                fontWeight: '600'
+              }}
+            >
+
+              {props.limit} kg
+
+            </span>
+
+          </div>
+
+        )
+
+      }
+
+    </div>
+
   )
+
 }
 
 export default StatusCard

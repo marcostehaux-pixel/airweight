@@ -23,7 +23,8 @@ function SeatMap(props) {
 
     <div
       style={{
-        backgroundColor: '#1f1f1f',
+        background:
+  'linear-gradient(145deg, rgba(8,24,44,0.94), rgba(5,16,31,0.94))',
         position: 'relative',
         padding: '20px',
         borderRadius: '15px',

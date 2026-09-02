@@ -1345,24 +1345,31 @@ return (
   <div
 
     style={{
+  minHeight: '100vh',
+  display: 'flex',
 
-      minHeight: '100vh',
+  background: `
+    radial-gradient(
+      circle at 78% 12%,
+      rgba(21,101,255,0.13) 0%,
+      rgba(21,101,255,0.05) 22%,
+      transparent 42%
+    ),
+    radial-gradient(
+      circle at 45% 85%,
+      rgba(35,78,125,0.10) 0%,
+      transparent 38%
+    ),
+    linear-gradient(
+      135deg,
+      #061426 0%,
+      #08182c 48%,
+      #050f1d 100%
+    )
+  `,
 
-      display: 'flex',
-     background:
-`
-linear-gradient(
-rgba(10,10,15,0.88),
-rgba(20,20,30,0.92)
-),
-url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05')
-`,
-
-backgroundSize: 'cover',
-
-backgroundPosition: 'center', 
-
-    }}
+  backgroundAttachment: 'fixed',
+}}
 
   >
 {/* SIDEBAR */}
@@ -1719,10 +1726,13 @@ padding:'40px',
 borderRadius:'20px',
 
 background:
-'rgba(255,255,255,0.03)',
+'linear-gradient(145deg, rgba(8,24,44,0.96), rgba(5,16,31,0.96))',
 
 border:
 '1px solid rgba(255,255,255,0.08)',
+
+boxShadow:
+'0 12px 35px rgba(0,0,0,0.20)',
 
 textAlign:'center'
 
@@ -1730,26 +1740,68 @@ textAlign:'center'
 
 >
 
-<h1
+{/* HEADER */}
+
+<div
 style={{
-
-color:'#00ff88',
-
-marginBottom:'12px'
-
+marginBottom:'28px'
 }}
-
 >
 
-B737-800 CF
+<div
+style={{
+fontSize:'12px',
+letterSpacing:'2.5px',
+fontWeight:'700',
+color:'#4f8cff',
+marginBottom:'8px'
+}}
+>
+OPERDAT · CARGO OPERATIONS
+</div>
 
+<h1
+style={{
+color:'#f4f7fb',
+margin:'0 0 8px 0',
+fontSize:'38px',
+fontWeight:'700',
+letterSpacing:'-0.5px'
+}}
+>
+B737-800 CF
 </h1>
+
+<div
+style={{
+fontSize:'14px',
+color:'#8fa0b7',
+letterSpacing:'0.5px'
+}}
+>
+Cargo Weight & Balance Module
+</div>
+
+</div>
+
+
+{/* AIRCRAFT SELECTOR + CLEAR */}
+
+<div
+style={{
+display:'flex',
+justifyContent:'center',
+alignItems:'center',
+gap:'12px',
+marginBottom:'28px',
+flexWrap:'wrap'
+}}
+>
+
 <select
 
 value={
-
 selectedCargoAircraft.registration
-
 }
 
 onChange={(e)=>{
@@ -1772,11 +1824,24 @@ e.target.value
 
 style={{
 
-padding:'12px',
+padding:'11px 16px',
 
-borderRadius:'12px',
+borderRadius:'9px',
 
-marginBottom:'20px'
+background:'#08182c',
+
+color:'#f4f7fb',
+
+border:
+'1px solid rgba(21,101,255,0.30)',
+
+fontSize:'13px',
+
+fontWeight:'600',
+
+cursor:'pointer',
+
+outline:'none'
 
 }}
 
@@ -1810,35 +1875,34 @@ value={a.registration}
 
 </select>
 
+
 <button
 
 onClick={
-
 clearCargo
-
 }
 
 style={{
 
-marginBottom:'30px',
-
 padding:'10px 18px',
 
-borderRadius:'10px',
+borderRadius:'9px',
 
 border:
-
-'1px solid rgba(95, 255, 80, 0.2)',
+'1px solid rgba(255,90,90,0.28)',
 
 background:
+'rgba(255,70,70,0.06)',
 
-'rgba(12, 169, 117, 0.08)',
-
-color:'#ff6666',
+color:'#ff7a7a',
 
 cursor:'pointer',
 
-fontWeight:'700'
+fontWeight:'700',
+
+fontSize:'11px',
+
+letterSpacing:'0.8px'
 
 }}
 
@@ -1847,22 +1911,11 @@ fontWeight:'700'
 CLEAR ALL
 
 </button>
-<div
-style={{
-
-fontSize:'18px',
-
-color:'#b8c0cc',
-
-marginBottom:'30px'
-
-}}
-
->
-
-Cargo Weight & Balance Module
 
 </div>
+
+
+{/* FLIGHT INFORMATION */}
 
 <div
 style={{
@@ -1871,23 +1924,37 @@ display:'flex',
 
 justifyContent:'center',
 
-gap:'40px',
+gap:'26px',
 
-marginBottom:'25px',
+marginBottom:'22px',
 
-fontSize:'15px',
+fontSize:'13px',
 
-color:'#b8c0cc',
+color:'#8fa0b7',
 
-flexWrap:'wrap'
+flexWrap:'wrap',
+
+alignItems:'flex-start'
 
 }}
 
 >
 
+{/* FROM */}
+
 <div>
 
-<b>FROM</b><br/>
+<div
+style={{
+fontSize:'10px',
+letterSpacing:'1.3px',
+marginBottom:'6px',
+fontWeight:'700',
+color:'#7f8da0'
+}}
+>
+FROM
+</div>
 
 <input
 
@@ -1905,23 +1972,48 @@ e.target.value.toUpperCase()
 
 style={{
 
-width:'80px',
+width:'82px',
 
 textAlign:'center',
 
-padding:'6px',
+padding:'8px',
 
-borderRadius:'6px'
+borderRadius:'7px',
+
+background:
+'rgba(255,255,255,0.04)',
+
+border:
+'1px solid rgba(255,255,255,0.10)',
+
+color:'#f4f7fb',
+
+fontWeight:'700',
+
+outline:'none'
 
 }}
 
- />
+/>
 
 </div>
 
+
+{/* TO */}
+
 <div>
 
-<b>TO</b><br/>
+<div
+style={{
+fontSize:'10px',
+letterSpacing:'1.3px',
+marginBottom:'6px',
+fontWeight:'700',
+color:'#7f8da0'
+}}
+>
+TO
+</div>
 
 <input
 
@@ -1939,23 +2031,48 @@ e.target.value.toUpperCase()
 
 style={{
 
-width:'80px',
+width:'82px',
 
 textAlign:'center',
 
-padding:'6px',
+padding:'8px',
 
-borderRadius:'6px'
+borderRadius:'7px',
+
+background:
+'rgba(255,255,255,0.04)',
+
+border:
+'1px solid rgba(255,255,255,0.10)',
+
+color:'#f4f7fb',
+
+fontWeight:'700',
+
+outline:'none'
 
 }}
 
- />
+/>
 
 </div>
 
+
+{/* FLIGHT */}
+
 <div>
 
-<b>FLIGHT</b><br/>
+<div
+style={{
+fontSize:'10px',
+letterSpacing:'1.3px',
+marginBottom:'6px',
+fontWeight:'700',
+color:'#7f8da0'
+}}
+>
+FLIGHT
+</div>
 
 <input
 
@@ -1973,135 +2090,240 @@ e.target.value.toUpperCase()
 
 style={{
 
-width:'100px',
+width:'105px',
 
 textAlign:'center',
 
-padding:'6px',
+padding:'8px',
 
-borderRadius:'6px'
+borderRadius:'7px',
+
+background:
+'rgba(255,255,255,0.04)',
+
+border:
+'1px solid rgba(255,255,255,0.10)',
+
+color:'#f4f7fb',
+
+fontWeight:'700',
+
+outline:'none'
 
 }}
 
- />
+/>
 
 </div>
+
+
+{/* WEATHER */}
+
 <div
-  style={{
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    minWidth: '300px',
-    maxWidth: '420px',
-    fontSize: '14px',
-    lineHeight: '1.35'
-  }}
->
-  <div>
-    <span
-      style={{
-        color: '#00ff88',
-        fontWeight: '700'
-      }}
-    >
-      DEP {cargoFlightFrom || '----'}:
-    </span>{' '}
-    <span style={{color:'#b8c0cc'}}>
-      {cargoMetarFrom || '---'}
-    </span>
-  </div>
 
-  <div style={{marginTop:'4px'}}>
-    <span
-      style={{
-        color: '#00ff88',
-        fontWeight: '700'
-      }}
-    >
-      ARR {cargoFlightTo || '----'}:
-    </span>{' '}
-    <span style={{color:'#b8c0cc'}}>
-      {cargoMetarTo || '---'}
-    </span>
-  </div>
-</div>
+style={{
+
+minWidth:'320px',
+
+maxWidth:'440px',
+
+textAlign:'left',
+
+padding:'10px 14px',
+
+borderRadius:'10px',
+
+background:
+'rgba(255,255,255,0.025)',
+
+border:
+'1px solid rgba(255,255,255,0.06)',
+
+fontSize:'12px',
+
+lineHeight:'1.45'
+
+}}
+
+>
+
 <div>
-<div
-  style={{
-    display: 'flex',
-    justifyContent: 'center',
-    marginBottom: '25px'
-  }}
+
+<span
+style={{
+color:'#4f8cff',
+fontWeight:'700'
+}}
 >
+DEP {cargoFlightFrom || '----'}:
+</span>{' '}
 
-  <button
-    onClick={saveCurrentFreighterFlight}
-
-    style={{
-      padding: '10px 22px',
-
-      borderRadius: '10px',
-
-      border:
-        '1px solid rgba(0,255,140,0.35)',
-
-      background:
-        'rgba(0,255,140,0.10)',
-
-      color: '#00ff88',
-
-      fontWeight: '700',
-
-      cursor: 'pointer',
-
-      letterSpacing: '0.5px'
-    }}
-  >
-
-    {activeFreighterFlightId
-      ? 'UPDATE FLIGHT'
-      : 'SAVE FLIGHT'}
-
-  </button>
-<button
-  onClick={newFreighterFlight}
-
-  style={{
-    padding: '10px 22px',
-    borderRadius: '10px',
-
-    border:
-      '1px solid rgba(255,255,255,0.18)',
-
-    background:
-      'rgba(255,255,255,0.05)',
-
-    color: '#b8c0cc',
-
-    fontWeight: '700',
-
-    cursor: 'pointer',
-
-    letterSpacing: '0.5px'
-  }}
+<span
+style={{
+color:'#aeb9c8'
+}}
 >
-  NEW FLIGHT
-</button>
+{cargoMetarFrom || '---'}
+</span>
+
 </div>
 
-<b>UTC</b><br/>
+
+<div
+style={{
+marginTop:'5px'
+}}
+>
+
+<span
+style={{
+color:'#4f8cff',
+fontWeight:'700'
+}}
+>
+ARR {cargoFlightTo || '----'}:
+</span>{' '}
+
+<span
+style={{
+color:'#aeb9c8'
+}}
+>
+{cargoMetarTo || '---'}
+</span>
+
+</div>
+
+</div>
+
+</div>
+
+
+{/* ACTIONS */}
+
+<div
+style={{
+display:'flex',
+justifyContent:'center',
+gap:'10px',
+marginBottom:'18px',
+flexWrap:'wrap'
+}}
+>
+
+<button
+
+onClick={saveCurrentFreighterFlight}
+
+style={{
+
+padding:'10px 22px',
+
+borderRadius:'9px',
+
+border:
+'1px solid rgba(21,101,255,0.42)',
+
+background:
+'rgba(21,101,255,0.15)',
+
+color:'#75a5ff',
+
+fontWeight:'700',
+
+cursor:'pointer',
+
+letterSpacing:'0.7px',
+
+fontSize:'11px'
+
+}}
+
+>
+
+{activeFreighterFlightId
+? 'UPDATE FLIGHT'
+: 'SAVE FLIGHT'}
+
+</button>
+
+
+<button
+
+onClick={newFreighterFlight}
+
+style={{
+
+padding:'10px 22px',
+
+borderRadius:'9px',
+
+border:
+'1px solid rgba(255,255,255,0.12)',
+
+background:
+'rgba(255,255,255,0.04)',
+
+color:'#aeb9c8',
+
+fontWeight:'700',
+
+cursor:'pointer',
+
+letterSpacing:'0.7px',
+
+fontSize:'11px'
+
+}}
+
+>
+
+NEW FLIGHT
+
+</button>
+
+</div>
+
+
+{/* UTC */}
+
+<div
+style={{
+marginBottom:'28px',
+fontSize:'11px',
+letterSpacing:'1.2px',
+color:'#7f8da0'
+}}
+>
+
+<span
+style={{
+fontWeight:'700',
+color:'#aeb9c8'
+}}
+>
+UTC
+</span>
+
+&nbsp;·&nbsp;
+
 {
 new Date().toLocaleTimeString(
+
 'en-GB',
+
 {
+
 timeZone:'UTC',
+
 hour:'2-digit',
+
 minute:'2-digit'
+
 }
+
 ) + 'Z'
 }
-</div>
 
 </div>
 <div
@@ -4118,7 +4340,7 @@ padding:'15px',
 borderRadius:'12px',
 
 background:
-'rgba(255,255,255,0.04)',
+'linear-gradient(145deg, rgba(8,24,44,0.94), rgba(5,16,31,0.94))',
 
 display:'flex',
 
@@ -4421,7 +4643,7 @@ AIRCRAFT DATA
 
 style={{
 
-color:'#ccc0b8',
+color: '#4f8cff',
 
 marginBottom:'30px'
 
@@ -5834,20 +6056,13 @@ searchTaf ||
 </div>
 
     <p
-
-      style={{
-
-        color: '#b8c0cc',
-
-        marginBottom: '30px'
-
-      }}
-
-    >
-
-      Generate operational loadsheet PDF.
-
-    </p>
+  style={{
+    color: '#4f8cff',
+    marginBottom: '30px'
+  }}
+>
+  Generate operational loadsheet PDF.
+</p>
 
     <div
 
@@ -6376,66 +6591,128 @@ aftInfants
     }}
   >
 
-    <h1
-      style={{
-        fontSize: '38px',
-        marginBottom: '5px'
-      }}
-    >
-      FLIGHT RECORDS
-    </h1>
+    {/* HEADER */}
 
-    <p
+    <div
       style={{
-        color: '#b8c0cc',
-        marginBottom: '30px'
+        marginBottom: '32px'
       }}
     >
-      Last 10 Freighter operations
-    </p>
+
+      <div
+        style={{
+          color: '#4f8cff',
+          fontSize: '12px',
+          fontWeight: '700',
+          letterSpacing: '2.5px',
+          marginBottom: '8px'
+        }}
+      >
+        OPERDAT · OPERATIONS
+      </div>
+
+      <h1
+        style={{
+          fontSize: '38px',
+          margin: 0,
+          fontWeight: '700',
+          letterSpacing: '-0.5px'
+        }}
+      >
+        FLIGHT RECORDS
+      </h1>
+
+      <p
+        style={{
+          color: '#8fa0b7',
+          marginTop: '8px',
+          marginBottom: 0,
+          fontSize: '14px'
+        }}
+      >
+        Recent freighter operational records
+      </p>
+
+    </div>
+
+
+    {/* EMPTY STATE */}
 
     {cargoFlightRecords.length === 0 && (
 
       <div
         style={{
-          padding: '30px',
+          padding: '50px 30px',
           borderRadius: '16px',
+
           background:
-            'rgba(255,255,255,0.03)',
-          color: '#777',
-          textAlign: 'center'
+            'linear-gradient(145deg, rgba(10,28,50,0.92), rgba(5,17,32,0.92))',
+
+          border:
+            '1px solid rgba(255,255,255,0.08)',
+
+          color: '#7f8da0',
+
+          textAlign: 'center',
+
+          boxShadow:
+            '0 10px 30px rgba(0,0,0,0.18)'
         }}
       >
-        No flight records
+
+        <div
+          style={{
+            fontSize: '13px',
+            letterSpacing: '1.5px',
+            fontWeight: '600'
+          }}
+        >
+          NO FLIGHT RECORDS AVAILABLE
+        </div>
+
       </div>
 
     )}
+
+
+    {/* FLIGHT RECORDS */}
 
     {cargoFlightRecords.map(
       flight => (
 
         <div
           key={flight.id}
+
           style={{
             marginBottom: '14px',
-            padding: '18px',
 
-            borderRadius: '14px',
+            padding: '20px 22px',
+
+            borderRadius: '16px',
 
             background:
-              'rgba(255,255,255,0.04)',
+              'linear-gradient(145deg, rgba(10,28,50,0.94), rgba(5,17,32,0.94))',
 
             border:
-              '1px solid rgba(255,255,255,0.08)'
+              '1px solid rgba(255,255,255,0.08)',
+
+            boxShadow:
+              '0 8px 24px rgba(0,0,0,0.18)'
           }}
         >
+
+          {/* FLIGHT HEADER */}
 
           <div
             style={{
               display: 'flex',
+
               justifyContent:
                 'space-between',
-              alignItems: 'center'
+
+              alignItems: 'center',
+
+              gap: '20px'
             }}
           >
 
@@ -6443,189 +6720,445 @@ aftInfants
 
               <strong
                 style={{
-                  fontSize: '18px'
+                  fontSize: '20px',
+                  color: '#f4f7fb',
+                  letterSpacing: '0.5px'
                 }}
               >
                 {flight.flightNumber}
               </strong>
 
+
               <div
                 style={{
-                  color: '#b8c0cc',
-                  marginTop: '4px'
+                  color: '#8fa0b7',
+
+                  marginTop: '5px',
+
+                  fontSize: '13px'
                 }}
               >
+
                 {flight.from}
-                {' → '}
+
+                <span
+                  style={{
+                    color: '#4f8cff',
+                    margin: '0 8px'
+                  }}
+                >
+                  →
+                </span>
+
                 {flight.to}
-                {' · '}
+
+                <span
+                  style={{
+                    color: '#556579',
+                    margin: '0 8px'
+                  }}
+                >
+                  ·
+                </span>
+
                 {flight.registration}
+
               </div>
 
             </div>
 
+
+            {/* STATUS */}
+
             <div
               style={{
-                color:
-                  flight.status === 'OPEN'
-                    ? '#00ff88'
-                    : '#888',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
 
-                fontWeight: '700'
+                padding: '6px 10px',
+
+                borderRadius: '20px',
+
+                background:
+                  flight.status === 'OPEN'
+                    ? 'rgba(21,101,255,0.12)'
+                    : 'rgba(255,255,255,0.05)',
+
+                border:
+                  flight.status === 'OPEN'
+                    ? '1px solid rgba(21,101,255,0.28)'
+                    : '1px solid rgba(255,255,255,0.08)'
               }}
             >
-              {flight.status}
+
+              <div
+                style={{
+                  width: '7px',
+
+                  height: '7px',
+
+                  borderRadius: '50%',
+
+                  background:
+                    flight.status === 'OPEN'
+                      ? '#4f8cff'
+                      : '#778395',
+
+                  boxShadow:
+                    flight.status === 'OPEN'
+                      ? '0 0 8px rgba(79,140,255,0.60)'
+                      : 'none'
+                }}
+              />
+
+              <span
+                style={{
+                  color:
+                    flight.status === 'OPEN'
+                      ? '#6ea0ff'
+                      : '#8d99aa',
+
+                  fontSize: '10px',
+
+                  fontWeight: '700',
+
+                  letterSpacing: '1.3px'
+                }}
+              >
+                {flight.status}
+              </span>
+
             </div>
 
           </div>
+
+
+          {/* WEIGHTS */}
 
           <div
             style={{
               display: 'grid',
 
               gridTemplateColumns:
-                'repeat(3,1fr)',
+                'repeat(3, minmax(120px, 1fr))',
 
               gap: '12px',
 
-              marginTop: '18px',
-
-              fontSize: '13px'
+              marginTop: '20px'
             }}
           >
 
-            <div>
-              ZFW
-              <strong>
-                {' '}
+            {/* ZFW */}
+
+            <div
+              style={{
+                padding: '12px 14px',
+
+                borderRadius: '10px',
+
+                background:
+                  'rgba(255,255,255,0.025)',
+
+                border:
+                  '1px solid rgba(255,255,255,0.05)'
+              }}
+            >
+
+              <div
+                style={{
+                  color: '#7f8da0',
+
+                  fontSize: '10px',
+
+                  letterSpacing: '1.4px',
+
+                  marginBottom: '5px'
+                }}
+              >
+                ZFW
+              </div>
+
+              <strong
+                style={{
+                  fontSize: '16px',
+                  color: '#eaf0f7'
+                }}
+              >
                 {Number(
                   flight.zfw
-                ).toFixed(0)} kg
+                ).toFixed(0)}
               </strong>
+
+              <span
+                style={{
+                  marginLeft: '5px',
+
+                  fontSize: '10px',
+
+                  color: '#7f8da0'
+                }}
+              >
+                KG
+              </span>
+
             </div>
 
-            <div>
-              TOW
-              <strong>
-                {' '}
+
+            {/* TOW */}
+
+            <div
+              style={{
+                padding: '12px 14px',
+
+                borderRadius: '10px',
+
+                background:
+                  'rgba(255,255,255,0.025)',
+
+                border:
+                  '1px solid rgba(255,255,255,0.05)'
+              }}
+            >
+
+              <div
+                style={{
+                  color: '#7f8da0',
+
+                  fontSize: '10px',
+
+                  letterSpacing: '1.4px',
+
+                  marginBottom: '5px'
+                }}
+              >
+                TOW
+              </div>
+
+              <strong
+                style={{
+                  fontSize: '16px',
+                  color: '#eaf0f7'
+                }}
+              >
                 {Number(
                   flight.tow
-                ).toFixed(0)} kg
+                ).toFixed(0)}
               </strong>
+
+              <span
+                style={{
+                  marginLeft: '5px',
+
+                  fontSize: '10px',
+
+                  color: '#7f8da0'
+                }}
+              >
+                KG
+              </span>
+
             </div>
 
-            <div>
-              LW
-              <strong>
-                {' '}
+
+            {/* LW */}
+
+            <div
+              style={{
+                padding: '12px 14px',
+
+                borderRadius: '10px',
+
+                background:
+                  'rgba(255,255,255,0.025)',
+
+                border:
+                  '1px solid rgba(255,255,255,0.05)'
+              }}
+            >
+
+              <div
+                style={{
+                  color: '#7f8da0',
+
+                  fontSize: '10px',
+
+                  letterSpacing: '1.4px',
+
+                  marginBottom: '5px'
+                }}
+              >
+                LW
+              </div>
+
+              <strong
+                style={{
+                  fontSize: '16px',
+                  color: '#eaf0f7'
+                }}
+              >
                 {Number(
                   flight.lw
-                ).toFixed(0)} kg
+                ).toFixed(0)}
               </strong>
+
+              <span
+                style={{
+                  marginLeft: '5px',
+
+                  fontSize: '10px',
+
+                  color: '#7f8da0'
+                }}
+              >
+                KG
+              </span>
+
             </div>
 
           </div>
 
+
+          {/* OPEN FLIGHT ACTIONS */}
+
           {flight.status === 'OPEN' && (
 
-  <div
-    style={{
-      display: 'flex',
-      gap: '10px',
-      marginTop: '18px'
-    }}
-  >
+            <div
+              style={{
+                display: 'flex',
 
-    <button
-     onClick={() =>
-  openFreighterFlight(flight.id)
-}
+                gap: '10px',
 
-      style={{
-        padding: '8px 14px',
+                marginTop: '18px',
 
-        borderRadius: '8px',
+                paddingTop: '16px',
 
-        border:
-          '1px solid rgba(0,255,140,0.35)',
+                borderTop:
+                  '1px solid rgba(255,255,255,0.06)'
+              }}
+            >
 
-        background:
-          'rgba(0,255,140,0.10)',
+              <button
+                onClick={() =>
+                  openFreighterFlight(
+                    flight.id
+                  )
+                }
 
-        color: '#00ff88',
+                style={{
+                  padding: '9px 16px',
 
-        fontWeight: '700',
+                  borderRadius: '8px',
 
-        cursor: 'pointer'
-      }}
-    >
-      OPEN FLIGHT
-    </button>
+                  border:
+                    '1px solid rgba(21,101,255,0.45)',
+
+                  background:
+                    'rgba(21,101,255,0.16)',
+
+                  color: '#75a5ff',
+
+                  fontSize: '11px',
+
+                  letterSpacing: '0.8px',
+
+                  fontWeight: '700',
+
+                  cursor: 'pointer'
+                }}
+              >
+                OPEN FLIGHT
+              </button>
 
 
-    <button
-      onClick={() =>
-        closeFreighterFlight(
-          flight.id
-        )
-      }
+              <button
+                onClick={() =>
+                  closeFreighterFlight(
+                    flight.id
+                  )
+                }
 
-      style={{
-        padding: '8px 14px',
+                style={{
+                  padding: '9px 16px',
 
-        borderRadius: '8px',
+                  borderRadius: '8px',
 
-        border:
-          '1px solid rgba(255,255,255,0.15)',
+                  border:
+                    '1px solid rgba(255,255,255,0.12)',
 
-        background:
-          'rgba(255,255,255,0.04)',
+                  background:
+                    'rgba(255,255,255,0.04)',
 
-        color: '#b8c0cc',
+                  color: '#aeb9c8',
 
-        fontWeight: '700',
+                  fontSize: '11px',
 
-        cursor: 'pointer'
-      }}
-    >
-      CLOSE FLIGHT
-    </button>
+                  letterSpacing: '0.8px',
 
-  </div>
+                  fontWeight: '700',
 
-)}
-{flight.status === 'CLOSED' && (
+                  cursor: 'pointer'
+                }}
+              >
+                CLOSE FLIGHT
+              </button>
 
-  <button
-    onClick={() =>
-      printClosedFreighterFlight(
-        flight
-      )
-    }
+            </div>
 
-    style={{
-      marginTop: '18px',
-      padding: '8px 14px',
+          )}
 
-      borderRadius: '8px',
 
-      border:
-        '1px solid rgba(0,255,140,0.35)',
+          {/* CLOSED FLIGHT */}
 
-      background:
-        'rgba(0,255,140,0.10)',
+          {flight.status === 'CLOSED' && (
 
-      color: '#00ff88',
+            <div
+              style={{
+                marginTop: '18px',
 
-      fontWeight: '700',
+                paddingTop: '16px',
 
-      cursor: 'pointer'
-    }}
-  >
-    GENERATE PDF
-  </button>
+                borderTop:
+                  '1px solid rgba(255,255,255,0.06)'
+              }}
+            >
 
-)}
+              <button
+                onClick={() =>
+                  printClosedFreighterFlight(
+                    flight
+                  )
+                }
+
+                style={{
+                  padding: '9px 16px',
+
+                  borderRadius: '8px',
+
+                  border:
+                    '1px solid rgba(21,101,255,0.40)',
+
+                  background:
+                    'rgba(21,101,255,0.12)',
+
+                  color: '#75a5ff',
+
+                  fontSize: '11px',
+
+                  letterSpacing: '0.8px',
+
+                  fontWeight: '700',
+
+                  cursor: 'pointer'
+                }}
+              >
+                GENERATE PDF
+              </button>
+
+            </div>
+
+          )}
+
         </div>
 
       )
