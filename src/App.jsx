@@ -910,9 +910,9 @@ const [cargoFlightRecords, setCargoFlightRecords] =
   useState(() => {
 
     const saved =
-      localStorage.getItem(
-        'airweightFreighterFlights'
-      )
+  localStorage.getItem(
+    'operdatFreighterFlights'
+  )
 
     return saved
       ? JSON.parse(saved)
@@ -921,7 +921,7 @@ const [cargoFlightRecords, setCargoFlightRecords] =
   useEffect(() => {
 
   localStorage.setItem(
-    'airweightFreighterFlights',
+    'operdatFreighterFlights',
     JSON.stringify(cargoFlightRecords)
   )
 
@@ -1365,579 +1365,346 @@ backgroundPosition: 'center',
     }}
 
   >
+{/* SIDEBAR */}
 
-    {/* SIDEBAR */}
+<div
+  style={{
+    width: '250px',
+    minHeight: '100vh',
+    background: 'rgba(5, 16, 33, 0.94)',
+    boxShadow: '8px 0 35px rgba(0,0,0,0.28)',
+    backdropFilter: 'blur(16px)',
+    borderRight: '1px solid rgba(255,255,255,0.07)',
+    padding: '28px 22px',
+    display: 'flex',
+    flexDirection: 'column'
+  }}
+>
+
+  {/* LOGO */}
+
+  <div
+    style={{
+      marginBottom: '38px',
+      textAlign: 'center'
+    }}
+  >
+    <img
+      src={logo}
+      alt="OPERDAT Logo"
+      style={{
+        width: '185px',
+        maxWidth: '100%',
+        objectFit: 'contain'
+      }}
+    />
 
     <div
       style={{
-        width: '250px',
-        background:'rgba(255,255,255,0.04)',
-boxShadow:
-'0 0 40px rgba(0,0,0,0.35)',
-
-backdropFilter:
-'blur(14px)',
-
-borderRight:
-'1px solid rgba(255,255,255,0.08)',
-        padding: '30px',
-        borderRight: '1px solid #333'
+        marginTop: '8px',
+        fontSize: '9px',
+        letterSpacing: '2px',
+        color: '#7f91aa',
+        fontWeight: '600'
       }}
     >
-
-      <h1
-        style={{
-          fontSize: '28px',
-          marginBottom: '40px'
-        }}
-      ><img
-  src={logo}
-  alt="AIRWEIGHT Logo"
-  style={{
-    width: '180px',
-    marginBottom: '20px'
-  }}
-/>
-        AIRWEIGHT
-      </h1>
-
-    {userRole !== 'freighter' && (
-<div
-  onClick={() =>
-    setActiveMenu('Dashboard')
-  }
-
-  style={{
-
-    marginBottom: '20px',
-
-    padding: '12px 16px',
-
-    borderRadius: '12px',
-
-    background:
-      activeMenu === 'Dashboard'
-        ? 'rgba(0,255,140,0.12)'
-        : 'rgba(255,255,255,0.03)',
-
-    border:
-      activeMenu === 'Dashboard'
-        ? '1px solid rgba(0,255,140,0.25)'
-        : '1px solid transparent',
-
-    boxShadow:
-      activeMenu === 'Dashboard'
-        ? '0 0 25px rgba(0,255,140,0.15)'
-        : 'none',
-
-    transition:
-      'all 0.3s ease',
-transform:
-  activeMenu === 'Dashboard'
-    ? 'translateX(6px)'
-    : 'translateX(0px)',
-    cursor: 'pointer',
-
-    transition:
-     'all 0.3s ease',
-
-    boxShadow:
-    '0 0 25px rgba(0,255,140,0.20)',
-  }}
-
->
-
-  Passenger
-
-</div>
-)}
-{(userRole === 'freighter' || userRole === 'admin') && (
-
-  <div
-    onClick={() =>
-      setActiveMenu('Flight Records')
-    }
-
-    onMouseEnter={(e) => {
-
-      if (activeMenu !== 'Flight Records') {
-
-        e.currentTarget.style.transform =
-          'translateX(4px)'
-
-        e.currentTarget.style.boxShadow =
-          '0 0 18px rgba(255,255,255,0.08)'
-      }
-
-    }}
-
-    onMouseLeave={(e) => {
-
-      if (activeMenu !== 'Flight Records') {
-
-        e.currentTarget.style.transform =
-          'translateX(0px)'
-
-        e.currentTarget.style.boxShadow =
-          'none'
-      }
-
-    }}
-
-    style={{
-      marginBottom: '20px',
-      padding: '12px 16px',
-      borderRadius: '12px',
-
-      background:
-        activeMenu === 'Flight Records'
-          ? 'rgba(0,255,140,0.12)'
-          : 'rgba(255,255,255,0.03)',
-
-      border:
-        activeMenu === 'Flight Records'
-          ? '1px solid rgba(0,255,140,0.25)'
-          : '1px solid transparent',
-
-      boxShadow:
-        activeMenu === 'Flight Records'
-          ? '0 0 25px rgba(0,255,140,0.15)'
-          : 'none',
-
-      transition: 'all 0.3s ease',
-      cursor: 'pointer'
-    }}
-  >
-    Flight Records
+      FLIGHT OPERATIONS PLATFORM
+    </div>
   </div>
 
-)}
-{userRole !== 'student' && (
-<div
-onClick={()=>
-setActiveMenu('FreighterLoadsheet')
-}
 
-style={{
-marginBottom:'20px',
-padding:'12px 16px',
-borderRadius:'12px',
+  {/* PASSENGER */}
+
+  {userRole !== 'freighter' && (
+    <div
+      onClick={() => setActiveMenu('Dashboard')}
+      style={{
+        marginBottom: '10px',
+        padding: '12px 15px',
+        borderRadius: '9px',
+        background:
+          activeMenu === 'Dashboard'
+            ? 'rgba(21,101,255,0.16)'
+            : 'transparent',
+        border:
+          activeMenu === 'Dashboard'
+            ? '1px solid rgba(21,101,255,0.40)'
+            : '1px solid transparent',
+        color:
+          activeMenu === 'Dashboard'
+            ? '#ffffff'
+            : '#b9c4d3',
+        fontWeight: activeMenu === 'Dashboard' ? '700' : '500',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        boxShadow:
+          activeMenu === 'Dashboard'
+            ? '0 0 20px rgba(21,101,255,0.12)'
+            : 'none'
+      }}
+    >
+      Passenger
+    </div>
+  )}
+
+
+  {/* FLIGHT RECORDS */}
+
+  {(userRole === 'freighter' || userRole === 'admin') && (
+    <div
+      onClick={() => setActiveMenu('Flight Records')}
+      style={{
+        marginBottom: '10px',
+        padding: '12px 15px',
+        borderRadius: '9px',
+        background:
+          activeMenu === 'Flight Records'
+            ? 'rgba(21,101,255,0.16)'
+            : 'transparent',
+        border:
+          activeMenu === 'Flight Records'
+            ? '1px solid rgba(21,101,255,0.40)'
+            : '1px solid transparent',
+        color:
+          activeMenu === 'Flight Records'
+            ? '#ffffff'
+            : '#b9c4d3',
+        fontWeight:
+          activeMenu === 'Flight Records'
+            ? '700'
+            : '500',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease'
+      }}
+    >
+      Flight Records
+    </div>
+  )}
+
+
+  {/* FREIGHTER LOADSHEET */}
+
+  {userRole !== 'student' && (
+    <div
+      onClick={() =>
+        setActiveMenu('FreighterLoadsheet')
+      }
+      style={{
+        marginBottom: '10px',
+        padding: '12px 15px',
+        borderRadius: '9px',
+        background:
+          activeMenu === 'FreighterLoadsheet'
+            ? 'rgba(21,101,255,0.16)'
+            : 'transparent',
+        border:
+          activeMenu === 'FreighterLoadsheet'
+            ? '1px solid rgba(21,101,255,0.40)'
+            : '1px solid transparent',
+        color:
+          activeMenu === 'FreighterLoadsheet'
+            ? '#ffffff'
+            : '#b9c4d3',
+        fontWeight:
+          activeMenu === 'FreighterLoadsheet'
+            ? '700'
+            : '500',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease'
+      }}
+    >
+      Freighter Loadsheet
+    </div>
+  )}
+
+
+  {/* PASSENGER LOADSHEET */}
+
+  {userRole !== 'freighter' && (
+    <div
+      onClick={() => setActiveMenu('Loadsheet')}
+      style={{
+        marginBottom: '10px',
+        padding: '12px 15px',
+        borderRadius: '9px',
+        background:
+          activeMenu === 'Loadsheet'
+            ? 'rgba(21,101,255,0.16)'
+            : 'transparent',
+        border:
+          activeMenu === 'Loadsheet'
+            ? '1px solid rgba(21,101,255,0.40)'
+            : '1px solid transparent',
+        color:
+          activeMenu === 'Loadsheet'
+            ? '#ffffff'
+            : '#b9c4d3',
+        fontWeight:
+          activeMenu === 'Loadsheet'
+            ? '700'
+            : '500',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease'
+      }}
+    >
+      Passenger Loadsheet
+    </div>
+  )}
+
+
+  {/* FUEL */}
+
+  <div
+    onClick={() => setActiveMenu('Fuel')}
+    style={{
+      marginBottom: '10px',
+      padding: '12px 15px',
+      borderRadius: '9px',
+      background:
+        activeMenu === 'Fuel'
+          ? 'rgba(21,101,255,0.16)'
+          : 'transparent',
+      border:
+        activeMenu === 'Fuel'
+          ? '1px solid rgba(21,101,255,0.40)'
+          : '1px solid transparent',
+      color:
+        activeMenu === 'Fuel'
+          ? '#ffffff'
+          : '#b9c4d3',
+      fontWeight:
+        activeMenu === 'Fuel'
+          ? '700'
+          : '500',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease'
+    }}
+  >
+    Fuel Load
+  </div>
+
+
+  {/* AIRCRAFT */}
+
+  {userRole !== 'freighter' && (
+    <div
+      onClick={() => setActiveMenu('Aircraft')}
+      style={{
+        marginBottom: '10px',
+        padding: '12px 15px',
+        borderRadius: '9px',
+        background:
+          activeMenu === 'Aircraft'
+            ? 'rgba(21,101,255,0.16)'
+            : 'transparent',
+        border:
+          activeMenu === 'Aircraft'
+            ? '1px solid rgba(21,101,255,0.40)'
+            : '1px solid transparent',
+        color:
+          activeMenu === 'Aircraft'
+            ? '#ffffff'
+            : '#b9c4d3',
+        fontWeight:
+          activeMenu === 'Aircraft'
+            ? '700'
+            : '500',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease'
+      }}
+    >
+      Aircraft Data
+    </div>
+  )}
+
+
+  {/* SEAT MAP */}
+
+  {userRole !== 'freighter' && (
+    <div
+      onClick={() => setActiveMenu('Seat Map')}
+      style={{
+        marginBottom: '10px',
+        padding: '12px 15px',
+        borderRadius: '9px',
+        background:
+          activeMenu === 'Seat Map'
+            ? 'rgba(21,101,255,0.16)'
+            : 'transparent',
+        border:
+          activeMenu === 'Seat Map'
+            ? '1px solid rgba(21,101,255,0.40)'
+            : '1px solid transparent',
+        color:
+          activeMenu === 'Seat Map'
+            ? '#ffffff'
+            : '#b9c4d3',
+        fontWeight:
+          activeMenu === 'Seat Map'
+            ? '700'
+            : '500',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease'
+      }}
+    >
+      Seat Map
+    </div>
+  )}
+
+
+  {/* WEATHER */}
+
+  <div
+    onClick={() => setActiveMenu('Settings')}
+    style={{
+      marginBottom: '10px',
+      padding: '12px 15px',
+      borderRadius: '9px',
+      background:
+        activeMenu === 'Settings'
+          ? 'rgba(21,101,255,0.16)'
+          : 'transparent',
+      border:
+        activeMenu === 'Settings'
+          ? '1px solid rgba(21,101,255,0.40)'
+          : '1px solid transparent',
+      color:
+        activeMenu === 'Settings'
+          ? '#ffffff'
+          : '#b9c4d3',
+      fontWeight:
+        activeMenu === 'Settings'
+          ? '700'
+          : '500',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease'
+    }}
+  >
+    Weather Center
+  </div>
+
+
+  {/* SIGN OUT */}
+
+  <div
+    onClick={() => {
+      localStorage.removeItem('user')
+      window.location.reload()
+    }}
+    style={{
+      marginTop: 'auto',
+      padding: '12px 15px',
+      borderRadius: '9px',
+      background: 'rgba(255,255,255,0.035)',
+      border: '1px solid rgba(255,255,255,0.08)',
+      color: '#8f9bad',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease'
+    }}
+  >
+    Sign Out
+  </div>
 
-background:
-activeMenu==='FreighterLoadsheet'
-? 'rgba(0,255,140,0.12)'
-: 'rgba(255,255,255,0.03)',
-
-border:
-activeMenu==='FreighterLoadsheet'
-? '1px solid rgba(0,255,140,0.25)'
-: '1px solid transparent',
-
-cursor:'pointer'
-}}
-
->
-
-Freighter Loadheet
-
-</div>
-
-)}
-
-{userRole !== 'freighter' && (
-  
-<div
-
-  onClick={() =>
-    setActiveMenu('Loadsheet')
-  }
-onMouseEnter={(e) => {
-
-  if (activeMenu !== 'Dashboard') {
-
-    e.currentTarget.style.transform =
-      'translateX(4px)'
-
-    e.currentTarget.style.boxShadow =
-      '0 0 18px rgba(255,255,255,0.08)'
-
-  }
-
-}}
-
-onMouseLeave={(e) => {
-
-  if (activeMenu !== 'Dashboard') {
-
-    e.currentTarget.style.transform =
-      'translateX(0px)'
-
-    e.currentTarget.style.boxShadow =
-      'none'
-
-  }
-
-}}
-  style={{
-
-    marginBottom: '20px',
-
-    padding: '12px 16px',
-
-    borderRadius: '12px',
-
-    background:
-      activeMenu === 'Loadsheet'
-        ? 'rgba(0,255,140,0.12)'
-        : 'rgba(255,255,255,0.03)',
-
-    border:
-      activeMenu === 'Loadsheet'
-        ? '1px solid rgba(0,255,140,0.25)'
-        : '1px solid transparent',
-
-    boxShadow:
-      activeMenu === 'Loadsheet'
-        ? '0 0 25px rgba(0,255,140,0.15)'
-        : 'none',
-
-    transition:
-      'all 0.3s ease',
-transform:
-  activeMenu === 'Dashboard'
-    ? 'translateX(6px)'
-    : 'translateX(0px)',
-    cursor: 'pointer'
-
-  }}
-
->
-
-  Passenger Loadsheet
-
-</div>
-
-)}
-
-<div
-
-  onClick={() =>
-    setActiveMenu('Fuel')
-  }
-
-  onMouseEnter={(e) => {
-
-    if (activeMenu !== 'Fuel') {
-
-      e.currentTarget.style.transform =
-        'translateX(4px)'
-
-      e.currentTarget.style.boxShadow =
-        '0 0 18px rgba(255,255,255,0.08)'
-
-    }
-
-  }}
-
-  onMouseLeave={(e) => {
-
-    if (activeMenu !== 'Fuel') {
-
-      e.currentTarget.style.transform =
-        'translateX(0px)'
-
-      e.currentTarget.style.boxShadow =
-        'none'
-
-    }
-
-  }}
-
-  style={{
-
-    marginBottom: '20px',
-
-    padding: '12px 16px',
-
-    borderRadius: '12px',
-
-    background:
-      activeMenu === 'Fuel'
-        ? 'rgba(0,255,140,0.12)'
-        : 'rgba(255,255,255,0.03)',
-
-    border:
-      activeMenu === 'Fuel'
-        ? '1px solid rgba(0,255,140,0.25)'
-        : '1px solid transparent',
-
-    boxShadow:
-      activeMenu === 'Fuel'
-        ? '0 0 25px rgba(0,255,140,0.15)'
-        : 'none',
-
-    transition:
-      'all 0.3s ease',
-
-    cursor: 'pointer'
-
-  }}
-
->
-
-  Fuel Load
-
-</div>
-
-{userRole !== 'freighter' && (
-<div
-
-  onClick={() =>
-    setActiveMenu('Aircraft')
-  }
-onMouseEnter={(e) => {
-
-  if (activeMenu !== 'Dashboard') {
-
-    e.currentTarget.style.transform =
-      'translateX(4px)'
-
-    e.currentTarget.style.boxShadow =
-      '0 0 18px rgba(255,255,255,0.08)'
-
-  }
-
-}}
-
-onMouseLeave={(e) => {
-
-  if (activeMenu !== 'Dashboard') {
-
-    e.currentTarget.style.transform =
-      'translateX(0px)'
-
-    e.currentTarget.style.boxShadow =
-      'none'
-
-  }
-
-}}
-  style={{
-
-    marginBottom: '20px',
-
-    padding: '12px 16px',
-
-    borderRadius: '12px',
-
-    background:
-      activeMenu === 'Aircraft'
-        ? 'rgba(0,255,140,0.12)'
-        : 'rgba(255,255,255,0.03)',
-
-    border:
-      activeMenu === 'Aircraft'
-        ? '1px solid rgba(0,255,140,0.25)'
-        : '1px solid transparent',
-
-    boxShadow:
-      activeMenu === 'Aircraft'
-        ? '0 0 25px rgba(0,255,140,0.15)'
-        : 'none',
-
-    transition:
-      'all 0.3s ease',
-
-    cursor: 'pointer'
-
-  }}
-
->
-
-  Aircraft Data
-
-</div>
-)}
-{userRole !== 'freighter' && (
-<div
-
-  onClick={() =>
-    setActiveMenu('Seat Map')
-  }
-onMouseEnter={(e) => {
-
-  if (activeMenu !== 'Dashboard') {
-
-    e.currentTarget.style.transform =
-      'translateX(4px)'
-
-    e.currentTarget.style.boxShadow =
-      '0 0 18px rgba(255,255,255,0.08)'
-
-  }
-
-}}
-
-onMouseLeave={(e) => {
-
-  if (activeMenu !== 'Dashboard') {
-
-    e.currentTarget.style.transform =
-      'translateX(0px)'
-
-    e.currentTarget.style.boxShadow =
-      'none'
-
-  }
-
-}}
-  style={{
-
-    marginBottom: '20px',
-
-    padding: '12px 16px',
-
-    borderRadius: '12px',
-
-    background:
-      activeMenu === 'Seat Map'
-        ? 'rgba(0,255,140,0.12)'
-        : 'rgba(255,255,255,0.03)',
-
-    border:
-      activeMenu === 'Seat Map'
-        ? '1px solid rgba(0,255,140,0.25)'
-        : '1px solid transparent',
-
-    boxShadow:
-      activeMenu === 'Seat Map'
-        ? '0 0 25px rgba(0,255,140,0.15)'
-        : 'none',
-
-    transition:
-      'all 0.3s ease',
-
-    cursor: 'pointer'
-
-  }}
-
->
-
-  Seat Map
-
-</div>
-)}
-<div
-
-  onClick={() =>
-    setActiveMenu('Settings')
-    
-  }
-  
-onMouseEnter={(e) => {
-
-  if (activeMenu !== 'Dashboard') {
-
-    e.currentTarget.style.transform =
-      'translateX(4px)'
-
-    e.currentTarget.style.boxShadow =
-      '0 0 18px rgba(255,255,255,0.08)'
-
-  }
-
-}}
-
-onMouseLeave={(e) => {
-
-  if (activeMenu !== 'Aircraft') {
-
-    e.currentTarget.style.transform =
-      'translateX(0px)'
-
-    e.currentTarget.style.boxShadow =
-      'none'
-
-  }
-
-}}
-
-  style={{
-
-    marginBottom: '20px',
-
-    padding: '12px 16px',
-
-    borderRadius: '12px',
-
-    background:
-      activeMenu === 'Settings'
-        ? 'rgba(0,255,140,0.12)'
-        : 'rgba(255,255,255,0.03)',
-
-    border:
-      activeMenu === 'Settings'
-        ? '1px solid rgba(0,255,140,0.25)'
-        : '1px solid transparent',
-
-    boxShadow:
-      activeMenu === 'Settings'
-        ? '0 0 25px rgba(0,255,140,0.15)'
-        : 'none',
-
-    transition:
-      'all 0.3s ease',
-
-    cursor: 'pointer'
-
-  }}
-
->
-
-  Wather Center
-
-</div>
-<div
-
-onClick={()=>{
-
-localStorage.removeItem(
-
-'user'
-
-)
-
-window.location.reload()
-
-}}
-
-style={{
-
-marginTop:'auto',
-
-padding:'12px 16px',
-
-borderRadius:'12px',
-
-background:
-
-'rgba(255,80,80,0.08)',
-
-border:
-
-'1px solid rgba(255,80,80,0.15)',
-
-cursor:'pointer',
-
-transition:'0.3s'
-
-}}
-
->
-
-Sign Out
-
-</div>
 </div>
 {/* MAIN CONTENT */}
 {
@@ -5009,7 +4776,7 @@ kg
 
           style={{
 
-            color: '#00ff99',
+            color: '#4f8cff',
 
             letterSpacing: '3px',
 
@@ -5021,7 +4788,7 @@ kg
 
         >
 
-          AIRWEIGHT FLIGHT OPERATIONS
+          OPERDAT · FLIGHT OPERATIONS
 
         </p>
 
@@ -5169,7 +4936,7 @@ width:'120px'
     objectFit: 'contain',
 
     filter:
-      'drop-shadow(0 0 18px rgba(0,255,140,0.18))'
+    'drop-shadow(0 0 22px rgba(21,101,255,0.20))'
 
   }}
 
@@ -5191,7 +4958,7 @@ width:'120px'
         }}
 style={{
 
-background:'#141414',
+background:'#08182c',
 
 color:'#ffffff',
 
@@ -5205,7 +4972,7 @@ fontSize:'14px',
 
 cursor:'pointer',
 boxShadow:
-'0 0 18px rgba(0,255,140,0.10)'
+'0 0 18px rgba(21,101,255,0.12)'
 }}
 
 >
@@ -6058,7 +5825,7 @@ searchTaf ||
       objectFit: 'contain',
 
       filter:
-        'drop-shadow(0 0 18px rgba(0,255,140,0.18))'
+        'drop-shadow(0 0 22px rgba(21,101,255,0.20))'
 
     }}
 
