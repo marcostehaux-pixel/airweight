@@ -439,18 +439,71 @@ export default function Login({ onLogin }) {
           </button>
 
           <div
-            style={{
-              marginTop: '30px',
-              paddingTop: '22px',
-              borderTop: '1px solid rgba(255,255,255,0.10)',
-              textAlign: 'center',
-              color: 'rgba(255,255,255,0.48)',
-              fontSize: '12px',
-              letterSpacing: '0.4px',
-            }}
-          >
-            Secure access to OPERDAT
-          </div>
+  style={{
+    marginTop: '30px',
+    paddingTop: '22px',
+    borderTop: '1px solid rgba(255,255,255,0.10)',
+    textAlign: 'center',
+    fontSize: '12px',
+    letterSpacing: '0.4px',
+  }}
+>
+  <div
+    style={{
+      color: 'rgba(255,255,255,0.48)',
+      marginBottom: '14px',
+    }}
+  >
+    Secure access to OPERDAT
+  </div>
+
+  <div
+    style={{
+      fontSize: '11px',
+      letterSpacing: '1.2px',
+      fontWeight: 700,
+      color: '#6f9fe9',
+      marginBottom: '9px',
+    }}
+  >
+    CONTACT & SUPPORT
+  </div>
+
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      flexWrap: 'wrap',
+      gap: '7px 10px',
+      color: 'rgba(255,255,255,0.66)',
+    }}
+  >
+    <a
+      href="mailto:info@operdat.com"
+      style={{
+        color: 'rgba(255,255,255,0.76)',
+        textDecoration: 'none',
+      }}
+    >
+      info@operdat.com
+    </a>
+
+    <span style={{ color: 'rgba(255,255,255,0.25)' }}>•</span>
+
+    <a
+      href="https://wa.me/5492233497378"
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        color: 'rgba(255,255,255,0.76)',
+        textDecoration: 'none',
+      }}
+    >
+      +54 9 223 349-7378
+    </a>
+  </div>
+</div>
         </div>
       </div>
     </div>
