@@ -1,50 +1,27 @@
-export async function getMetar(icao){
+export async function getMetar(icao) {
+  try {
+    const code = String(icao || '')
+      .trim()
+      .toUpperCase()
 
-try{
+    if (code.length !== 4) {
+      return null
+    }
 
-const local =
-window.location.hostname
-=== "localhost"
+    const response = await fetch(
+      `/api/metar?icao=${encodeURIComponent(code)}`
+    )
 
-const url =
-local
-? `https://corsproxy.io/?https://tgftp.nws.noaa.gov/data/observations/metar/stations/${icao}.TXT`
-: `/api/metar?icao=${icao}`
+    if (!response.ok) {
+      return null
+    }
 
-const response =
-await fetch(url)
+    const data = await response.json()
 
-if(!response.ok){
+    return data.metar || null
 
-return null
-
-}
-
-if(local){
-
-const text =
-await response.text()
-
-const lines =
-text
-.split("\n")
-.filter(Boolean)
-
-return lines[1] || null
-
-}
-
-const data =
-await response.json()
-
-return data.metar
-
-}
-
-catch{
-
-return null
-
-}
-
+  } catch (error) {
+    console.error('METAR ERROR:', error)
+    return null
+  }
 }

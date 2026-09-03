@@ -1,41 +1,26 @@
-export default async function handler(req, res) {
+export async function getMetar(icao) {
+  try {
+    const code = String(icao || '')
+      .trim()
+      .toUpperCase()
 
-try {
+    if (code.length !== 4) {
+      return null
+    }
 
-const icao =
-(req.query.icao || "")
-.toUpperCase()
+    const response = await fetch(
+      `/api/metar?icao=${encodeURIComponent(code)}`
+    )
 
-const response =
-await fetch(
-`https://tgftp.nws.noaa.gov/data/observations/metar/stations/${icao}.TXT`
-)
+    if (!response.ok) {
+      return null
+    }
 
-const text =
-await response.text()
+    const data = await response.json()
 
-const lines =
-text
-.split("\n")
-.filter(Boolean)
-
-res.status(200).json({
-
-metar:
-lines[1] || null
-
-})
-
-}
-
-catch {
-
-res.status(500).json({
-
-metar:null
-
-})
-
-}
-
+    return data.metar || null
+  } catch (error) {
+    console.error('METAR ERROR:', error)
+    return null
+  }
 }
