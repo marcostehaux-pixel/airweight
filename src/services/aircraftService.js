@@ -7,7 +7,13 @@ export async function getAircraft() {
     .order('registration')
 
   if (error) {
-    console.error('Error loading aircraft:', error)
+    console.error('Error loading aircraft:', {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code
+    })
+
     throw error
   }
 
