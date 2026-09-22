@@ -9,7 +9,7 @@ export default function Login({ onLogin }) {
   const [showPassword, setShowPassword] = useState(false)
 
   function login() {
-    const expiration = new Date('2026-09-20')
+    const expiration = new Date('2026-10-20')
 
     if (new Date() > expiration) {
       alert('Trial expired')

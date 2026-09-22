@@ -84,8 +84,254 @@ import CargoPanel from './components/CargoPanel'
 import generateLoadsheet from './utils/generateLoadsheet'
 
 import logo from './assets/logo.png'
+
+import {
+  getAircraft,
+  getAircraftFullData,
+  adaptSupabaseAircraft,
+  getCargoAircraftFleet
+} from './services/aircraftService'
 import aircraftImage from './assets/a320.png'
+console.log('APP FILE LOADED - SUPABASE TEST')
 function App() {
+  useEffect(() => {
+     console.log('SUPABASE EFFECT STARTED')
+  async function testSupabaseConnection() {
+    try {
+      const aircraft = await getAircraft()
+      console.log('AIRCRAFT FROM SUPABASE:', aircraft)
+      const lvNgr = aircraft.find(
+  item => item.registration === 'LV-NGR'
+)
+
+if (lvNgr) {
+  const fullData = await getAircraftFullData(lvNgr.id)
+
+  console.log(
+    'LV-NGR FULL DATA FROM SUPABASE:',
+    fullData
+  )
+
+  const adaptedLvNgr = adaptSupabaseAircraft(fullData)
+
+  console.log(
+    'LV-NGR ADAPTED FROM SUPABASE:',
+    adaptedLvNgr
+  )
+
+  const currentLvNgr = aircraftCargoDatabase.find(
+    item => item.registration === 'LV-NGR'
+  )
+
+  console.log(
+    'LV-NGR CURRENT OPERDAT:',
+    currentLvNgr
+  )
+
+  console.log(
+    'M1 SUPABASE:',
+    adaptedLvNgr.cargoConfig.mainDeck[0]
+  )
+
+  console.log(
+    'M1 CURRENT:',
+    currentLvNgr.cargoConfig.mainDeck[0]
+  )
+
+  console.log(
+    'F1 SUPABASE:',
+    adaptedLvNgr.cargoConfig.lowerDeck[0]
+  )
+
+  console.log(
+    'F1 CURRENT:',
+    currentLvNgr.cargoConfig.lowerDeck[0]
+  )
+  const cargoMatch =
+  JSON.stringify(adaptedLvNgr.cargoConfig) ===
+  JSON.stringify(currentLvNgr.cargoConfig)
+
+console.log(
+  'CARGO CONFIG MATCH:',
+  cargoMatch
+)
+const operationalSupabase = {
+  registration: adaptedLvNgr.registration,
+  type: adaptedLvNgr.type,
+  datum: adaptedLvNgr.datum,
+  mac: adaptedLvNgr.mac,
+  lemac: adaptedLvNgr.lemac,
+  basicWeight: adaptedLvNgr.basicWeight,
+  basicIndex: adaptedLvNgr.basicIndex,
+  indexReferenceArm: adaptedLvNgr.indexReferenceArm,
+  indexConstant: adaptedLvNgr.indexConstant,
+  indexOffset: adaptedLvNgr.indexOffset,
+  basicConfig: adaptedLvNgr.basicConfig,
+  basicCrew: adaptedLvNgr.basicCrew,
+  maxZFW: adaptedLvNgr.maxZFW,
+  maxTOW: adaptedLvNgr.maxTOW,
+  maxRW: adaptedLvNgr.maxRW,
+  maxLW: adaptedLvNgr.maxLW,
+  seatArmFwd: adaptedLvNgr.seatArmFwd,
+  seatArmMid: adaptedLvNgr.seatArmMid,
+  seatArmAft: adaptedLvNgr.seatArmAft,
+  fuelArm: adaptedLvNgr.fuelArm,
+  forwardCargoArm: adaptedLvNgr.forwardCargoArm,
+  aftCargoArm: adaptedLvNgr.aftCargoArm,
+  envelope: adaptedLvNgr.envelope,
+  cargoConfig: adaptedLvNgr.cargoConfig
+}
+
+const operationalCurrent = {
+  registration: currentLvNgr.registration,
+  type: currentLvNgr.type,
+  datum: currentLvNgr.datum,
+  mac: currentLvNgr.mac,
+  lemac: currentLvNgr.lemac,
+  basicWeight: currentLvNgr.basicWeight,
+  basicIndex: currentLvNgr.basicIndex,
+  indexReferenceArm: currentLvNgr.indexReferenceArm,
+  indexConstant: currentLvNgr.indexConstant,
+  indexOffset: currentLvNgr.indexOffset,
+  basicConfig: currentLvNgr.basicConfig,
+  basicCrew: currentLvNgr.basicCrew,
+  maxZFW: currentLvNgr.maxZFW,
+  maxTOW: currentLvNgr.maxTOW,
+  maxRW: currentLvNgr.maxRW,
+  maxLW: currentLvNgr.maxLW,
+  seatArmFwd: currentLvNgr.seatArmFwd,
+  seatArmMid: currentLvNgr.seatArmMid,
+  seatArmAft: currentLvNgr.seatArmAft,
+  fuelArm: currentLvNgr.fuelArm,
+  forwardCargoArm: currentLvNgr.forwardCargoArm,
+  aftCargoArm: currentLvNgr.aftCargoArm,
+  envelope: currentLvNgr.envelope,
+  cargoConfig: currentLvNgr.cargoConfig
+}
+
+const aircraftMatch =
+  JSON.stringify(operationalSupabase) ===
+  JSON.stringify(operationalCurrent)
+
+console.log(
+  'LV-NGR OPERATIONAL MATCH:',
+  aircraftMatch
+)
+console.log(
+  'ENVELOPE SUPABASE:',
+  adaptedLvNgr.envelope
+)
+
+console.log(
+  'ENVELOPE CURRENT:',
+  currentLvNgr.envelope
+)
+
+const envelopeMatch =
+  JSON.stringify(adaptedLvNgr.envelope) ===
+  JSON.stringify(currentLvNgr.envelope)
+
+console.log(
+  'ENVELOPE MATCH:',
+  envelopeMatch
+)
+Object.keys(operationalCurrent).forEach((key) => {
+  const supabaseValue = operationalSupabase[key]
+  const currentValue = operationalCurrent[key]
+
+  const match =
+    JSON.stringify(supabaseValue) ===
+    JSON.stringify(currentValue)
+
+  if (!match) {
+    console.log(
+      `DIFFERENCE → ${key}:`,
+      'SUPABASE =',
+      supabaseValue,
+      '| CURRENT =',
+      currentValue
+    )
+  }
+})
+const registrationsToTest = [
+  'LV-NGR',
+  'LV-NPW',
+  'LV-ZZM',
+  'LV-ZOR'
+]
+
+const operationalKeys = [
+  'registration',
+  'type',
+  'datum',
+  'mac',
+  'lemac',
+  'basicWeight',
+  'basicIndex',
+  'indexReferenceArm',
+  'indexConstant',
+  'indexOffset',
+  'basicConfig',
+  'basicCrew',
+  'maxZFW',
+  'maxTOW',
+  'maxRW',
+  'maxLW',
+  'seatArmFwd',
+  'seatArmMid',
+  'seatArmAft',
+  'fuelArm',
+  'forwardCargoArm',
+  'aftCargoArm',
+  'envelope',
+  'cargoConfig'
+]
+
+for (const registration of registrationsToTest) {
+  const cloudAircraft = aircraft.find(
+    item => item.registration === registration
+  )
+
+  const currentAircraft = aircraftCargoDatabase.find(
+    item => item.registration === registration
+  )
+
+  if (!cloudAircraft || !currentAircraft) {
+    console.log(
+      `AIRCRAFT VALIDATION ${registration}: NOT FOUND`
+    )
+    continue
+  }
+
+  const fullData = await getAircraftFullData(cloudAircraft.id)
+  const adaptedAircraft = adaptSupabaseAircraft(fullData)
+
+  const differences = operationalKeys.filter((key) => {
+    return (
+      JSON.stringify(adaptedAircraft[key]) !==
+      JSON.stringify(currentAircraft[key])
+    )
+  })
+
+  if (differences.length === 0) {
+    console.log(
+      `AIRCRAFT VALIDATION ${registration}: TRUE`
+    )
+  } else {
+    console.log(
+      `AIRCRAFT VALIDATION ${registration}: FALSE`,
+      differences
+    )
+  }
+}
+}
+    } catch (error) {
+      console.error('SUPABASE TEST ERROR:', error)
+    }
+  }
+
+  testSupabaseConnection()
+}, [])
 const [logged,setLogged]=useState(false)
 const [userRole, setUserRole] = useState(null)
 const [tripFuel, setTripFuel] = useState(0)
@@ -98,6 +344,43 @@ function clearCargo(){setCargoWeights(
 {}
 )
 }
+const [cargoAircraftFleet, setCargoAircraftFleet] =
+  useState(aircraftCargoDatabase)
+
+useEffect(() => {
+  async function loadCargoFleet() {
+    try {
+      const fleet = await getCargoAircraftFleet()
+
+      if (fleet && fleet.length > 0) {
+        setCargoAircraftFleet(fleet)
+
+        setSelectedCargoAircraft((current) => {
+          const supabaseAircraft = fleet.find(
+            aircraft =>
+              aircraft.registration === current?.registration
+          )
+
+          return supabaseAircraft || fleet[0]
+        })
+
+        console.log(
+          'CARGO FLEET SOURCE: SUPABASE',
+          fleet
+        )
+      }
+    } catch (error) {
+      console.error(
+        'CARGO FLEET SUPABASE ERROR - USING LOCAL FALLBACK:',
+        error
+      )
+
+      setCargoAircraftFleet(aircraftCargoDatabase)
+    }
+  }
+
+  loadCargoFleet()
+}, [])
 const [flightFrom, setFlightFrom] = useState('')
 const [flightTo, setFlightTo] = useState('')
 const [cargoWeights, setCargoWeights]=useState({})
@@ -1839,17 +2122,11 @@ selectedCargoAircraft.registration
 onChange={(e)=>{
 
 setSelectedCargoAircraft(
-
-aircraftCargoDatabase.find(
-
-a=>
-
-a.registration===
-
-e.target.value
-
-)
-
+  cargoAircraftFleet.find(
+    a =>
+      a.registration ===
+      e.target.value
+  )
 )
 
 }}
@@ -1881,13 +2158,9 @@ outline:'none'
 
 {
 
-aircraftCargoDatabase
-
-.map(
-
-a=>(
-
-<option
+cargoAircraftFleet.map(
+  a => (
+    <option
 
 key={a.registration}
 
@@ -4724,9 +4997,9 @@ a=>a.registration===e.target.value
 )
 
 const cargoAircraft =
-aircraftCargoDatabase.find(
-a=>a.registration===e.target.value
-)
+  cargoAircraftFleet.find(
+    a => a.registration === e.target.value
+  )
 const [
   performanceMaxTow,
   setPerformanceMaxTow
@@ -4765,12 +5038,9 @@ outline:'none'
 {
 
 [
-
-...aircraftDatabase,
-
-...aircraftCargoDatabase
-
-].map(a=>(
+  ...aircraftDatabase,
+  ...cargoAircraftFleet
+].map(a => (
 
 <option
 

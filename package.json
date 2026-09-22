@@ -3,15 +3,16 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
- "scripts": {
-  "dev": "vite",
-  "build": "vite build",
-  "postinstall": "vite build",
-  "start": "node server.js",
-  "lint": "eslint .",
-  "preview": "vite preview"
-},
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "postinstall": "vite build",
+    "start": "node server.js",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
   "dependencies": {
+    "@supabase/supabase-js": "^2.115.0",
     "express": "^5.2.1",
     "jspdf": "^4.2.1",
     "react": "^19.2.6",
