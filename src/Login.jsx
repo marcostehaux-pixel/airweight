@@ -2,13 +2,74 @@ import { useState } from 'react'
 import './Login.css'
 import loginAircraft from './assets/login-aircraft.png'
 import operdatLogo from './assets/airweight-Logo.png'
-
+import { supabase } from './lib/supabase'
 export default function Login({ onLogin }) {
   const [user, setUser] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
 
-  function login() {
+  async function login() {
+  try {
+    // ==========================================
+    // 1. REAL USER — SUPABASE AUTH
+    // ==========================================
+    if (user.includes('@')) {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: user.trim(),
+        password,
+      })
+
+      if (error) {
+        console.error('SUPABASE LOGIN ERROR:', error)
+        alert('Invalid email or password')
+        return
+      }
+
+      const authenticatedUser = data.user
+
+      if (!authenticatedUser) {
+        alert('Unable to authenticate user')
+        return
+      }
+
+      // ==========================================
+      // 2. LOAD OPERDAT PROFILE
+      // ==========================================
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select(`
+          id,
+          full_name,
+          role,
+          status,
+          organization_id
+        `)
+        .eq('id', authenticatedUser.id)
+        .single()
+
+      if (profileError) {
+        console.error('PROFILE ERROR:', profileError)
+        await supabase.auth.signOut()
+        alert('User profile not found')
+        return
+      }
+
+      if (profile.status !== 'active') {
+        await supabase.auth.signOut()
+        alert('User account is not active')
+        return
+      }
+
+      console.log('OPERDAT AUTH USER:', authenticatedUser.email)
+      console.log('OPERDAT PROFILE:', profile)
+
+      onLogin(profile.role)
+      return
+    }
+
+    // ==========================================
+    // 3. TEMPORARY LEGACY USERS
+    // ==========================================
     const expiration = new Date('2026-10-20')
 
     if (new Date() > expiration) {
@@ -25,7 +86,11 @@ export default function Login({ onLogin }) {
     } else {
       alert('Invalid credentials')
     }
+  } catch (error) {
+    console.error('LOGIN ERROR:', error)
+    alert('Unable to sign in')
   }
+}
 
   const featureItems = [
     'WEIGHT & BALANCE',
