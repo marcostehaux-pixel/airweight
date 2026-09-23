@@ -363,6 +363,7 @@ useEffect(() => {
 
     console.log('OPERDAT SESSION RESTORED:', session.user.email)
     console.log('OPERDAT SESSION PROFILE:', profile)
+    console.log('OPERDAT SESSION ROLE:', profile.role)
 
     setUserRole(profile.role)
 
@@ -375,6 +376,7 @@ useEffect(() => {
 
   restoreSession()
 }, [])
+
 const [tripFuel, setTripFuel] = useState(0)
 const [taxiFuel,setTaxiFuel ]= useState(0)
 const [fuel, setFuel] = useState(0)
@@ -1776,9 +1778,10 @@ return (
   </div>
 
 
-  {/* PASSENGER */}
 
-  {userRole !== 'freighter' && (
+{/* PASSENGER */}
+
+{userRole !== 'freighter' && (
     <div
       onClick={() => setActiveMenu('Dashboard')}
       style={{
