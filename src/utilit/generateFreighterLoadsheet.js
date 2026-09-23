@@ -10,6 +10,7 @@ export function generateFreighterLoadsheet(data) {
 cargoFlightFrom,
 cargoFlightTo,
 cargoFlightNumber,
+preparedBy,
 cargoMetarFrom,
 cargoMetarTo,
 basicWeight,
@@ -202,7 +203,21 @@ doc.text(cargoFlightNumber || '',85,38)
     90,
     44
   )
+doc.setFont('helvetica', 'normal')
 
+doc.text(
+  'PREPARED BY',
+  145,
+  44
+)
+
+doc.setFont('helvetica', 'bold')
+
+doc.text(
+  preparedBy || '---',
+  145,
+  50
+)
 
   doc.setFont('helvetica', 'bold')
 

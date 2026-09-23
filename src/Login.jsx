@@ -63,7 +63,13 @@ export default function Login({ onLogin }) {
       console.log('OPERDAT AUTH USER:', authenticatedUser.email)
       console.log('OPERDAT PROFILE:', profile)
 
-      onLogin(profile.role)
+     onLogin(profile.role, {
+  id: authenticatedUser.id,
+  email: authenticatedUser.email,
+  fullName: profile.full_name,
+  role: profile.role,
+  organizationId: profile.organization_id
+})
       return
     }
 

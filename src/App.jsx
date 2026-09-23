@@ -335,6 +335,7 @@ for (const registration of registrationsToTest) {
 }, [])
 const [logged,setLogged]=useState(false)
 const [userRole, setUserRole] = useState(null)
+const [currentUser, setCurrentUser] = useState(null)
 useEffect(() => {
   async function restoreSession() {
     const {
@@ -366,12 +367,25 @@ useEffect(() => {
     console.log('OPERDAT SESSION ROLE:', profile.role)
 
     setUserRole(profile.role)
-
+setCurrentUser({
+  id: session.user.id,
+  email: session.user.email,
+  fullName: profile.full_name,
+  role: profile.role,
+  organizationId: profile.organization_id
+})
     if (profile.role === 'freighter') {
       setActiveMenu('FreighterLoadsheet')
     }
 
     setLogged(true)
+    setCurrentUser({
+  id: session.user.id,
+  email: session.user.email,
+  fullName: profile.full_name,
+  role: profile.role,
+  organizationId: profile.organization_id
+})
   }
 
   restoreSession()
@@ -1531,16 +1545,17 @@ if(
 
 return(
 
-<Login
-  onLogin={(role) => {
+<Login 
+  onLogin={(role, userData) => { 
     setUserRole(role)
+    setCurrentUser(userData)
 
-    if (role === 'freighter') {
-      setActiveMenu('FreighterLoadsheet')
+    if (role === 'freighter') { 
+      setActiveMenu('FreighterLoadsheet') 
     }
 
-    setLogged(true)
-  }}
+    setLogged(true) 
+  }} 
 />
 
 )
@@ -2048,7 +2063,52 @@ return (
   >
     Weather Center
   </div>
+{/* CURRENT USER */}
 
+{currentUser && (
+  <div
+    style={{
+      marginTop: 'auto',
+      marginBottom: '10px',
+      padding: '12px 15px',
+      borderRadius: '9px',
+      background: 'rgba(255,255,255,0.025)',
+      border: '1px solid rgba(255,255,255,0.07)'
+    }}
+  >
+    <div
+      style={{
+        fontSize: '10px',
+        color: '#66758a',
+        letterSpacing: '1px',
+        marginBottom: '5px'
+      }}
+    >
+      SIGNED IN AS
+    </div>
+
+    <div
+      style={{
+        fontSize: '13px',
+        color: '#ffffff',
+        fontWeight: '600'
+      }}
+    >
+      {currentUser.fullName || currentUser.email}
+    </div>
+
+    <div
+      style={{
+        fontSize: '11px',
+        color: '#8f9bad',
+        marginTop: '3px',
+        textTransform: 'capitalize'
+      }}
+    >
+      {currentUser.role}
+    </div>
+  </div>
+)}
 
   {/* SIGN OUT */}
 
@@ -2064,10 +2124,11 @@ return (
   localStorage.removeItem('user')
   setLogged(false)
   setUserRole(null)
+  setCurrentUser(null)
   setActiveMenu('Dashboard')
 }}
     style={{
-      marginTop: 'auto',
+      marginTop: '0',
       padding: '12px 15px',
       borderRadius: '9px',
       background: 'rgba(255,255,255,0.035)',
@@ -4360,6 +4421,7 @@ if (!freighterPrintValid) {
       cargoFlightFrom,
 cargoFlightTo,
 cargoFlightNumber,
+preparedBy: currentUser?.fullName || currentUser?.email || 'Unknown User',
 cargoMetarFrom,
   cargoMetarTo,
 basicWeight:
