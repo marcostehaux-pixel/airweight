@@ -31,6 +31,7 @@ import {
   getForwardBagIndex,
   getAftBagIndex
 } from './utilit/bagIndexCalculator'
+import { supabase } from './lib/supabase'
 import { calculatePassengerTrim } from './utilit/trimCalculator'
 function getMainIndex(position,weight){
 if(!mainDeckTables[position])
@@ -334,6 +335,46 @@ for (const registration of registrationsToTest) {
 }, [])
 const [logged,setLogged]=useState(false)
 const [userRole, setUserRole] = useState(null)
+useEffect(() => {
+  async function restoreSession() {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+
+    if (!session?.user) {
+      return
+    }
+
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('role, status, organization_id, full_name')
+      .eq('id', session.user.id)
+      .single()
+
+    if (error) {
+      console.error('SESSION PROFILE ERROR:', error)
+      return
+    }
+
+    if (profile.status !== 'active') {
+      await supabase.auth.signOut()
+      return
+    }
+
+    console.log('OPERDAT SESSION RESTORED:', session.user.email)
+    console.log('OPERDAT SESSION PROFILE:', profile)
+
+    setUserRole(profile.role)
+
+    if (profile.role === 'freighter') {
+      setActiveMenu('FreighterLoadsheet')
+    }
+
+    setLogged(true)
+  }
+
+  restoreSession()
+}, [])
 const [tripFuel, setTripFuel] = useState(0)
 const [taxiFuel,setTaxiFuel ]= useState(0)
 const [fuel, setFuel] = useState(0)
@@ -2009,10 +2050,19 @@ return (
   {/* SIGN OUT */}
 
   <div
-    onClick={() => {
-      localStorage.removeItem('user')
-      window.location.reload()
-    }}
+   onClick={async () => {
+  const { error } = await supabase.auth.signOut()
+
+  if (error) {
+    console.error('SIGN OUT ERROR:', error)
+    return
+  }
+
+  localStorage.removeItem('user')
+  setLogged(false)
+  setUserRole(null)
+  setActiveMenu('Dashboard')
+}}
     style={{
       marginTop: 'auto',
       padding: '12px 15px',
