@@ -56,6 +56,7 @@ const cargoConfig = {
 }
 
   return {
+    id: aircraft.id,
     registration: aircraft.registration,
     manufacturer: aircraft.manufacturer,
     model: aircraft.model,

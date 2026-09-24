@@ -85,14 +85,23 @@ import CargoPanel from './components/CargoPanel'
 import generateLoadsheet from './utils/generateLoadsheet'
 
 import logo from './assets/logo.png'
-
 import {
   getAircraft,
   getAircraftFullData,
   adaptSupabaseAircraft,
   getCargoAircraftFleet
 } from './services/aircraftService'
+import {
+  getFreighterFlights,
+  createFreighterFlight,
+  updateFreighterFlight,
+  closeFreighterFlightInSupabase,
+  adaptFreighterFlightToSupabase,
+  adaptSupabaseFlightToOperdat
+} from './services/flightService'
+
 import aircraftImage from './assets/a320.png'
+
 console.log('APP FILE LOADED - SUPABASE TEST')
 function App() {
   useEffect(() => {
@@ -336,6 +345,36 @@ for (const registration of registrationsToTest) {
 const [logged,setLogged]=useState(false)
 const [userRole, setUserRole] = useState(null)
 const [currentUser, setCurrentUser] = useState(null)
+useEffect(() => {
+  if (!logged || !currentUser) return
+
+  async function testSupabaseFlights() {
+    try {
+      const flights =
+        await getFreighterFlights()
+
+      const adaptedFlights =
+        flights.map(
+          adaptSupabaseFlightToOperdat
+        )
+
+      console.log(
+        'OPERDAT ADAPTED FLIGHTS:',
+        adaptedFlights
+      )
+      setCargoFlightRecords(
+  adaptedFlights.slice(0, 20)
+)
+    } catch (error) {
+      console.error(
+        'OPERDAT FLIGHTS TEST ERROR:',
+        error
+      )
+    }
+  }
+
+  testSupabaseFlights()
+}, [logged, currentUser])
 useEffect(() => {
   async function restoreSession() {
     const {
@@ -637,32 +676,76 @@ useState(
 ''
 
 )
-function closeFreighterFlight(id) {
+async function closeFreighterFlight(id) {
 
-  setCargoFlightRecords(
-    previous =>
-      previous.map(flight =>
-
-        flight.id === id
-          ? {
-              ...flight,
-
-              status: 'CLOSED',
-
-              closedAt:
-                new Date().toISOString()
-            }
-
-          : flight
-      )
+  const flight = cargoFlightRecords.find(
+    item => item.id === id
   )
 
-  if (
-    id === activeFreighterFlightId
-  ) {
+  if (!flight) {
+    console.log('Flight not found:', id)
+    return
+  }
 
-    setActiveFreighterFlightId(null)
+  const canModifyFlight =
+    userRole === 'admin' ||
+    flight.createdBy === currentUser?.id
 
+  if (!canModifyFlight) {
+    console.warn(
+      'ACCESS DENIED - FLIGHT OWNER:',
+      flight.createdBy,
+      'CURRENT USER:',
+      currentUser?.id
+    )
+
+    alert(
+      'You can only close flights created by your user.'
+    )
+
+    return
+  }
+
+  try {
+
+    const closedFlight =
+      await closeFreighterFlightInSupabase(id)
+
+    const adaptedClosedFlight =
+      adaptSupabaseFlightToOperdat(
+        closedFlight
+      )
+
+    setCargoFlightRecords(
+      previous =>
+        previous.map(flight =>
+          flight.id === id
+            ? adaptedClosedFlight
+            : flight
+        )
+    )
+
+    if (id === activeFreighterFlightId) {
+      setActiveFreighterFlightId(null)
+    }
+
+    console.log(
+      'OPERDAT FLIGHT CLOSED:',
+      adaptedClosedFlight
+    )
+
+    alert('Flight closed')
+
+  } catch (error) {
+
+    console.error(
+      'FLIGHT CLOSE FAILED:',
+      error
+    )
+
+    alert(
+      'The flight could not be closed in the database.'
+    )
   }
 }
 function openFreighterFlight(id) {
@@ -679,7 +762,25 @@ function openFreighterFlight(id) {
     )
     return
   }
+const canModifyFlight =
+  userRole === 'admin' ||
+  flight.createdBy === currentUser?.id
 
+if (!canModifyFlight) {
+
+  console.warn(
+    'ACCESS DENIED - FLIGHT OWNER:',
+    flight.createdBy,
+    'CURRENT USER:',
+    currentUser?.id
+  )
+
+  alert(
+    'You can only modify flights created by your user.'
+  )
+
+  return
+}
   if (flight.status !== 'OPEN') {
     return
   }
@@ -1561,11 +1662,14 @@ return(
 )
 
 }
-function saveCurrentFreighterFlight() {
+async function saveCurrentFreighterFlight() {
 
   const now =
     new Date().toISOString()
-
+console.log(
+  'SELECTED CARGO AIRCRAFT:',
+  selectedCargoAircraft
+)
   const flightData = {
 
     status: 'OPEN',
@@ -1663,37 +1767,111 @@ rampWeight:
   weightData.rampWeight,
   }
 
-  if (activeFreighterFlightId) {
+  console.log(
+  'AIRCRAFT ID BEFORE SUPABASE:',
+  selectedCargoAircraft?.id,
+  selectedCargoAircraft?.registration
+)
+
+const supabaseFlight =
+  adaptFreighterFlightToSupabase({
+    flightData,
+    currentUser,
+    aircraftId: selectedCargoAircraft?.id
+  })
+
+console.log(
+  'FLIGHT READY FOR SUPABASE:',
+  supabaseFlight
+)
+
+
+// ======================================================
+// UPDATE EXISTING FLIGHT
+// ======================================================
+
+if (activeFreighterFlightId) {
+
+  try {
+
+    const updatedFlight =
+      await updateFreighterFlight(
+        activeFreighterFlightId,
+        supabaseFlight
+      )
+
+    console.log(
+      'FLIGHT UPDATED IN SUPABASE:',
+      updatedFlight
+    )
+
+    const adaptedUpdatedFlight =
+      adaptSupabaseFlightToOperdat(
+        updatedFlight
+      )
 
     setCargoFlightRecords(
       previous =>
         previous.map(flight =>
-
-          flight.id === activeFreighterFlightId &&
-          flight.status === 'OPEN'
-
-            ? {
-                ...flight,
-                ...flightData
-              }
-
+          flight.id === activeFreighterFlightId
+            ? adaptedUpdatedFlight
             : flight
         )
     )
 
     alert('Flight updated')
 
-    return
+  } catch (error) {
+
+    console.error(
+      'FLIGHT UPDATE FAILED:',
+      error
+    )
+
+    alert(
+      'The flight could not be updated in the database.'
+    )
   }
 
-  const newFlight = {
+  return
+}
 
-    id: Date.now(),
 
-    createdAt: now,
+// ======================================================
+// CREATE NEW FLIGHT
+// ======================================================
 
-    ...flightData
-  }
+let savedFlight
+
+try {
+
+  savedFlight =
+    await createFreighterFlight(
+      supabaseFlight
+    )
+
+  console.log(
+    'FLIGHT SAVED IN SUPABASE:',
+    savedFlight
+  )
+
+} catch (error) {
+
+  console.error(
+    'FLIGHT SAVE FAILED:',
+    error
+  )
+
+  alert(
+    'The flight could not be saved in the database.'
+  )
+
+  return
+}
+ const newFlight =
+  adaptSupabaseFlightToOperdat(
+    savedFlight
+  )
 
   setCargoFlightRecords(
     previous => {
@@ -7094,8 +7272,12 @@ aftInfants
 
     {/* FLIGHT RECORDS */}
 
-    {cargoFlightRecords.map(
-      flight => (
+    {cargoFlightRecords
+  .filter(flight =>
+    userRole === 'admin' ||
+    flight.createdBy === currentUser?.id
+  )
+  .map(flight => (
 
         <div
           key={flight.id}
