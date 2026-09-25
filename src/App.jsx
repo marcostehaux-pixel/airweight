@@ -87,8 +87,6 @@ import generateLoadsheet from './utils/generateLoadsheet'
 import logo from './assets/logo.png'
 import {
   getAircraft,
-  getAircraftFullData,
-  adaptSupabaseAircraft,
   getCargoAircraftFleet
 } from './services/aircraftService'
 import {
@@ -104,251 +102,14 @@ import aircraftImage from './assets/a320.png'
 
 console.log('APP FILE LOADED - SUPABASE TEST')
 function App() {
-  useEffect(() => {
-     console.log('SUPABASE EFFECT STARTED')
-  async function testSupabaseConnection() {
-    try {
-      const aircraft = await getAircraft()
-      console.log('AIRCRAFT FROM SUPABASE:', aircraft)
-      const lvNgr = aircraft.find(
-  item => item.registration === 'LV-NGR'
-)
-
-if (lvNgr) {
-  const fullData = await getAircraftFullData(lvNgr.id)
-
-  console.log(
-    'LV-NGR FULL DATA FROM SUPABASE:',
-    fullData
-  )
-
-  const adaptedLvNgr = adaptSupabaseAircraft(fullData)
-
-  console.log(
-    'LV-NGR ADAPTED FROM SUPABASE:',
-    adaptedLvNgr
-  )
-
-  const currentLvNgr = aircraftCargoDatabase.find(
-    item => item.registration === 'LV-NGR'
-  )
-
-  console.log(
-    'LV-NGR CURRENT OPERDAT:',
-    currentLvNgr
-  )
-
-  console.log(
-    'M1 SUPABASE:',
-    adaptedLvNgr.cargoConfig.mainDeck[0]
-  )
-
-  console.log(
-    'M1 CURRENT:',
-    currentLvNgr.cargoConfig.mainDeck[0]
-  )
-
-  console.log(
-    'F1 SUPABASE:',
-    adaptedLvNgr.cargoConfig.lowerDeck[0]
-  )
-
-  console.log(
-    'F1 CURRENT:',
-    currentLvNgr.cargoConfig.lowerDeck[0]
-  )
-  const cargoMatch =
-  JSON.stringify(adaptedLvNgr.cargoConfig) ===
-  JSON.stringify(currentLvNgr.cargoConfig)
-
-console.log(
-  'CARGO CONFIG MATCH:',
-  cargoMatch
-)
-const operationalSupabase = {
-  registration: adaptedLvNgr.registration,
-  type: adaptedLvNgr.type,
-  datum: adaptedLvNgr.datum,
-  mac: adaptedLvNgr.mac,
-  lemac: adaptedLvNgr.lemac,
-  basicWeight: adaptedLvNgr.basicWeight,
-  basicIndex: adaptedLvNgr.basicIndex,
-  indexReferenceArm: adaptedLvNgr.indexReferenceArm,
-  indexConstant: adaptedLvNgr.indexConstant,
-  indexOffset: adaptedLvNgr.indexOffset,
-  basicConfig: adaptedLvNgr.basicConfig,
-  basicCrew: adaptedLvNgr.basicCrew,
-  maxZFW: adaptedLvNgr.maxZFW,
-  maxTOW: adaptedLvNgr.maxTOW,
-  maxRW: adaptedLvNgr.maxRW,
-  maxLW: adaptedLvNgr.maxLW,
-  seatArmFwd: adaptedLvNgr.seatArmFwd,
-  seatArmMid: adaptedLvNgr.seatArmMid,
-  seatArmAft: adaptedLvNgr.seatArmAft,
-  fuelArm: adaptedLvNgr.fuelArm,
-  forwardCargoArm: adaptedLvNgr.forwardCargoArm,
-  aftCargoArm: adaptedLvNgr.aftCargoArm,
-  envelope: adaptedLvNgr.envelope,
-  cargoConfig: adaptedLvNgr.cargoConfig
-}
-
-const operationalCurrent = {
-  registration: currentLvNgr.registration,
-  type: currentLvNgr.type,
-  datum: currentLvNgr.datum,
-  mac: currentLvNgr.mac,
-  lemac: currentLvNgr.lemac,
-  basicWeight: currentLvNgr.basicWeight,
-  basicIndex: currentLvNgr.basicIndex,
-  indexReferenceArm: currentLvNgr.indexReferenceArm,
-  indexConstant: currentLvNgr.indexConstant,
-  indexOffset: currentLvNgr.indexOffset,
-  basicConfig: currentLvNgr.basicConfig,
-  basicCrew: currentLvNgr.basicCrew,
-  maxZFW: currentLvNgr.maxZFW,
-  maxTOW: currentLvNgr.maxTOW,
-  maxRW: currentLvNgr.maxRW,
-  maxLW: currentLvNgr.maxLW,
-  seatArmFwd: currentLvNgr.seatArmFwd,
-  seatArmMid: currentLvNgr.seatArmMid,
-  seatArmAft: currentLvNgr.seatArmAft,
-  fuelArm: currentLvNgr.fuelArm,
-  forwardCargoArm: currentLvNgr.forwardCargoArm,
-  aftCargoArm: currentLvNgr.aftCargoArm,
-  envelope: currentLvNgr.envelope,
-  cargoConfig: currentLvNgr.cargoConfig
-}
-
-const aircraftMatch =
-  JSON.stringify(operationalSupabase) ===
-  JSON.stringify(operationalCurrent)
-
-console.log(
-  'LV-NGR OPERATIONAL MATCH:',
-  aircraftMatch
-)
-console.log(
-  'ENVELOPE SUPABASE:',
-  adaptedLvNgr.envelope
-)
-
-console.log(
-  'ENVELOPE CURRENT:',
-  currentLvNgr.envelope
-)
-
-const envelopeMatch =
-  JSON.stringify(adaptedLvNgr.envelope) ===
-  JSON.stringify(currentLvNgr.envelope)
-
-console.log(
-  'ENVELOPE MATCH:',
-  envelopeMatch
-)
-Object.keys(operationalCurrent).forEach((key) => {
-  const supabaseValue = operationalSupabase[key]
-  const currentValue = operationalCurrent[key]
-
-  const match =
-    JSON.stringify(supabaseValue) ===
-    JSON.stringify(currentValue)
-
-  if (!match) {
-    console.log(
-      `DIFFERENCE → ${key}:`,
-      'SUPABASE =',
-      supabaseValue,
-      '| CURRENT =',
-      currentValue
-    )
-  }
-})
-const registrationsToTest = [
-  'LV-NGR',
-  'LV-NPW',
-  'LV-ZZM',
-  'LV-ZOR'
-]
-
-const operationalKeys = [
-  'registration',
-  'type',
-  'datum',
-  'mac',
-  'lemac',
-  'basicWeight',
-  'basicIndex',
-  'indexReferenceArm',
-  'indexConstant',
-  'indexOffset',
-  'basicConfig',
-  'basicCrew',
-  'maxZFW',
-  'maxTOW',
-  'maxRW',
-  'maxLW',
-  'seatArmFwd',
-  'seatArmMid',
-  'seatArmAft',
-  'fuelArm',
-  'forwardCargoArm',
-  'aftCargoArm',
-  'envelope',
-  'cargoConfig'
-]
-
-for (const registration of registrationsToTest) {
-  const cloudAircraft = aircraft.find(
-    item => item.registration === registration
-  )
-
-  const currentAircraft = aircraftCargoDatabase.find(
-    item => item.registration === registration
-  )
-
-  if (!cloudAircraft || !currentAircraft) {
-    console.log(
-      `AIRCRAFT VALIDATION ${registration}: NOT FOUND`
-    )
-    continue
-  }
-
-  const fullData = await getAircraftFullData(cloudAircraft.id)
-  const adaptedAircraft = adaptSupabaseAircraft(fullData)
-
-  const differences = operationalKeys.filter((key) => {
-    return (
-      JSON.stringify(adaptedAircraft[key]) !==
-      JSON.stringify(currentAircraft[key])
-    )
-  })
-
-  if (differences.length === 0) {
-    console.log(
-      `AIRCRAFT VALIDATION ${registration}: TRUE`
-    )
-  } else {
-    console.log(
-      `AIRCRAFT VALIDATION ${registration}: FALSE`,
-      differences
-    )
-  }
-}
-}
-    } catch (error) {
-      console.error('SUPABASE TEST ERROR:', error)
-    }
-  }
-
-  testSupabaseConnection()
-}, [])
+  
 const [logged,setLogged]=useState(false)
 const [userRole, setUserRole] = useState(null)
 const [currentUser, setCurrentUser] = useState(null)
 useEffect(() => {
   if (!logged || !currentUser) return
 
-  async function testSupabaseFlights() {
+  async function loadFreighterFlights() {
     try {
       const flights =
         await getFreighterFlights()
@@ -373,7 +134,7 @@ useEffect(() => {
     }
   }
 
-  testSupabaseFlights()
+  loadFreighterFlights()
 }, [logged, currentUser])
 useEffect(() => {
   async function restoreSession() {
@@ -400,10 +161,6 @@ useEffect(() => {
       await supabase.auth.signOut()
       return
     }
-
-    console.log('OPERDAT SESSION RESTORED:', session.user.email)
-    console.log('OPERDAT SESSION PROFILE:', profile)
-    console.log('OPERDAT SESSION ROLE:', profile.role)
 
     setUserRole(profile.role)
 setCurrentUser({
@@ -1380,25 +1137,8 @@ useState('')
 const [cargoFlightNumber, setCargoFlightNumber] =
 useState('')
 const [cargoFlightRecords, setCargoFlightRecords] =
-  useState(() => {
+  useState([])
 
-    const saved =
-  localStorage.getItem(
-    'operdatFreighterFlights'
-  )
-
-    return saved
-      ? JSON.parse(saved)
-      : []
-  })
-  useEffect(() => {
-
-  localStorage.setItem(
-    'operdatFreighterFlights',
-    JSON.stringify(cargoFlightRecords)
-  )
-
-}, [cargoFlightRecords])
 const [activeFreighterFlightId, setActiveFreighterFlightId] =
   useState(null)
 const [cargoMetarFrom, setCargoMetarFrom] = useState(null)
@@ -1767,24 +1507,12 @@ rampWeight:
   weightData.rampWeight,
   }
 
-  console.log(
-  'AIRCRAFT ID BEFORE SUPABASE:',
-  selectedCargoAircraft?.id,
-  selectedCargoAircraft?.registration
-)
-
 const supabaseFlight =
   adaptFreighterFlightToSupabase({
     flightData,
     currentUser,
     aircraftId: selectedCargoAircraft?.id
   })
-
-console.log(
-  'FLIGHT READY FOR SUPABASE:',
-  supabaseFlight
-)
-
 
 // ======================================================
 // UPDATE EXISTING FLIGHT

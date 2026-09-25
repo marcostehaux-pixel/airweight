@@ -11,8 +11,6 @@ export async function getFreighterFlights() {
     throw error
   }
 
-  console.log('FLIGHTS FROM SUPABASE:', data)
-
   return data || []
 }
 export function adaptFreighterFlightToSupabase({
@@ -217,10 +215,6 @@ export async function createFreighterFlight(flight) {
     throw error
   }
 
-  console.log(
-    'FLIGHT CREATED IN SUPABASE:',
-    data
-  )
 
   return data
 }
@@ -242,11 +236,6 @@ export async function updateFreighterFlight(
     )
     throw error
   }
-
-  console.log(
-    'FLIGHT UPDATED IN SUPABASE:',
-    data
-  )
 
   return data
 }
@@ -272,11 +261,6 @@ export async function closeFreighterFlightInSupabase(
     )
     throw error
   }
-
-  console.log(
-    'FLIGHT CLOSED IN SUPABASE:',
-    data
-  )
 
   return data
 }
