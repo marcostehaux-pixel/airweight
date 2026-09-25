@@ -123,8 +123,8 @@ useEffect(() => {
         'OPERDAT ADAPTED FLIGHTS:',
         adaptedFlights
       )
-      setCargoFlightRecords(
-  adaptedFlights.slice(0, 20)
+     setCargoFlightRecords(
+  adaptedFlights
 )
     } catch (error) {
       console.error(
@@ -1141,6 +1141,16 @@ const [cargoFlightRecords, setCargoFlightRecords] =
 
 const [activeFreighterFlightId, setActiveFreighterFlightId] =
   useState(null)
+  const [historySearch, setHistorySearch] =
+  useState('')
+
+const [historyStatus, setHistoryStatus] =
+  useState('ALL')
+
+const [historyDate, setHistoryDate] =
+  useState('')
+  const [historyUser, setHistoryUser] =
+  useState('ALL')
 const [cargoMetarFrom, setCargoMetarFrom] = useState(null)
 const [cargoMetarTo, setCargoMetarTo] = useState(null)
 
@@ -1619,6 +1629,59 @@ try {
 
   alert('Flight saved as OPEN')
 }
+const filteredHistoryFlights =
+  cargoFlightRecords.filter(flight => {
+
+    const userMatch =
+      userRole === 'admin' ||
+      flight.createdBy === currentUser?.id
+
+    const search =
+      historySearch.trim().toLowerCase()
+
+    const searchMatch =
+      !search ||
+      (flight.flightNumber || '')
+        .toLowerCase()
+        .includes(search) ||
+      (flight.registration || '')
+        .toLowerCase()
+        .includes(search) ||
+      (flight.from || '')
+        .toLowerCase()
+        .includes(search) ||
+      (flight.to || '')
+        .toLowerCase()
+        .includes(search)
+
+    const statusMatch =
+      historyStatus === 'ALL' ||
+      flight.status === historyStatus
+
+    const userHistoryMatch =
+      userRole !== 'admin' ||
+      historyUser === 'ALL' ||
+      flight.createdByName === historyUser
+
+    const flightDate =
+      flight.createdAt
+        ? new Date(flight.createdAt)
+            .toISOString()
+            .slice(0, 10)
+        : ''
+
+    const dateMatch =
+      !historyDate ||
+      flightDate === historyDate
+
+    return (
+      userMatch &&
+      searchMatch &&
+      statusMatch &&
+      userHistoryMatch &&
+      dateMatch
+    )
+  })
 return (
 
   <div
@@ -1767,7 +1830,38 @@ return (
       Flight Records
     </div>
   )}
+{/* FLIGHT HISTORY */}
 
+{(userRole === 'freighter' || userRole === 'admin') && (
+  <div
+    onClick={() => setActiveMenu('Flight History')}
+    style={{
+      marginBottom: '10px',
+      padding: '12px 15px',
+      borderRadius: '9px',
+      background:
+        activeMenu === 'Flight History'
+          ? 'rgba(21,101,255,0.16)'
+          : 'transparent',
+      border:
+        activeMenu === 'Flight History'
+          ? '1px solid rgba(21,101,255,0.40)'
+          : '1px solid transparent',
+      color:
+        activeMenu === 'Flight History'
+          ? '#ffffff'
+          : '#b9c4d3',
+      fontWeight:
+        activeMenu === 'Flight History'
+          ? '700'
+          : '500',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease'
+    }}
+  >
+    Flight History
+  </div>
+)}
 
   {/* FREIGHTER LOADSHEET */}
 
@@ -6997,15 +7091,9 @@ aftInfants
 
     )}
 
-
     {/* FLIGHT RECORDS */}
 
-    {cargoFlightRecords
-  .filter(flight =>
-    userRole === 'admin' ||
-    flight.createdBy === currentUser?.id
-  )
-  .map(flight => (
+    {filteredHistoryFlights.map(flight => (
 
         <div
           key={flight.id}
@@ -7514,6 +7602,429 @@ aftInfants
   </div>
 
 )}
+{activeMenu === 'Flight History' && (
+
+  <div
+    style={{
+      flex: 1,
+      padding: '40px'
+    }}
+  >
+
+    {/* HEADER */}
+
+    <div
+      style={{
+        marginBottom: '32px'
+      }}
+    >
+
+      <div
+        style={{
+          color: '#4f8cff',
+          fontSize: '12px',
+          fontWeight: '700',
+          letterSpacing: '2.5px',
+          marginBottom: '8px'
+        }}
+      >
+        OPERDAT · OPERATIONS
+      </div>
+
+      <h1
+        style={{
+          fontSize: '38px',
+          margin: 0,
+          fontWeight: '700',
+          letterSpacing: '-0.5px'
+        }}
+      >
+        FLIGHT HISTORY
+      </h1>
+
+      <p
+        style={{
+          color: '#8fa0b7',
+          marginTop: '8px',
+          marginBottom: 0,
+          fontSize: '14px'
+        }}
+      >
+        Complete freighter operational history
+      </p>
+
+    </div>
+{/* HISTORY FILTERS */}
+
+<div
+  style={{
+    display: 'flex',
+    gap: '12px',
+    marginBottom: '28px',
+    flexWrap: 'wrap',
+    alignItems: 'center'
+  }}
+>
+
+  {/* SEARCH */}
+
+  <input
+    type="text"
+    value={historySearch}
+    onChange={(e) =>
+      setHistorySearch(e.target.value)
+    }
+    placeholder="Flight, registration, origin or destination"
+    style={{
+      width: '420px',
+maxWidth: '100%',
+      padding: '12px 14px',
+      borderRadius: '9px',
+      border:
+        '1px solid rgba(255,255,255,0.10)',
+      background:
+        'rgba(5,17,32,0.80)',
+      color: '#ffffff',
+      fontSize: '13px',
+      outline: 'none'
+    }}
+  />
+
+
+  {/* STATUS */}
+
+  <select
+    value={historyStatus}
+    onChange={(e) =>
+      setHistoryStatus(e.target.value)
+    }
+    style={{
+      padding: '12px 14px',
+      borderRadius: '9px',
+      border:
+        '1px solid rgba(255,255,255,0.10)',
+      background:
+        'rgba(5,17,32,0.80)',
+      color: '#ffffff',
+      fontSize: '13px',
+      outline: 'none',
+      cursor: 'pointer'
+    }}
+  >
+    <option value="ALL">
+      All Status
+    </option>
+
+    <option value="OPEN">
+      Open
+    </option>
+
+    <option value="CLOSED">
+      Closed
+    </option>
+  </select>
+{userRole === 'admin' && (
+  <select
+    value={historyUser}
+    onChange={(e) =>
+      setHistoryUser(e.target.value)
+    }
+    style={{
+      padding: '12px 14px',
+      borderRadius: '9px',
+      border:
+        '1px solid rgba(255,255,255,0.10)',
+      background:
+        'rgba(5,17,32,0.80)',
+      color: '#ffffff',
+      fontSize: '13px',
+      outline: 'none',
+      cursor: 'pointer'
+    }}
+  >
+    <option value="ALL">
+      All Users
+    </option>
+
+    {[
+      ...new Set(
+        cargoFlightRecords
+          .map(flight => flight.createdByName)
+          .filter(Boolean)
+      )
+    ].map(name => (
+      <option
+        key={name}
+        value={name}
+      >
+        {name}
+      </option>
+    ))}
+
+  </select>
+)}
+
+  {/* DATE */}
+
+  <input
+    type="date"
+    value={historyDate}
+    onChange={(e) =>
+      setHistoryDate(e.target.value)
+    }
+    style={{
+      padding: '11px 14px',
+      borderRadius: '9px',
+      border:
+        '1px solid rgba(255,255,255,0.10)',
+      background:
+        'rgba(5,17,32,0.80)',
+      color: '#ffffff',
+      fontSize: '13px',
+      outline: 'none'
+    }}
+  />
+
+</div>
+{/* HISTORY SUMMARY */}
+
+<div
+  style={{
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '18px'
+  }}
+>
+  <div
+    style={{
+      color: '#8fa0b7',
+      fontSize: '12px',
+      fontWeight: '600',
+      letterSpacing: '1px'
+    }}
+  >
+    {filteredHistoryFlights.length}{' '}
+    {filteredHistoryFlights.length === 1
+      ? 'RECORD FOUND'
+      : 'RECORDS FOUND'}
+  </div>
+
+  {(historySearch ||
+    historyStatus !== 'ALL' ||
+    historyDate ||
+    historyUser !== 'ALL') && (
+
+    <button
+      onClick={() => {
+        setHistorySearch('')
+        setHistoryStatus('ALL')
+        setHistoryDate('')
+        setHistoryUser('ALL')
+      }}
+      style={{
+        padding: '8px 14px',
+        borderRadius: '8px',
+        border:
+          '1px solid rgba(79,140,255,0.35)',
+        background:
+          'rgba(79,140,255,0.10)',
+        color: '#4f8cff',
+        fontSize: '11px',
+        fontWeight: '700',
+        letterSpacing: '0.8px',
+        cursor: 'pointer'
+      }}
+    >
+      CLEAR FILTERS
+    </button>
+
+  )}
+</div>
+    {/* EMPTY STATE */}
+
+    {filteredHistoryFlights.length === 0 && (
+
+      <div
+        style={{
+          padding: '50px 30px',
+          borderRadius: '16px',
+          background:
+            'linear-gradient(145deg, rgba(10,28,50,0.92), rgba(5,17,32,0.92))',
+          border:
+            '1px solid rgba(255,255,255,0.08)',
+          color: '#7f8da0',
+          textAlign: 'center',
+          boxShadow:
+            '0 10px 30px rgba(0,0,0,0.18)'
+        }}
+      >
+
+        <div
+          style={{
+            fontSize: '13px',
+            letterSpacing: '1.5px',
+            fontWeight: '600'
+          }}
+        >{cargoFlightRecords.length === 0
+  ? 'NO FLIGHT HISTORY AVAILABLE'
+  : 'NO RECORDS MATCH THE SELECTED FILTERS'}
+          NO FLIGHT HISTORY AVAILABLE
+        </div>
+
+      </div>
+
+    )}
+
+
+    {/* HISTORY */}
+
+    {cargoFlightRecords
+  .filter(flight => {
+
+    const userMatch =
+      userRole === 'admin' ||
+      flight.createdBy === currentUser?.id
+
+    const search =
+      historySearch.trim().toLowerCase()
+
+    const searchMatch =
+      !search ||
+      (flight.flightNumber || '')
+        .toLowerCase()
+        .includes(search) ||
+      (flight.registration || '')
+        .toLowerCase()
+        .includes(search) ||
+      (flight.from || '')
+        .toLowerCase()
+        .includes(search) ||
+      (flight.to || '')
+        .toLowerCase()
+        .includes(search)
+
+    const statusMatch =
+      historyStatus === 'ALL' ||
+      flight.status === historyStatus
+const userHistoryMatch =
+  userRole !== 'admin' ||
+  historyUser === 'ALL' ||
+  flight.createdByName === historyUser
+    const flightDate =
+      flight.createdAt
+        ? new Date(flight.createdAt)
+            .toISOString()
+            .slice(0, 10)
+        : ''
+
+    const dateMatch =
+      !historyDate ||
+      flightDate === historyDate
+
+    return (
+  userMatch &&
+  searchMatch &&
+  statusMatch &&
+  userHistoryMatch &&
+  dateMatch
+)
+  })
+  .map(flight => (
+
+        <div
+          key={flight.id}
+          style={{
+            marginBottom: '14px',
+            padding: '20px 22px',
+            borderRadius: '16px',
+            background:
+              'linear-gradient(145deg, rgba(10,28,50,0.94), rgba(5,17,32,0.94))',
+            border:
+              '1px solid rgba(255,255,255,0.08)',
+            boxShadow:
+              '0 8px 24px rgba(0,0,0,0.18)'
+          }}
+        >
+
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: '20px'
+            }}
+          >
+
+            <div>
+
+              <div
+                style={{
+                  fontSize: '18px',
+                  fontWeight: '700',
+                  marginBottom: '6px'
+                }}
+              >
+                {flight.flightNumber || '----'}
+              </div>
+
+              <div
+                style={{
+                  color: '#8fa0b7',
+                  fontSize: '13px'
+                }}
+              >
+                {flight.from || '----'}
+                {' → '}
+                {flight.to || '----'}
+                {' · '}
+                {flight.registration || '----'}
+              </div>
+
+            </div>
+
+            <div
+              style={{
+                textAlign: 'right'
+              }}
+            >
+
+              <div
+                style={{
+                  fontSize: '12px',
+                  fontWeight: '700',
+                  letterSpacing: '1px'
+                }}
+              >
+                {flight.status || '----'}
+              </div>
+
+              <div
+                style={{
+                  color: '#8fa0b7',
+                  fontSize: '12px',
+                  marginTop: '5px'
+                }}
+              >
+                {flight.createdAt
+                  ? new Date(
+                      flight.createdAt
+                    ).toLocaleString()
+                  : '----'}
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      ))}
+
+  </div>
+
+)}
+
 {activeMenu === 'Fuel' && (
 
   <div
