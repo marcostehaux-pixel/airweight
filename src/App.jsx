@@ -185,7 +185,9 @@ setCurrentUser({
     if (profile.role === 'freighter') {
       setActiveMenu('FreighterLoadsheet')
     }
-
+if (profile.role === 'super_admin') {
+  setActiveMenu('Flight History')
+}
     setLogged(true)
     setCurrentUser({
   id: session.user.id,
@@ -1666,12 +1668,23 @@ try {
 
   alert('Flight saved as OPEN')
 }
+console.log(
+  'FLIGHT HISTORY USER:',
+  userRole,
+  currentUser
+)
+
+console.log(
+  'FLIGHT HISTORY RECORDS:',
+  cargoFlightRecords.length
+)
 const filteredHistoryFlights =
   cargoFlightRecords.filter(flight => {
 
     const userMatch =
-      userRole === 'admin' ||
-      flight.createdBy === currentUser?.id
+  userRole === 'super_admin' ||
+  userRole === 'admin' ||
+  flight.createdBy === currentUser?.id
 
     const search =
       historySearch.trim().toLowerCase()
@@ -1696,9 +1709,10 @@ const filteredHistoryFlights =
       flight.status === historyStatus
 
     const userHistoryMatch =
-      userRole !== 'admin' ||
-      historyUser === 'ALL' ||
-      flight.createdByName === historyUser
+  (userRole !== 'admin' &&
+   userRole !== 'super_admin') ||
+  historyUser === 'ALL' ||
+  flight.createdByName === historyUser
 
     const flightDate =
       flight.createdAt
@@ -1837,7 +1851,11 @@ return (
 
   {/* FLIGHT RECORDS */}
 
-  {(userRole === 'freighter' || userRole === 'admin') && (
+  {(
+  userRole === 'freighter' ||
+  userRole === 'admin' ||
+  userRole === 'super_admin'
+) && (
     <div
       onClick={() => setActiveMenu('Flight Records')}
       style={{
@@ -1869,7 +1887,11 @@ return (
   )}
 {/* FLIGHT HISTORY */}
 
-{(userRole === 'freighter' || userRole === 'admin') && (
+{(
+  userRole === 'freighter' ||
+  userRole === 'admin' ||
+  userRole === 'super_admin'
+) && (
   <div
     onClick={() => setActiveMenu('Flight History')}
     style={{
@@ -7951,58 +7973,7 @@ maxWidth: '100%',
 
     {/* HISTORY */}
 
-    {cargoFlightRecords
-  .filter(flight => {
-
-    const userMatch =
-      userRole === 'admin' ||
-      flight.createdBy === currentUser?.id
-
-    const search =
-      historySearch.trim().toLowerCase()
-
-    const searchMatch =
-      !search ||
-      (flight.flightNumber || '')
-        .toLowerCase()
-        .includes(search) ||
-      (flight.registration || '')
-        .toLowerCase()
-        .includes(search) ||
-      (flight.from || '')
-        .toLowerCase()
-        .includes(search) ||
-      (flight.to || '')
-        .toLowerCase()
-        .includes(search)
-
-    const statusMatch =
-      historyStatus === 'ALL' ||
-      flight.status === historyStatus
-const userHistoryMatch =
-  userRole !== 'admin' ||
-  historyUser === 'ALL' ||
-  flight.createdByName === historyUser
-    const flightDate =
-      flight.createdAt
-        ? new Date(flight.createdAt)
-            .toISOString()
-            .slice(0, 10)
-        : ''
-
-    const dateMatch =
-      !historyDate ||
-      flightDate === historyDate
-
-    return (
-  userMatch &&
-  searchMatch &&
-  statusMatch &&
-  userHistoryMatch &&
-  dateMatch
-)
-  })
-  .map(flight => (
+    {filteredHistoryFlights.map(flight => (
 
         <div
           key={flight.id}
