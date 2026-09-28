@@ -8331,17 +8331,49 @@ const userHistoryMatch =
     }}
   >
 
-    <div
-      style={{
-        color: '#4f8cff',
-        fontSize: '11px',
-        fontWeight: '700',
-        letterSpacing: '1.5px',
-        marginBottom: '8px'
-      }}
-    >
-      AIRCRAFT CONFIGURATION
-    </div>
+   <div
+  style={{
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '8px'
+  }}
+>
+  <div
+    style={{
+      color: '#4f8cff',
+      fontSize: '11px',
+      fontWeight: '700',
+      letterSpacing: '1.5px'
+    }}
+  >
+    AIRCRAFT CONFIGURATION
+  </div>
+
+  <button
+    type="button"
+    onClick={() => {
+      setSelectedAdminAircraft(null)
+      setSelectedAdminAircraftFullData(null)
+    }}
+    title="Close configuration"
+    style={{
+      width: '32px',
+      height: '32px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: '8px',
+      border: '1px solid rgba(255,255,255,0.10)',
+      background: 'rgba(255,255,255,0.04)',
+      color: '#8fa0b7',
+      fontSize: '18px',
+      cursor: 'pointer'
+    }}
+  >
+    ▲
+  </button>
+</div>
 
     <div
       style={{
