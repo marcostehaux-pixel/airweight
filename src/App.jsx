@@ -87,7 +87,9 @@ import generateLoadsheet from './utils/generateLoadsheet'
 import logo from './assets/logo.png'
 import {
   getAircraft,
-  getCargoAircraftFleet
+  getCargoAircraftFleet,
+  getAircraftFullData,
+  adaptSupabaseAircraft
 } from './services/aircraftService'
 import {
   getFreighterFlights,
@@ -105,6 +107,16 @@ function App() {
   
 const [logged,setLogged]=useState(false)
 const [userRole, setUserRole] = useState(null)
+const [adminAircraft, setAdminAircraft] =
+  useState([])
+  const [
+  selectedAdminAircraft,
+  setSelectedAdminAircraft
+] = useState(null)
+const [
+  selectedAdminAircraftFullData,
+  setSelectedAdminAircraftFullData
+] = useState(null)
 const [currentUser, setCurrentUser] = useState(null)
 useEffect(() => {
   if (!logged || !currentUser) return
@@ -186,7 +198,32 @@ setCurrentUser({
 
   restoreSession()
 }, [])
+useEffect(() => {
+  if (!logged || userRole !== 'admin') return
 
+  async function loadAdminAircraft() {
+    try {
+      const aircraft =
+        await getAircraft()
+
+      setAdminAircraft(
+        aircraft || []
+      )
+console.log(
+  'ADMIN AIRCRAFT:',
+  aircraft
+)
+    } catch (error) {
+      console.error(
+        'AIRCRAFT MANAGEMENT LOAD ERROR:',
+        error
+      )
+    }
+  }
+
+  loadAdminAircraft()
+
+}, [logged, userRole])
 const [tripFuel, setTripFuel] = useState(0)
 const [taxiFuel,setTaxiFuel ]= useState(0)
 const [fuel, setFuel] = useState(0)
@@ -1858,8 +1895,43 @@ return (
       cursor: 'pointer',
       transition: 'all 0.2s ease'
     }}
+    
   >
     Flight History
+  </div>
+)}
+{/* AIRCRAFT MANAGEMENT */}
+
+{userRole === 'admin' && (
+  <div
+    onClick={() =>
+      setActiveMenu('Aircraft Management')
+    }
+    style={{
+      marginBottom: '10px',
+      padding: '12px 15px',
+      borderRadius: '9px',
+      background:
+        activeMenu === 'Aircraft Management'
+          ? 'rgba(21,101,255,0.16)'
+          : 'transparent',
+      border:
+        activeMenu === 'Aircraft Management'
+          ? '1px solid rgba(21,101,255,0.40)'
+          : '1px solid transparent',
+      color:
+        activeMenu === 'Aircraft Management'
+          ? '#ffffff'
+          : '#b9c4d3',
+      fontWeight:
+        activeMenu === 'Aircraft Management'
+          ? '700'
+          : '500',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease'
+    }}
+  >
+    Aircraft Management
   </div>
 )}
 
@@ -8024,7 +8096,734 @@ const userHistoryMatch =
   </div>
 
 )}
+{activeMenu === 'Aircraft Management' && (
 
+  <div
+    style={{
+      flex: 1,
+      padding: '40px'
+    }}
+  >
+
+    <div
+      style={{
+        color: '#4f8cff',
+        fontSize: '12px',
+        fontWeight: '700',
+        letterSpacing: '2.5px',
+        marginBottom: '8px'
+      }}
+    >
+      OPERDAT · ADMINISTRATION
+    </div>
+
+    <h1
+      style={{
+        fontSize: '38px',
+        margin: 0,
+        fontWeight: '700',
+        letterSpacing: '-0.5px'
+      }}
+    >
+      AIRCRAFT MANAGEMENT
+    </h1>
+
+    <p
+      style={{
+        color: '#8fa0b7',
+        marginTop: '8px',
+        fontSize: '14px'
+      }}
+    >
+      Organization fleet and aircraft configuration
+    </p>
+
+   {/* FLEET SUMMARY */}
+
+<div
+  style={{
+    marginTop: '30px',
+    marginBottom: '16px',
+    color: '#8fa0b7',
+    fontSize: '12px',
+    fontWeight: '600',
+    letterSpacing: '1px'
+  }}
+>
+  {adminAircraft.length}{' '}
+  {adminAircraft.length === 1
+    ? 'AIRCRAFT'
+    : 'AIRCRAFT'}{' '}
+  IN ORGANIZATION FLEET
+</div>
+
+
+{/* FLEET TABLE */}
+
+<div
+  style={{
+    borderRadius: '16px',
+    overflow: 'hidden',
+    border:
+      '1px solid rgba(255,255,255,0.08)',
+    background:
+      'linear-gradient(145deg, rgba(10,28,50,0.94), rgba(5,17,32,0.94))',
+    boxShadow:
+      '0 8px 24px rgba(0,0,0,0.18)'
+  }}
+>
+
+  {/* TABLE HEADER */}
+
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns:
+        '1.1fr 1.5fr 0.9fr 0.9fr 0.9fr 0.9fr 0.8fr 1.2fr',
+      gap: '12px',
+      padding: '14px 18px',
+      background:
+        'rgba(255,255,255,0.035)',
+      color: '#7f8da0',
+      fontSize: '10px',
+      fontWeight: '700',
+      letterSpacing: '1px'
+    }}
+  >
+    <div>REGISTRATION</div>
+    <div>TYPE</div>
+    <div>DOW</div>
+    <div>MZFW</div>
+    <div>MTOW</div>
+    <div>MLW</div>
+    <div>STATUS</div>
+    <div>ACTION</div>
+  </div>
+
+
+  {/* AIRCRAFT ROWS */}
+
+  {adminAircraft.map((aircraft) => (
+
+    <div
+      key={aircraft.id}
+      style={{
+        display: 'grid',
+        gridTemplateColumns:
+          '1.1fr 1.5fr 0.9fr 0.9fr 0.9fr 0.9fr 0.8fr 1.2fr',
+        gap: '12px',
+        padding: '18px',
+        alignItems: 'center',
+        borderTop:
+          '1px solid rgba(255,255,255,0.06)',
+        fontSize: '13px'
+      }}
+    >
+
+      <div
+        style={{
+          color: '#ffffff',
+          fontWeight: '700'
+        }}
+      >
+        {aircraft.registration}
+      </div>
+
+      <div
+        style={{
+          color: '#b9c4d3'
+        }}
+      >
+        {aircraft.aircraft_type}
+      </div>
+
+      <div>
+        {Number(aircraft.dow).toLocaleString()}
+      </div>
+
+      <div>
+        {Number(aircraft.mzfw).toLocaleString()}
+      </div>
+
+      <div>
+        {Number(aircraft.mtow).toLocaleString()}
+      </div>
+
+      <div>
+        {Number(aircraft.mlw).toLocaleString()}
+      </div>
+
+      <div
+        style={{
+          fontWeight: '700',
+          fontSize: '11px',
+          letterSpacing: '0.7px'
+        }}
+      >
+        {aircraft.status?.toUpperCase()}
+      </div>
+
+      <button
+        type="button"
+        onClick={async () => {
+  try {
+    console.log(
+  'VIEW CONFIGURATION CLICK:',
+  aircraft.id,
+  aircraft.registration
+)
+    setSelectedAdminAircraft(aircraft)
+
+    const fullData =
+      await getAircraftFullData(
+        aircraft.id
+      )
+
+    setSelectedAdminAircraftFullData(
+      fullData
+    )
+
+    console.log(
+      'ADMIN AIRCRAFT FULL DATA:',
+      fullData
+    )
+
+  } catch (error) {
+    console.error(
+      'AIRCRAFT CONFIGURATION LOAD ERROR:',
+      error
+    )
+  }
+}}
+  style={{
+          padding: '8px 12px',
+          borderRadius: '8px',
+          border:
+            '1px solid rgba(79,140,255,0.35)',
+          background:
+            'rgba(79,140,255,0.10)',
+          color: '#4f8cff',
+          fontSize: '10px',
+          fontWeight: '700',
+          letterSpacing: '0.6px',
+          cursor: 'pointer'
+        }}
+      >
+        VIEW CONFIGURATION
+      </button>
+
+    </div>
+
+  ))}
+{selectedAdminAircraft && (
+
+  <div
+    style={{
+      marginTop: '28px',
+      padding: '24px',
+      borderRadius: '16px',
+      background:
+        'linear-gradient(145deg, rgba(10,28,50,0.94), rgba(5,17,32,0.94))',
+      border:
+        '1px solid rgba(79,140,255,0.20)',
+      boxShadow:
+        '0 8px 24px rgba(0,0,0,0.18)'
+    }}
+  >
+
+    <div
+      style={{
+        color: '#4f8cff',
+        fontSize: '11px',
+        fontWeight: '700',
+        letterSpacing: '1.5px',
+        marginBottom: '8px'
+      }}
+    >
+      AIRCRAFT CONFIGURATION
+    </div>
+
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: '20px'
+      }}
+    >
+
+      <div>
+
+        <div
+          style={{
+            fontSize: '26px',
+            fontWeight: '700'
+          }}
+        >
+          {selectedAdminAircraft.registration}
+        </div>
+
+        <div
+          style={{
+            color: '#8fa0b7',
+            marginTop: '5px',
+            fontSize: '13px'
+          }}
+        >
+          {selectedAdminAircraft.manufacturer}{' '}
+          {selectedAdminAircraft.model}{' '}
+          {selectedAdminAircraft.variant}
+        </div>
+
+      </div>
+
+      <div
+        style={{
+          textAlign: 'right'
+        }}
+      >
+        <div
+          style={{
+            color: '#8fa0b7',
+            fontSize: '10px',
+            letterSpacing: '1px'
+          }}
+        >
+          STATUS
+        </div>
+
+        <div
+          style={{
+            marginTop: '5px',
+            fontWeight: '700',
+            fontSize: '13px'
+          }}
+        >
+          {selectedAdminAircraft.status?.toUpperCase()}
+          {selectedAdminAircraftFullData && (
+
+  <div
+    style={{
+      marginTop: '26px',
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr',
+      gap: '18px'
+    }}
+  >
+
+    {/* AIRCRAFT DATA */}
+
+    <div
+      style={{
+        padding: '20px',
+        borderRadius: '12px',
+        background: 'rgba(255,255,255,0.025)',
+        border: '1px solid rgba(255,255,255,0.07)'
+      }}
+    >
+
+      <div
+        style={{
+          color: '#4f8cff',
+          fontSize: '11px',
+          fontWeight: '700',
+          letterSpacing: '1.3px',
+          marginBottom: '18px'
+        }}
+      >
+        AIRCRAFT DATA
+      </div>
+
+      {[
+        ['DOW', selectedAdminAircraftFullData.aircraft.dow],
+        ['MZFW', selectedAdminAircraftFullData.aircraft.mzfw],
+        ['MTOW', selectedAdminAircraftFullData.aircraft.mtow],
+        ['MRW', selectedAdminAircraftFullData.aircraft.mrw],
+        ['MLW', selectedAdminAircraftFullData.aircraft.mlw]
+      ].map(([label, value]) => (
+
+        <div
+          key={label}
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            padding: '9px 0',
+            borderBottom:
+              '1px solid rgba(255,255,255,0.05)'
+          }}
+        >
+          <span style={{ color: '#8fa0b7' }}>
+            {label}
+          </span>
+
+          <span style={{ fontWeight: '600' }}>
+            {Number(value).toLocaleString()} kg
+          </span>
+        </div>
+
+      ))}
+
+    </div>
+
+
+    {/* W&B CONFIGURATION */}
+
+    <div
+      style={{
+        padding: '20px',
+        borderRadius: '12px',
+        background: 'rgba(255,255,255,0.025)',
+        border: '1px solid rgba(255,255,255,0.07)'
+      }}
+    >
+
+      <div
+        style={{
+          color: '#4f8cff',
+          fontSize: '11px',
+          fontWeight: '700',
+          letterSpacing: '1.3px',
+          marginBottom: '18px'
+        }}
+      >
+        WEIGHT & BALANCE CONFIGURATION
+      </div>
+
+      {[
+        ['Basic Weight', selectedAdminAircraftFullData.configuration.basic_weight],
+        ['Basic Index', selectedAdminAircraftFullData.configuration.basic_index],
+        ['MAC', selectedAdminAircraftFullData.configuration.mac],
+        ['LEMAC', selectedAdminAircraftFullData.configuration.lemac],
+        ['Datum', selectedAdminAircraftFullData.configuration.datum],
+        ['Index Reference Arm', selectedAdminAircraftFullData.configuration.index_reference_arm],
+        ['Index Constant', selectedAdminAircraftFullData.configuration.index_constant],
+        ['Index Offset', selectedAdminAircraftFullData.configuration.index_offset],
+         ['Basic Weight', selectedAdminAircraftFullData.configuration.basic_weight],
+  ['Basic Index', selectedAdminAircraftFullData.configuration.basic_index],
+
+  ['Basic Configuration', selectedAdminAircraftFullData.configuration.basic_config],
+  ['Basic Crew', selectedAdminAircraftFullData.configuration.basic_crew],
+
+  ['MAC', selectedAdminAircraftFullData.configuration.mac],
+  ['LEMAC', selectedAdminAircraftFullData.configuration.lemac],
+  ['Datum', selectedAdminAircraftFullData.configuration.datum],
+
+  ['Index Reference Arm', selectedAdminAircraftFullData.configuration.index_reference_arm],
+  ['Index Constant', selectedAdminAircraftFullData.configuration.index_constant],
+  ['Index Offset', selectedAdminAircraftFullData.configuration.index_offset],
+
+  ['Seat Arm FWD', selectedAdminAircraftFullData.configuration.seat_arm_fwd],
+  ['Seat Arm MID', selectedAdminAircraftFullData.configuration.seat_arm_mid],
+  ['Seat Arm AFT', selectedAdminAircraftFullData.configuration.seat_arm_aft],
+
+  ['Fuel Arm', selectedAdminAircraftFullData.configuration.fuel_arm],
+  ['Forward Cargo Arm', selectedAdminAircraftFullData.configuration.foward_cargo_arm],
+  ['Aft Cargo Arm', selectedAdminAircraftFullData.configuration.aft_cargo_arm]
+      ].map(([label, value]) => (
+
+        <div
+          key={label}
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            padding: '9px 0',
+            borderBottom:
+              '1px solid rgba(255,255,255,0.05)'
+          }}
+        >
+          <span style={{ color: '#8fa0b7' }}>
+            {label}
+          </span>
+
+          <span style={{ fontWeight: '600' }}>
+            {value ?? '----'}
+          </span>
+        </div>
+
+      ))}
+{/* OPERATIONAL ENVELOPES */}
+
+<div
+  style={{
+    marginTop: '18px',
+    padding: '20px',
+    borderRadius: '12px',
+    background: 'rgba(255,255,255,0.025)',
+    border: '1px solid rgba(255,255,255,0.07)'
+  }}
+>
+
+  <div
+    style={{
+      color: '#4f8cff',
+      fontSize: '11px',
+      fontWeight: '700',
+      letterSpacing: '1.3px',
+      marginBottom: '18px'
+    }}
+  >
+    OPERATIONAL ENVELOPES
+  </div>
+
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns:
+        '0.8fr 1fr 1fr 1fr 1fr',
+      gap: '12px',
+      paddingBottom: '10px',
+      color: '#7f8da0',
+      fontSize: '10px',
+      fontWeight: '700',
+      letterSpacing: '0.8px'
+    }}
+  >
+    <div>PHASE</div>
+    <div>INDEX MIN</div>
+    <div>INDEX MAX</div>
+    <div>CG MIN</div>
+    <div>CG MAX</div>
+  </div>
+
+  {selectedAdminAircraftFullData.envelopes.map(
+    (envelope) => (
+
+      <div
+        key={envelope.id}
+        style={{
+          display: 'grid',
+          gridTemplateColumns:
+            '0.8fr 1fr 1fr 1fr 1fr',
+          gap: '12px',
+          padding: '11px 0',
+          borderTop:
+            '1px solid rgba(255,255,255,0.05)',
+          fontSize: '13px'
+        }}
+      >
+
+        <div
+          style={{
+            fontWeight: '700',
+            color: '#ffffff'
+          }}
+        >
+          {envelope.phase}
+        </div>
+
+        <div>{envelope.index_min}</div>
+        <div>{envelope.index_max}</div>
+
+        <div>
+          {envelope.cg_min} %
+        </div>
+
+        <div>
+          {envelope.cg_max} %
+        </div>
+
+      </div>
+
+    )
+  )}
+
+</div>
+{/* CARGO POSITIONS */}
+
+<div
+  style={{
+    marginTop: '18px',
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '18px'
+  }}
+>
+
+  {/* MAIN DECK */}
+
+  <div
+    style={{
+      padding: '20px',
+      borderRadius: '12px',
+      background: 'rgba(255,255,255,0.025)',
+      border: '1px solid rgba(255,255,255,0.07)'
+    }}
+  >
+
+    <div
+      style={{
+        color: '#4f8cff',
+        fontSize: '11px',
+        fontWeight: '700',
+        letterSpacing: '1.3px',
+        marginBottom: '18px'
+      }}
+    >
+      MAIN DECK CARGO POSITIONS
+    </div>
+
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr 1fr',
+        gap: '10px',
+        paddingBottom: '9px',
+        color: '#7f8da0',
+        fontSize: '10px',
+        fontWeight: '700',
+        letterSpacing: '0.7px'
+      }}
+    >
+      <div>POSITION</div>
+      <div>MAX WEIGHT</div>
+      <div>ARM</div>
+    </div>
+
+    {selectedAdminAircraftFullData.cargoPositions
+      .filter(position =>
+        position.deck === 'MAIN'
+      )
+      .map(position => (
+
+        <div
+          key={position.id}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr 1fr',
+            gap: '10px',
+            padding: '9px 0',
+            borderTop:
+              '1px solid rgba(255,255,255,0.05)',
+            fontSize: '12px'
+          }}
+        >
+          <div
+            style={{
+              color: '#ffffff',
+              fontWeight: '700'
+            }}
+          >
+            {position.position_code}
+          </div>
+
+          <div>
+            {Number(
+              position.max_weight
+            ).toLocaleString()} kg
+          </div>
+
+          <div>
+            {position.arm}
+          </div>
+        </div>
+
+      ))}
+
+  </div>
+
+
+  {/* LOWER DECK */}
+
+  <div
+    style={{
+      padding: '20px',
+      borderRadius: '12px',
+      background: 'rgba(255,255,255,0.025)',
+      border: '1px solid rgba(255,255,255,0.07)'
+    }}
+  >
+
+    <div
+      style={{
+        color: '#4f8cff',
+        fontSize: '11px',
+        fontWeight: '700',
+        letterSpacing: '1.3px',
+        marginBottom: '18px'
+      }}
+    >
+      LOWER DECK CARGO POSITIONS
+    </div>
+
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr 1fr',
+        gap: '10px',
+        paddingBottom: '9px',
+        color: '#7f8da0',
+        fontSize: '10px',
+        fontWeight: '700',
+        letterSpacing: '0.7px'
+      }}
+    >
+      <div>POSITION</div>
+      <div>MAX WEIGHT</div>
+      <div>ARM</div>
+    </div>
+
+    {selectedAdminAircraftFullData.cargoPositions
+      .filter(position =>
+        position.deck === 'LOWER'
+      )
+      .map(position => (
+
+        <div
+          key={position.id}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr 1fr',
+            gap: '10px',
+            padding: '9px 0',
+            borderTop:
+              '1px solid rgba(255,255,255,0.05)',
+            fontSize: '12px'
+          }}
+        >
+          <div
+            style={{
+              color: '#ffffff',
+              fontWeight: '700'
+            }}
+          >
+            {position.position_code}
+          </div>
+
+          <div>
+            {Number(
+              position.max_weight
+            ).toLocaleString()} kg
+          </div>
+
+          <div>
+            {position.arm}
+          </div>
+        </div>
+
+      ))}
+
+  </div>
+
+</div>
+    </div>
+
+  </div>
+
+)}
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+)}
+</div>
+
+  </div>
+
+)}
 {activeMenu === 'Fuel' && (
 
   <div
