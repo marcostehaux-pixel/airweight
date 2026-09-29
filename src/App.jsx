@@ -32,6 +32,8 @@ import {
   getAftBagIndex
 } from './utilit/bagIndexCalculator'
 import { supabase } from './lib/supabase'
+import AircraftTechnicalConfiguration
+  from './components/AircraftTechnicalConfiguration'
 import { calculatePassengerTrim } from './utilit/trimCalculator'
 function getMainIndex(position,weight){
 if(!mainDeckTables[position])
@@ -99,7 +101,7 @@ import {
   adaptFreighterFlightToSupabase,
   adaptSupabaseFlightToOperdat
 } from './services/flightService'
-
+import { getOrganizations } from './services/organizationService'
 import aircraftImage from './assets/a320.png'
 
 console.log('APP FILE LOADED - SUPABASE TEST')
@@ -109,9 +111,28 @@ const [logged,setLogged]=useState(false)
 const [userRole, setUserRole] = useState(null)
 const [adminAircraft, setAdminAircraft] =
   useState([])
+  const [platformOrganizations, setPlatformOrganizations] = useState([])
+  const [
+  selectedPlatformOrganization,
+  setSelectedPlatformOrganization
+] = useState(null)
+
+const [
+  platformOrganizationAircraft,
+  setPlatformOrganizationAircraft
+] = useState([])
   const [
   selectedAdminAircraft,
   setSelectedAdminAircraft
+] = useState(null)
+const [
+  selectedPlatformAircraft,
+  setSelectedPlatformAircraft
+] = useState(null)
+
+const [
+  selectedPlatformAircraftFullData,
+  setSelectedPlatformAircraftFullData
 ] = useState(null)
 const [
   selectedAdminAircraftFullData,
@@ -148,6 +169,30 @@ useEffect(() => {
 
   loadFreighterFlights()
 }, [logged, currentUser])
+useEffect(() => {
+  if (!logged || userRole !== 'super_admin') return
+
+  async function loadPlatformOrganizations() {
+    try {
+      const organizations = await getOrganizations()
+
+      console.log(
+        'PLATFORM ORGANIZATIONS:',
+        organizations
+      )
+
+      setPlatformOrganizations(organizations)
+
+    } catch (error) {
+      console.error(
+        'PLATFORM ORGANIZATIONS ERROR:',
+        error
+      )
+    }
+  }
+
+  loadPlatformOrganizations()
+}, [logged, userRole])
 useEffect(() => {
   async function restoreSession() {
     const {
@@ -1732,6 +1777,7 @@ const filteredHistoryFlights =
       userHistoryMatch &&
       dateMatch
     )
+  
   })
 return (
 
@@ -1849,9 +1895,9 @@ return (
   )}
 
 
-  {/* FLIGHT RECORDS */}
+ {/* FLIGHT RECORDS */}
 
-  {(
+{(
   userRole === 'freighter' ||
   userRole === 'admin' ||
   userRole === 'super_admin'
@@ -1920,6 +1966,36 @@ return (
     
   >
     Flight History
+  </div>
+)}
+ {userRole === 'super_admin' && (
+  <div
+    onClick={() => setActiveMenu('Platform Management')}
+    style={{
+      marginBottom: '10px',
+      padding: '12px 15px',
+      borderRadius: '9px',
+      background:
+        activeMenu === 'Platform Management'
+          ? 'rgba(21,101,255,0.16)'
+          : 'transparent',
+      border:
+        activeMenu === 'Platform Management'
+          ? '1px solid rgba(21,101,255,0.40)'
+          : '1px solid transparent',
+      color:
+        activeMenu === 'Platform Management'
+          ? '#ffffff'
+          : '#b9c4d3',
+      fontWeight:
+        activeMenu === 'Platform Management'
+          ? '700'
+          : '500',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease'
+    }}
+  >
+    Platform Management
   </div>
 )}
 {/* AIRCRAFT MANAGEMENT */}
@@ -7092,7 +7168,393 @@ aftInfants
 
 
 )}
-{(userRole === 'freighter' || userRole === 'admin') &&
+{activeMenu === 'Platform Management' && (
+  <div
+    style={{
+      flex: 1,
+      padding: '40px'
+    }}
+  >
+
+    <div style={{ marginBottom: '32px' }}>
+      <div
+        style={{
+          color: '#4f8cff',
+          fontSize: '12px',
+          fontWeight: '700',
+          letterSpacing: '2.5px',
+          marginBottom: '8px'
+        }}
+      >
+        OPERDAT · PLATFORM ADMINISTRATION
+      </div>
+
+      <h1
+        style={{
+          fontSize: '38px',
+          margin: 0,
+          fontWeight: '700',
+          letterSpacing: '-0.5px'
+        }}
+      >
+        PLATFORM MANAGEMENT
+      </h1>
+
+      <p
+        style={{
+          color: '#8fa0b7',
+          marginTop: '8px',
+          marginBottom: 0,
+          fontSize: '14px'
+        }}
+      >
+        Organizations and platform configuration
+      </p>
+    </div>
+
+    {/* ORGANIZATIONS */}
+
+    <div
+      style={{
+        borderRadius: '16px',
+        overflow: 'hidden',
+        background:
+          'linear-gradient(145deg, rgba(10,28,50,0.94), rgba(5,17,32,0.94))',
+        border: '1px solid rgba(255,255,255,0.08)',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.18)'
+      }}
+    >
+
+      <div
+        style={{
+          padding: '20px 22px',
+          borderBottom:
+            '1px solid rgba(255,255,255,0.07)'
+        }}
+      >
+        <div
+          style={{
+            color: '#4f8cff',
+            fontSize: '11px',
+            fontWeight: '700',
+            letterSpacing: '1.5px'
+          }}
+        >
+          ORGANIZATIONS
+        </div>
+      </div>
+
+      {platformOrganizations.map((organization) => (
+  <div
+    key={organization.id}
+
+    onClick={async () => {
+      try {
+        setSelectedPlatformOrganization(organization)
+
+        const aircraft = await getAircraft()
+
+        const organizationAircraft = aircraft.filter(
+          item =>
+            item.organization_id === organization.id
+        )
+
+        setPlatformOrganizationAircraft(
+          organizationAircraft
+        )
+
+        console.log(
+          'PLATFORM ORGANIZATION AIRCRAFT:',
+          organizationAircraft
+        )
+
+      } catch (error) {
+        console.error(
+          'PLATFORM ORGANIZATION AIRCRAFT ERROR:',
+          error
+        )
+      }
+    }}
+
+    style={{
+            display: 'grid',
+            gridTemplateColumns:
+              '0.6fr 2fr 0.8fr 1fr',
+            gap: '16px',
+            padding: '18px 22px',
+            alignItems: 'center',
+            borderTop:
+              '1px solid rgba(255,255,255,0.05)'
+          }}
+        >
+          <div
+            style={{
+              color: '#4f8cff',
+              fontWeight: '700'
+            }}
+          >
+            {organization.code || '----'}
+          </div>
+
+          <div
+            style={{
+              color: '#ffffff',
+              fontWeight: '600'
+            }}
+          >
+            {organization.name}
+          </div>
+
+          <div
+            style={{
+              fontSize: '11px',
+              fontWeight: '700'
+            }}
+          >
+            {(organization.status || '----').toUpperCase()}
+          </div>
+
+          <div
+            style={{
+              color: '#8fa0b7',
+              fontSize: '12px'
+            }}
+          >
+            ID {organization.id}
+          </div>
+        </div>
+      ))}
+
+    </div>
+{/* SELECTED ORGANIZATION */}
+
+{selectedPlatformOrganization && (
+
+  <div
+    style={{
+      marginTop: '24px',
+      borderRadius: '16px',
+      padding: '24px',
+      background:
+        'linear-gradient(145deg, rgba(10,28,50,0.94), rgba(5,17,32,0.94))',
+      border:
+        '1px solid rgba(255,255,255,0.08)',
+      boxShadow:
+        '0 8px 24px rgba(0,0,0,0.18)'
+    }}
+  >
+
+    {/* HEADER */}
+
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '24px'
+      }}
+    >
+
+      <div>
+
+        <div
+          style={{
+            color: '#4f8cff',
+            fontSize: '11px',
+            fontWeight: '700',
+            letterSpacing: '1.5px',
+            marginBottom: '7px'
+          }}
+        >
+          ORGANIZATION
+        </div>
+
+        <div
+          style={{
+            fontSize: '24px',
+            fontWeight: '700'
+          }}
+        >
+          {selectedPlatformOrganization.name}
+        </div>
+
+        <div
+          style={{
+            color: '#8fa0b7',
+            fontSize: '13px',
+            marginTop: '6px'
+          }}
+        >
+          {selectedPlatformOrganization.code}
+          {' · '}
+          {(selectedPlatformOrganization.status || '')
+            .toUpperCase()}
+        </div>
+
+      </div>
+
+      {/* CLOSE */}
+
+      <button
+        type="button"
+        onClick={() => {
+          setSelectedPlatformOrganization(null)
+          setPlatformOrganizationAircraft([])
+        }}
+        title="Close organization"
+        style={{
+          width: '32px',
+          height: '32px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: '8px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background:
+            'rgba(255,255,255,0.04)',
+          color: '#8fa0b7',
+          fontSize: '18px',
+          cursor: 'pointer'
+        }}
+      >
+        ▲
+      </button>
+
+    </div>
+<AircraftTechnicalConfiguration
+  aircraft={selectedPlatformAircraft}
+  fullData={selectedPlatformAircraftFullData}
+  onClose={() => {
+    setSelectedPlatformAircraft(null)
+    setSelectedPlatformAircraftFullData(null)
+  }}
+/>
+
+    {/* FLEET TITLE */}
+
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '14px'
+      }}
+    >
+
+      <div
+        style={{
+          color: '#4f8cff',
+          fontSize: '11px',
+          fontWeight: '700',
+          letterSpacing: '1.3px'
+        }}
+      >
+        AIRCRAFT FLEET
+      </div>
+
+      <div
+        style={{
+          color: '#8fa0b7',
+          fontSize: '12px'
+        }}
+      >
+        {platformOrganizationAircraft.length} AIRCRAFT
+      </div>
+
+    </div>
+
+
+    {/* FLEET */}
+
+    {platformOrganizationAircraft.map(
+      (aircraft) => (
+
+        <div
+          key={aircraft.id}
+          onClick={async () => {
+  try {
+    setSelectedPlatformAircraft(aircraft)
+
+    const fullData =
+      await getAircraftFullData(aircraft.id)
+
+    setSelectedPlatformAircraftFullData(
+      fullData
+    )
+
+    console.log(
+      'PLATFORM AIRCRAFT FULL DATA:',
+      fullData
+    )
+
+  } catch (error) {
+    console.error(
+      'PLATFORM AIRCRAFT CONFIGURATION ERROR:',
+      error
+    )
+  }
+}}
+          style={{
+            display: 'grid',
+            cursor: 'pointer',
+            gridTemplateColumns:
+              '1fr 1.5fr 1fr 1fr',
+            gap: '16px',
+            padding: '14px 0',
+            alignItems: 'center',
+            borderTop:
+              '1px solid rgba(255,255,255,0.06)'
+          }}
+        >
+
+          <div
+            style={{
+              color: '#ffffff',
+              fontWeight: '700'
+            }}
+          >
+            {aircraft.registration}
+          </div>
+
+          <div
+            style={{
+              color: '#b9c4d3'
+            }}
+          >
+            {aircraft.aircraft_type}
+          </div>
+
+          <div
+            style={{
+              color: '#8fa0b7',
+              fontSize: '12px'
+            }}
+          >
+            {aircraft.manufacturer}
+          </div>
+
+          <div
+            style={{
+              fontSize: '11px',
+              fontWeight: '700'
+            }}
+          >
+            {(aircraft.status || '----')
+              .toUpperCase()}
+          </div>
+
+        </div>
+
+      )
+    )}
+
+  </div>
+
+)}
+  </div>
+)}
+{(userRole ===  userRole === 'super_admin' ||'freighter' || userRole === 'admin') &&
  activeMenu === 'Flight Records' && (
 
   <div
@@ -8493,15 +8955,7 @@ maxWidth: '100%',
       </div>
 
       {[
-        ['Basic Weight', selectedAdminAircraftFullData.configuration.basic_weight],
-        ['Basic Index', selectedAdminAircraftFullData.configuration.basic_index],
-        ['MAC', selectedAdminAircraftFullData.configuration.mac],
-        ['LEMAC', selectedAdminAircraftFullData.configuration.lemac],
-        ['Datum', selectedAdminAircraftFullData.configuration.datum],
-        ['Index Reference Arm', selectedAdminAircraftFullData.configuration.index_reference_arm],
-        ['Index Constant', selectedAdminAircraftFullData.configuration.index_constant],
-        ['Index Offset', selectedAdminAircraftFullData.configuration.index_offset],
-         ['Basic Weight', selectedAdminAircraftFullData.configuration.basic_weight],
+  ['Basic Weight', selectedAdminAircraftFullData.configuration.basic_weight],
   ['Basic Index', selectedAdminAircraftFullData.configuration.basic_index],
 
   ['Basic Configuration', selectedAdminAircraftFullData.configuration.basic_config],
@@ -8522,7 +8976,7 @@ maxWidth: '100%',
   ['Fuel Arm', selectedAdminAircraftFullData.configuration.fuel_arm],
   ['Forward Cargo Arm', selectedAdminAircraftFullData.configuration.foward_cargo_arm],
   ['Aft Cargo Arm', selectedAdminAircraftFullData.configuration.aft_cargo_arm]
-      ].map(([label, value]) => (
+].map(([label, value]) => (
 
         <div
           key={label}
