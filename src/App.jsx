@@ -101,7 +101,11 @@ import {
   adaptFreighterFlightToSupabase,
   adaptSupabaseFlightToOperdat
 } from './services/flightService'
-import { getOrganizations } from './services/organizationService'
+import {
+  getOrganizations,
+  createOrganization,
+  updateOrganization
+} from './services/organizationService'
 import aircraftImage from './assets/a320.png'
 
 console.log('APP FILE LOADED - SUPABASE TEST')
@@ -112,6 +116,44 @@ const [userRole, setUserRole] = useState(null)
 const [adminAircraft, setAdminAircraft] =
   useState([])
   const [platformOrganizations, setPlatformOrganizations] = useState([])
+  const [
+  showNewOrganizationForm,
+  setShowNewOrganizationForm
+] = useState(false)
+
+const [
+  newOrganizationName,
+  setNewOrganizationName
+] = useState('')
+
+const [
+  newOrganizationCode,
+  setNewOrganizationCode
+] = useState('')
+
+const [
+  creatingOrganization,
+  setCreatingOrganization
+] = useState(false)
+const [
+  editingOrganizationId,
+  setEditingOrganizationId
+] = useState(null)
+
+const [
+  editingOrganizationName,
+  setEditingOrganizationName
+] = useState('')
+
+const [
+  editingOrganizationCode,
+  setEditingOrganizationCode
+] = useState('')
+
+const [
+  updatingOrganization,
+  setUpdatingOrganization
+] = useState(false)
   const [
   selectedPlatformOrganization,
   setSelectedPlatformOrganization
@@ -7225,24 +7267,222 @@ aftInfants
       }}
     >
 
-      <div
-        style={{
-          padding: '20px 22px',
-          borderBottom:
-            '1px solid rgba(255,255,255,0.07)'
-        }}
-      >
+     <div
+  style={{
+    padding: '20px 22px',
+    borderBottom:
+      '1px solid rgba(255,255,255,0.07)',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  }}
+>
+  <div
+    style={{
+      color: '#4f8cff',
+      fontSize: '11px',
+      fontWeight: '700',
+      letterSpacing: '1.5px'
+    }}
+  >
+    ORGANIZATIONS
+  </div>
+
+  <button
+    type="button"
+    onClick={() => {
+      setShowNewOrganizationForm(
+        current => !current
+      )
+    }}
+    style={{
+      padding: '9px 14px',
+      borderRadius: '8px',
+      border:
+        '1px solid rgba(79,140,255,0.35)',
+      background:
+        'rgba(79,140,255,0.10)',
+      color: '#4f8cff',
+      fontSize: '10px',
+      fontWeight: '700',
+      letterSpacing: '0.7px',
+      cursor: 'pointer'
+    }}
+  >
+    {showNewOrganizationForm
+      ? 'CANCEL'
+      : '+ NEW ORGANIZATION'}
+  </button>
+</div>
+{showNewOrganizationForm && (
+  <div
+    style={{
+      padding: '20px 22px',
+      background: 'rgba(79,140,255,0.04)',
+      borderBottom:
+        '1px solid rgba(255,255,255,0.07)'
+    }}
+  >
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '2fr 1fr auto',
+        gap: '14px',
+        alignItems: 'end'
+      }}
+    >
+
+      {/* NAME */}
+
+      <div>
         <div
           style={{
-            color: '#4f8cff',
-            fontSize: '11px',
+            color: '#8fa0b7',
+            fontSize: '10px',
             fontWeight: '700',
-            letterSpacing: '1.5px'
+            letterSpacing: '0.8px',
+            marginBottom: '7px'
           }}
         >
-          ORGANIZATIONS
+          ORGANIZATION NAME
         </div>
+
+        <input
+          type="text"
+          value={newOrganizationName}
+          onChange={(e) =>
+            setNewOrganizationName(e.target.value)
+          }
+          placeholder="Example Aviation"
+          style={{
+            width: '100%',
+            boxSizing: 'border-box',
+            padding: '11px 12px',
+            borderRadius: '8px',
+            border:
+              '1px solid rgba(255,255,255,0.10)',
+            background: 'rgba(0,0,0,0.20)',
+            color: '#ffffff',
+            outline: 'none'
+          }}
+        />
       </div>
+
+      {/* CODE */}
+
+      <div>
+        <div
+          style={{
+            color: '#8fa0b7',
+            fontSize: '10px',
+            fontWeight: '700',
+            letterSpacing: '0.8px',
+            marginBottom: '7px'
+          }}
+        >
+          CODE
+        </div>
+
+        <input
+          type="text"
+          value={newOrganizationCode}
+          onChange={(e) =>
+            setNewOrganizationCode(
+              e.target.value.toUpperCase()
+            )
+          }
+          placeholder="EXA"
+          maxLength={10}
+          style={{
+            width: '100%',
+            boxSizing: 'border-box',
+            padding: '11px 12px',
+            borderRadius: '8px',
+            border:
+              '1px solid rgba(255,255,255,0.10)',
+            background: 'rgba(0,0,0,0.20)',
+            color: '#ffffff',
+            outline: 'none'
+          }}
+        />
+      </div>
+
+      {/* CREATE */}
+
+      <button
+        type="button"
+        disabled={
+          creatingOrganization ||
+          !newOrganizationName.trim() ||
+          !newOrganizationCode.trim()
+        }
+        onClick={async () => {
+          try {
+            setCreatingOrganization(true)
+
+            const created =
+              await createOrganization({
+                name: newOrganizationName,
+                code: newOrganizationCode
+              })
+
+            console.log(
+              'ORGANIZATION CREATED:',
+              created
+            )
+
+            setPlatformOrganizations(
+              current =>
+                [...current, created].sort(
+                  (a, b) =>
+                    a.name.localeCompare(b.name)
+                )
+            )
+
+            setNewOrganizationName('')
+            setNewOrganizationCode('')
+            setShowNewOrganizationForm(false)
+
+          } catch (error) {
+            console.error(
+              'CREATE ORGANIZATION ERROR:',
+              error
+            )
+          } finally {
+            setCreatingOrganization(false)
+          }
+        }}
+        style={{
+          padding: '11px 16px',
+          borderRadius: '8px',
+          border:
+            '1px solid rgba(79,140,255,0.40)',
+          background:
+            'rgba(79,140,255,0.15)',
+          color: '#ffffff',
+          fontSize: '10px',
+          fontWeight: '700',
+          letterSpacing: '0.7px',
+          cursor:
+            creatingOrganization
+              ? 'wait'
+              : 'pointer',
+          opacity:
+            creatingOrganization ||
+            !newOrganizationName.trim() ||
+            !newOrganizationCode.trim()
+              ? 0.45
+              : 1
+        }}
+      >
+        {creatingOrganization
+          ? 'CREATING...'
+          : 'CREATE'}
+      </button>
+
+    </div>
+  </div>
+)}
 
       {platformOrganizations.map((organization) => (
   <div
@@ -7287,41 +7527,316 @@ aftInfants
               '1px solid rgba(255,255,255,0.05)'
           }}
         >
-          <div
-            style={{
-              color: '#4f8cff',
-              fontWeight: '700'
-            }}
-          >
-            {organization.code || '----'}
-          </div>
+          {editingOrganizationId === organization.id ? (
+  <>
+    {/* EDIT NAME */}
 
-          <div
-            style={{
-              color: '#ffffff',
-              fontWeight: '600'
-            }}
-          >
-            {organization.name}
-          </div>
+    <input
+      type="text"
+      value={editingOrganizationName}
+      onChange={(e) =>
+        setEditingOrganizationName(e.target.value)
+      }
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        gridColumn: '1 / 3',
+        padding: '9px 10px',
+        borderRadius: '7px',
+        border:
+          '1px solid rgba(79,140,255,0.35)',
+        background: 'rgba(0,0,0,0.20)',
+        color: '#ffffff',
+        outline: 'none'
+      }}
+    />
 
-          <div
-            style={{
-              fontSize: '11px',
-              fontWeight: '700'
-            }}
-          >
-            {(organization.status || '----').toUpperCase()}
-          </div>
+    {/* EDIT CODE */}
 
-          <div
-            style={{
-              color: '#8fa0b7',
-              fontSize: '12px'
-            }}
-          >
-            ID {organization.id}
-          </div>
+    <input
+      type="text"
+      value={editingOrganizationCode}
+      maxLength={10}
+      onChange={(e) =>
+        setEditingOrganizationCode(
+          e.target.value.toUpperCase()
+        )
+      }
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        padding: '9px 10px',
+        borderRadius: '7px',
+        border:
+          '1px solid rgba(79,140,255,0.35)',
+        background: 'rgba(0,0,0,0.20)',
+        color: '#ffffff',
+        outline: 'none'
+      }}
+    />
+
+    {/* SAVE / CANCEL */}
+
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'flex-end',
+        gap: '8px'
+      }}
+    >
+      <button
+        type="button"
+        disabled={
+          updatingOrganization ||
+          !editingOrganizationName.trim() ||
+          !editingOrganizationCode.trim()
+        }
+        onClick={async (e) => {
+          e.stopPropagation()
+
+          try {
+            setUpdatingOrganization(true)
+
+            const updated =
+              await updateOrganization(
+                organization.id,
+                {
+                  name:
+                    editingOrganizationName.trim(),
+                  code:
+                    editingOrganizationCode
+                      .trim()
+                      .toUpperCase()
+                }
+              )
+
+            setPlatformOrganizations(
+              current =>
+                current
+                  .map(item =>
+                    item.id === updated.id
+                      ? updated
+                      : item
+                  )
+                  .sort((a, b) =>
+                    a.name.localeCompare(b.name)
+                  )
+            )
+
+            if (
+              selectedPlatformOrganization?.id ===
+              updated.id
+            ) {
+              setSelectedPlatformOrganization(
+                updated
+              )
+            }
+
+            setEditingOrganizationId(null)
+            setEditingOrganizationName('')
+            setEditingOrganizationCode('')
+
+            console.log(
+              'ORGANIZATION UPDATED:',
+              updated
+            )
+
+          } catch (error) {
+            console.error(
+              'EDIT ORGANIZATION ERROR:',
+              error
+            )
+          } finally {
+            setUpdatingOrganization(false)
+          }
+        }}
+        style={{
+          padding: '8px 11px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(79,140,255,0.40)',
+          background:
+            'rgba(79,140,255,0.15)',
+          color: '#ffffff',
+          fontSize: '9px',
+          fontWeight: '700',
+          cursor: 'pointer'
+        }}
+      >
+        {updatingOrganization
+          ? 'SAVING...'
+          : 'SAVE'}
+      </button>
+
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation()
+
+          setEditingOrganizationId(null)
+          setEditingOrganizationName('')
+          setEditingOrganizationCode('')
+        }}
+        style={{
+          padding: '8px 11px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background:
+            'rgba(255,255,255,0.04)',
+          color: '#8fa0b7',
+          fontSize: '9px',
+          fontWeight: '700',
+          cursor: 'pointer'
+        }}
+      >
+        CANCEL
+      </button>
+    </div>
+  </>
+) : (
+  <>
+    {/* NORMAL ROW */}
+
+    <div
+      style={{
+        color: '#4f8cff',
+        fontWeight: '700'
+      }}
+    >
+      {organization.code || '----'}
+    </div>
+
+    <div
+      style={{
+        color: '#ffffff',
+        fontWeight: '600'
+      }}
+    >
+      {organization.name}
+    </div>
+
+    <div
+      style={{
+        fontSize: '11px',
+        fontWeight: '700'
+      }}
+    >
+      {(organization.status || '----')
+        .toUpperCase()}
+    </div>
+
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        gap: '10px'
+      }}
+    >
+      <span
+        style={{
+          color: '#8fa0b7',
+          fontSize: '12px'
+        }}
+      >
+        ID {organization.id}
+      </span>
+
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation()
+
+          setEditingOrganizationId(
+            organization.id
+          )
+          setEditingOrganizationName(
+            organization.name || ''
+          )
+          setEditingOrganizationCode(
+            organization.code || ''
+          )
+        }}
+        style={{
+          padding: '7px 10px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(79,140,255,0.25)',
+          background:
+            'rgba(79,140,255,0.08)',
+          color: '#4f8cff',
+          fontSize: '9px',
+          fontWeight: '700',
+          cursor: 'pointer'
+        }}
+      >
+        EDIT
+      </button>
+
+      <button
+        type="button"
+        onClick={async (e) => {
+          e.stopPropagation()
+
+          try {
+            const nextStatus =
+              organization.status === 'active'
+                ? 'inactive'
+                : 'active'
+
+            const updated =
+              await updateOrganization(
+                organization.id,
+                { status: nextStatus }
+              )
+
+            setPlatformOrganizations(
+              current =>
+                current.map(item =>
+                  item.id === updated.id
+                    ? updated
+                    : item
+                )
+            )
+
+            if (
+              selectedPlatformOrganization?.id ===
+              updated.id
+            ) {
+              setSelectedPlatformOrganization(
+                updated
+              )
+            }
+
+          } catch (error) {
+            console.error(
+              'ORGANIZATION STATUS UPDATE ERROR:',
+              error
+            )
+          }
+        }}
+        style={{
+          padding: '7px 10px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background:
+            'rgba(255,255,255,0.04)',
+          color:
+            organization.status === 'active'
+              ? '#8fa0b7'
+              : '#4f8cff',
+          fontSize: '9px',
+          fontWeight: '700',
+          cursor: 'pointer'
+        }}
+      >
+        {organization.status === 'active'
+          ? 'DEACTIVATE'
+          : 'ACTIVATE'}
+      </button>
+    </div>
+  </>
+)}
         </div>
       ))}
 
