@@ -108,7 +108,7 @@ export async function getAircraftFullData(aircraftId) {
     .from('aircraft_configurations')
     .select('*')
     .eq('aircraft_id', aircraftId)
-    .single()
+    .maybeSingle()
 
   if (configurationError) throw configurationError
 
@@ -136,20 +136,211 @@ export async function getAircraftFullData(aircraftId) {
   }
   
 }
+export async function createAircraft({
+  organizationId,
+  registration,
+  manufacturer,
+  model,
+  variant,
+  aircraftType,
+  dow,
+  mzfw,
+  mtow,
+  mlw,
+  mrw
+}) {
+  const { data, error } = await supabase
+    .from('aircraft')
+    .insert({
+      organization_id: organizationId,
+      registration: registration.trim().toUpperCase(),
+      manufacturer: manufacturer.trim(),
+      model: model.trim(),
+      variant: variant.trim(),
+      aircraft_type: aircraftType.trim(),
+      dow: Number(dow),
+      mzfw: Number(mzfw),
+      mtow: Number(mtow),
+      mlw: Number(mlw),
+      mrw: Number(mrw),
+      status: 'active'
+    })
+    .select()
+    .single()
+
+  if (error) {
+    console.error(
+      'AIRCRAFT CREATE ERROR:',
+      error
+    )
+
+    throw error
+  }
+
+  return data
+}
+export async function createAircraftConfiguration({
+  aircraftId,
+  datum,
+  mac,
+  lemac,
+  basicWeight,
+  basicIndex,
+  indexReferenceArm,
+  indexConstant,
+  indexOffset,
+  basicConfig,
+  basicCrew,
+  seatArmFwd,
+  seatArmMid,
+  seatArmAft,
+  fuelArm,
+  forwardCargoArm,
+  aftCargoArm
+}) {
+  
+  const { data, error } = await supabase
+    .from('aircraft_configurations')
+    .insert({
+      aircraft_id: aircraftId,
+
+      datum: Number(datum),
+      mac: Number(mac),
+      lemac: Number(lemac),
+
+      basic_weight: Number(basicWeight),
+      basic_index: Number(basicIndex),
+
+      index_reference_arm:
+        Number(indexReferenceArm),
+
+      index_constant:
+        Number(indexConstant),
+
+      index_offset:
+        Number(indexOffset),
+
+      basic_config:
+        basicConfig.trim(),
+
+      basic_crew:
+        basicCrew.trim(),
+
+      seat_arm_fwd:
+        Number(seatArmFwd),
+
+      seat_arm_mid:
+        Number(seatArmMid),
+
+      seat_arm_aft:
+        Number(seatArmAft),
+
+      fuel_arm:
+        Number(fuelArm),
+
+      forward_cargo_arm:
+        Number(forwardCargoArm),
+
+      aft_cargo_arm:
+        Number(aftCargoArm)
+    })
+    .select()
+    .single()
+
+  if (error) {
+    console.error(
+      'AIRCRAFT CONFIGURATION CREATE ERROR:',
+      error
+    )
+
+    throw error
+  }
+
+  return data
+}
+export async function createAircraftEnvelopes({
+  aircraftId,
+  zfw,
+  tow,
+  ldw
+}) {
+  const rows = [
+    {
+      aircraft_id: aircraftId,
+      phase: 'ZFW',
+      index_min: Number(zfw.indexMin),
+      index_max: Number(zfw.indexMax),
+      cg_min: Number(zfw.cgMin),
+      cg_max: Number(zfw.cgMax)
+    },
+    {
+      aircraft_id: aircraftId,
+      phase: 'TOW',
+      index_min: Number(tow.indexMin),
+      index_max: Number(tow.indexMax),
+      cg_min: Number(tow.cgMin),
+      cg_max: Number(tow.cgMax)
+    },
+    {
+      aircraft_id: aircraftId,
+      phase: 'LDW',
+      index_min: Number(ldw.indexMin),
+      index_max: Number(ldw.indexMax),
+      cg_min: Number(ldw.cgMin),
+      cg_max: Number(ldw.cgMax)
+    }
+  ]
+
+  const { data, error } = await supabase
+    .from('aircraft_envelopes')
+    .insert(rows)
+    .select()
+
+  if (error) {
+    console.error(
+      'AIRCRAFT ENVELOPES CREATE ERROR:',
+      error
+    )
+
+    throw error
+  }
+
+  return data
+}
 export async function getCargoAircraftFleet() {
   const aircraftList = await getAircraft()
 
   const cargoAircraft = aircraftList.filter(
-    (item) => item.aircraft_type === 'B737-800CF'
+    (item) =>
+      item.aircraft_type === 'B737-800CF' &&
+      item.status === 'active'
   )
 
   const adaptedFleet = []
 
   for (const aircraft of cargoAircraft) {
-    const fullData = await getAircraftFullData(aircraft.id)
-    const adaptedAircraft = adaptSupabaseAircraft(fullData)
+    try {
+      const fullData =
+        await getAircraftFullData(aircraft.id)
 
-    adaptedFleet.push(adaptedAircraft)
+      if (!fullData?.configuration) {
+        console.warn(
+          `AIRCRAFT ${aircraft.registration} SKIPPED: configuration incomplete`
+        )
+        continue
+      }
+
+      const adaptedAircraft =
+        adaptSupabaseAircraft(fullData)
+
+      adaptedFleet.push(adaptedAircraft)
+
+    } catch (error) {
+      console.warn(
+        `AIRCRAFT ${aircraft.registration} SKIPPED: configuration incomplete`,
+        error
+      )
+    }
   }
 
   return adaptedFleet

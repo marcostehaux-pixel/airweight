@@ -91,6 +91,9 @@ import {
   getAircraft,
   getCargoAircraftFleet,
   getAircraftFullData,
+   createAircraft,
+   createAircraftConfiguration,
+   createAircraftEnvelopes,
   adaptSupabaseAircraft
 } from './services/aircraftService'
 import {
@@ -313,6 +316,37 @@ console.log(
   loadAdminAircraft()
 
 }, [logged, userRole])
+const [
+  newAircraftEnvelopes,
+  setNewAircraftEnvelopes
+] = useState({
+  zfw: {
+    indexMin: '',
+    indexMax: '',
+    cgMin: '',
+    cgMax: ''
+  },
+  tow: {
+    indexMin: '',
+    indexMax: '',
+    cgMin: '',
+    cgMax: ''
+  },
+  ldw: {
+    indexMin: '',
+    indexMax: '',
+    cgMin: '',
+    cgMax: ''
+  }
+})
+const [
+  creatingAircraftEnvelopes,
+  setCreatingAircraftEnvelopes
+] = useState(false)
+const [
+  showAircraftEnvelopesForm,
+  setShowAircraftEnvelopesForm
+] = useState(false)
 const [tripFuel, setTripFuel] = useState(0)
 const [taxiFuel,setTaxiFuel ]= useState(0)
 const [fuel, setFuel] = useState(0)
@@ -360,6 +394,62 @@ useEffect(() => {
 
   loadCargoFleet()
 }, [])
+const [
+  showNewAircraftForm,
+  setShowNewAircraftForm
+] = useState(false)
+
+const [
+  newAircraft,
+  setNewAircraft
+] = useState({
+    registration: '',
+    manufacturer: '',
+    model: '',
+    variant: '',
+    aircraftType: '',
+    dow: '',
+    mzfw: '',
+    mtow: '',
+    mlw: '',
+    mrw: ''
+  })
+const [
+  newAircraftConfiguration,
+  setNewAircraftConfiguration
+] = useState({
+  datum: '',
+  mac: '',
+  lemac: '',
+  basicWeight: '',
+  basicIndex: '',
+  indexReferenceArm: '',
+  indexConstant: '',
+  indexOffset: '',
+  basicConfig: '',
+  basicCrew: '',
+  seatArmFwd: '',
+  seatArmMid: '',
+  seatArmAft: '',
+  fuelArm: '',
+  forwardCargoArm: '',
+  aftCargoArm: ''
+})
+
+const [
+  creatingAircraftConfiguration,
+  setCreatingAircraftConfiguration
+] = useState(false)
+const [
+  showAircraftConfigurationForm,
+  setShowAircraftConfigurationForm
+] = useState(false)
+
+const [
+  creatingAircraft,
+  setCreatingAircraft
+] = useState(false)
+
 const [flightFrom, setFlightFrom] = useState('')
 const [flightTo, setFlightTo] = useState('')
 const [cargoWeights, setCargoWeights]=useState({})
@@ -7941,44 +8031,928 @@ aftInfants
   aircraft={selectedPlatformAircraft}
   fullData={selectedPlatformAircraftFullData}
   onClose={() => {
-    setSelectedPlatformAircraft(null)
-    setSelectedPlatformAircraftFullData(null)
-  }}
+  setSelectedPlatformAircraft(null)
+  setSelectedPlatformAircraftFullData(null)
+  setShowAircraftConfigurationForm(false)
+}}
+  onConfigure={() => {
+  console.log('CONFIGURE W&B CLICKED')
+  setShowAircraftConfigurationForm(true)
+}}
+onConfigureEnvelopes={() => {
+  setShowAircraftEnvelopesForm(true)
+}}
 />
+{showAircraftEnvelopesForm &&
+ selectedPlatformAircraft &&
+ selectedPlatformAircraftFullData?.configuration &&
+ (selectedPlatformAircraftFullData?.envelopes || []).length === 0 && (
 
-    {/* FLEET TITLE */}
+  <div
+    style={{
+      marginTop: '18px',
+      padding: '24px',
+      borderRadius: '16px',
+      background:
+        'linear-gradient(145deg, rgba(10,28,50,0.94), rgba(5,17,32,0.94))',
+      border:
+        '1px solid rgba(79,140,255,0.20)'
+    }}
+  >
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '22px'
+      }}
+    >
+      <div>
+        <div
+          style={{
+            color: '#4f8cff',
+            fontSize: '11px',
+            fontWeight: '700',
+            letterSpacing: '1.3px'
+          }}
+        >
+          OPERATIONAL ENVELOPES
+        </div>
+
+        <div
+          style={{
+            color: '#8fa0b7',
+            fontSize: '12px',
+            marginTop: '6px'
+          }}
+        >
+          {selectedPlatformAircraft.registration}
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() =>
+          setShowAircraftEnvelopesForm(false)
+        }
+        style={{
+          padding: '8px 12px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background:
+            'rgba(255,255,255,0.04)',
+          color: '#8fa0b7',
+          fontSize: '9px',
+          fontWeight: '700',
+          cursor: 'pointer'
+        }}
+      >
+        CANCEL
+      </button>
+    </div>
+
+    {/* COLUMN HEADERS */}
+
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns:
+          '0.7fr 1fr 1fr 1fr 1fr',
+        gap: '12px',
+        marginBottom: '10px',
+        color: '#7f8da0',
+        fontSize: '9px',
+        fontWeight: '700',
+        letterSpacing: '0.7px'
+      }}
+    >
+      <div>PHASE</div>
+      <div>INDEX MIN</div>
+      <div>INDEX MAX</div>
+      <div>CG MIN</div>
+      <div>CG MAX</div>
+    </div>
+
+    {[
+      ['zfw', 'ZFW'],
+      ['tow', 'TOW'],
+      ['ldw', 'LDW']
+    ].map(([phase, label]) => (
+
+      <div
+        key={phase}
+        style={{
+          display: 'grid',
+          gridTemplateColumns:
+            '0.7fr 1fr 1fr 1fr 1fr',
+          gap: '12px',
+          alignItems: 'center',
+          padding: '10px 0',
+          borderTop:
+            '1px solid rgba(255,255,255,0.05)'
+        }}
+      >
+        <div
+          style={{
+            color: '#ffffff',
+            fontSize: '12px',
+            fontWeight: '700'
+          }}
+        >
+          {label}
+        </div>
+
+        {[
+          'indexMin',
+          'indexMax',
+          'cgMin',
+          'cgMax'
+        ].map(field => (
+
+          <input
+            key={field}
+            type="number"
+            step="any"
+            value={
+              newAircraftEnvelopes[phase][field]
+            }
+            onChange={(e) =>
+              setNewAircraftEnvelopes(current => ({
+                ...current,
+                [phase]: {
+                  ...current[phase],
+                  [field]: e.target.value
+                }
+              }))
+            }
+            style={{
+              width: '100%',
+              boxSizing: 'border-box',
+              padding: '10px',
+              borderRadius: '7px',
+              border:
+                '1px solid rgba(255,255,255,0.10)',
+              background: 'rgba(0,0,0,0.20)',
+              color: '#ffffff',
+              outline: 'none'
+            }}
+          />
+
+        ))}
+      </div>
+
+    ))}
+
+  </div>
+)}
+{showAircraftConfigurationForm &&
+ selectedPlatformAircraft &&
+ !selectedPlatformAircraftFullData?.configuration && (
+
+  <div
+    style={{
+      marginTop: '18px',
+      padding: '24px',
+      borderRadius: '16px',
+      background:
+        'linear-gradient(145deg, rgba(10,28,50,0.94), rgba(5,17,32,0.94))',
+      border:
+        '1px solid rgba(79,140,255,0.20)'
+    }}
+  >
 
     <div
       style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: '14px'
+        marginBottom: '22px'
       }}
     >
+      <div>
+        <div
+          style={{
+            color: '#4f8cff',
+            fontSize: '11px',
+            fontWeight: '700',
+            letterSpacing: '1.3px'
+          }}
+        >
+          WEIGHT & BALANCE CONFIGURATION
+        </div>
 
-      <div
-        style={{
-          color: '#4f8cff',
-          fontSize: '11px',
-          fontWeight: '700',
-          letterSpacing: '1.3px'
-        }}
-      >
-        AIRCRAFT FLEET
+        <div
+          style={{
+            color: '#8fa0b7',
+            fontSize: '12px',
+            marginTop: '6px'
+          }}
+        >
+          {selectedPlatformAircraft.registration}
+        </div>
       </div>
 
-      <div
+      <button
+        type="button"
+        onClick={() =>
+          setShowAircraftConfigurationForm(false)
+        }
         style={{
+          padding: '8px 12px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background:
+            'rgba(255,255,255,0.04)',
           color: '#8fa0b7',
-          fontSize: '12px'
+          fontSize: '9px',
+          fontWeight: '700',
+          cursor: 'pointer'
         }}
       >
-        {platformOrganizationAircraft.length} AIRCRAFT
-      </div>
-
+        CANCEL
+      </button>
     </div>
 
+    {/* BASIC CONFIGURATION */}
+
+    <div
+      style={{
+        color: '#ffffff',
+        fontSize: '10px',
+        fontWeight: '700',
+        letterSpacing: '1px',
+        marginBottom: '12px'
+      }}
+    >
+      BASIC CONFIGURATION
+    </div>
+
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(4, 1fr)',
+        gap: '14px'
+      }}
+    >
+      {[
+        ['basicWeight', 'BASIC WEIGHT', 'number'],
+        ['basicIndex', 'BASIC INDEX', 'number'],
+        ['basicConfig', 'BASIC CONFIG', 'text'],
+        ['basicCrew', 'BASIC CREW', 'text']
+      ].map(([field, label, type]) => (
+        <div key={field}>
+          <div
+            style={{
+              color: '#8fa0b7',
+              fontSize: '9px',
+              fontWeight: '700',
+              marginBottom: '6px'
+            }}
+          >
+            {label}
+          </div>
+
+          <input
+            type={type}
+            value={newAircraftConfiguration[field]}
+            onChange={(e) =>
+              setNewAircraftConfiguration(current => ({
+                ...current,
+                [field]: e.target.value
+              }))
+            }
+            style={{
+              width: '100%',
+              boxSizing: 'border-box',
+              padding: '10px',
+              borderRadius: '7px',
+              border:
+                '1px solid rgba(255,255,255,0.10)',
+              background: 'rgba(0,0,0,0.20)',
+              color: '#ffffff',
+              outline: 'none'
+            }}
+          />
+        </div>
+      ))}
+    </div>
+
+    {/* GEOMETRY */}
+
+    <div
+      style={{
+        color: '#ffffff',
+        fontSize: '10px',
+        fontWeight: '700',
+        letterSpacing: '1px',
+        marginTop: '22px',
+        marginBottom: '12px'
+      }}
+    >
+      AIRCRAFT GEOMETRY
+    </div>
+
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: '14px'
+      }}
+    >
+      {[
+        ['datum', 'DATUM'],
+        ['mac', 'MAC'],
+        ['lemac', 'LEMAC']
+      ].map(([field, label]) => (
+        <div key={field}>
+          <div
+            style={{
+              color: '#8fa0b7',
+              fontSize: '9px',
+              fontWeight: '700',
+              marginBottom: '6px'
+            }}
+          >
+            {label}
+          </div>
+
+          <input
+            type="number"
+            step="any"
+            value={newAircraftConfiguration[field]}
+            onChange={(e) =>
+              setNewAircraftConfiguration(current => ({
+                ...current,
+                [field]: e.target.value
+              }))
+            }
+            style={{
+              width: '100%',
+              boxSizing: 'border-box',
+              padding: '10px',
+              borderRadius: '7px',
+              border:
+                '1px solid rgba(255,255,255,0.10)',
+              background: 'rgba(0,0,0,0.20)',
+              color: '#ffffff',
+              outline: 'none'
+            }}
+          />
+        </div>
+      ))}
+    </div>
+
+    {/* INDEX SYSTEM */}
+
+    <div
+      style={{
+        color: '#ffffff',
+        fontSize: '10px',
+        fontWeight: '700',
+        letterSpacing: '1px',
+        marginTop: '22px',
+        marginBottom: '12px'
+      }}
+    >
+      INDEX SYSTEM
+    </div>
+
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: '14px'
+      }}
+    >
+      {[
+        ['indexReferenceArm', 'REFERENCE ARM'],
+        ['indexConstant', 'INDEX CONSTANT'],
+        ['indexOffset', 'INDEX OFFSET']
+      ].map(([field, label]) => (
+        <div key={field}>
+          <div
+            style={{
+              color: '#8fa0b7',
+              fontSize: '9px',
+              fontWeight: '700',
+              marginBottom: '6px'
+            }}
+          >
+            {label}
+          </div>
+
+          <input
+            type="number"
+            step="any"
+            value={newAircraftConfiguration[field]}
+            onChange={(e) =>
+              setNewAircraftConfiguration(current => ({
+                ...current,
+                [field]: e.target.value
+              }))
+            }
+            style={{
+              width: '100%',
+              boxSizing: 'border-box',
+              padding: '10px',
+              borderRadius: '7px',
+              border:
+                '1px solid rgba(255,255,255,0.10)',
+              background: 'rgba(0,0,0,0.20)',
+              color: '#ffffff',
+              outline: 'none'
+            }}
+          />
+        </div>
+      ))}
+    </div>
+
+    {/* ARMS */}
+
+    <div
+      style={{
+        color: '#ffffff',
+        fontSize: '10px',
+        fontWeight: '700',
+        letterSpacing: '1px',
+        marginTop: '22px',
+        marginBottom: '12px'
+      }}
+    >
+      STATION ARMS
+    </div>
+<div
+  style={{
+    display: 'flex',
+    justifyContent: 'flex-end',
+    gap: '10px',
+    marginTop: '24px'
+  }}
+>
+  <button
+    type="button"
+    onClick={() => {
+      setShowAircraftConfigurationForm(false)
+    }}
+    style={{
+      padding: '10px 14px',
+      borderRadius: '8px',
+      border:
+        '1px solid rgba(255,255,255,0.10)',
+      background:
+        'rgba(255,255,255,0.04)',
+      color: '#8fa0b7',
+      fontSize: '10px',
+      fontWeight: '700',
+      cursor: 'pointer'
+    }}
+  >
+    CANCEL
+  </button>
+
+  <button
+    type="button"
+    disabled={
+  creatingAircraftConfiguration ||
+  Object.values(newAircraftConfiguration).some(
+    value => String(value).trim() === ''
+  )
+}
+
+    onClick={async () => {
+      try {
+        setCreatingAircraftConfiguration(true)
+
+        const created =
+          await createAircraftConfiguration({
+            aircraftId:
+              selectedPlatformAircraft.id,
+            ...newAircraftConfiguration
+          })
+
+        console.log(
+          'AIRCRAFT CONFIGURATION CREATED:',
+          created
+        )
+
+        const refreshedFullData =
+          await getAircraftFullData(
+            selectedPlatformAircraft.id
+          )
+
+        setSelectedPlatformAircraftFullData(
+          refreshedFullData
+        )
+
+        setShowAircraftConfigurationForm(false)
+
+        setNewAircraftConfiguration({
+          datum: '',
+          mac: '',
+          lemac: '',
+          basicWeight: '',
+          basicIndex: '',
+          indexReferenceArm: '',
+          indexConstant: '',
+          indexOffset: '',
+          basicConfig: '',
+          basicCrew: '',
+          seatArmFwd: '',
+          seatArmMid: '',
+          seatArmAft: '',
+          fuelArm: '',
+          forwardCargoArm: '',
+          aftCargoArm: ''
+        })
+
+      } catch (error) {
+        console.error(
+          'CREATE AIRCRAFT CONFIGURATION ERROR:',
+          error
+        )
+      } finally {
+        setCreatingAircraftConfiguration(false)
+      }
+    }}
+    style={{
+      padding: '10px 16px',
+      borderRadius: '8px',
+      border:
+        '1px solid rgba(79,140,255,0.40)',
+      background:
+        'rgba(79,140,255,0.15)',
+      color: '#ffffff',
+      fontSize: '10px',
+      fontWeight: '700',
+      letterSpacing: '0.7px',
+      cursor:
+  creatingAircraftConfiguration ||
+  Object.values(newAircraftConfiguration).some(
+    value => String(value).trim() === ''
+  )
+    ? 'not-allowed'
+    : 'pointer',
+      opacity:
+  creatingAircraftConfiguration ||
+  Object.values(newAircraftConfiguration).some(
+    value => String(value).trim() === ''
+  )
+    ? 0.45
+    : 1,
+    }}
+  >
+    {creatingAircraftConfiguration
+      ? 'SAVING...'
+      : 'SAVE CONFIGURATION'}
+  </button>
+</div>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: '14px'
+      }}
+    >
+      {[
+        ['seatArmFwd', 'SEAT ARM FWD'],
+        ['seatArmMid', 'SEAT ARM MID'],
+        ['seatArmAft', 'SEAT ARM AFT'],
+        ['fuelArm', 'FUEL ARM'],
+        ['forwardCargoArm', 'FORWARD CARGO ARM'],
+        ['aftCargoArm', 'AFT CARGO ARM']
+      ].map(([field, label]) => (
+        <div key={field}>
+          <div
+            style={{
+              color: '#8fa0b7',
+              fontSize: '9px',
+              fontWeight: '700',
+              marginBottom: '6px'
+            }}
+          >
+            {label}
+          </div>
+
+          <input
+            type="number"
+            step="any"
+            value={newAircraftConfiguration[field]}
+            onChange={(e) =>
+              setNewAircraftConfiguration(current => ({
+                ...current,
+                [field]: e.target.value
+              }))
+            }
+            style={{
+              width: '100%',
+              boxSizing: 'border-box',
+              padding: '10px',
+              borderRadius: '7px',
+              border:
+                '1px solid rgba(255,255,255,0.10)',
+              background: 'rgba(0,0,0,0.20)',
+              color: '#ffffff',
+              outline: 'none'
+            }}
+          />
+        </div>
+      ))}
+    </div>
+
+  </div>
+)}
+    {/* FLEET TITLE */}
+
+    <div
+  style={{
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '18px'
+  }}
+>
+  <div
+    style={{
+      color: '#4f8cff',
+      fontSize: '11px',
+      fontWeight: '700',
+      letterSpacing: '1.3px'
+    }}
+  >
+    AIRCRAFT FLEET
+  </div>
+
+  <button
+    type="button"
+    onClick={() => {
+      setShowNewAircraftForm(
+        current => !current
+      )
+    }}
+    style={{
+      padding: '9px 14px',
+      borderRadius: '8px',
+      border:
+        '1px solid rgba(79,140,255,0.35)',
+      background:
+        'rgba(79,140,255,0.10)',
+      color: '#4f8cff',
+      fontSize: '10px',
+      fontWeight: '700',
+      letterSpacing: '0.7px',
+      cursor: 'pointer'
+    }}
+  >
+    {showNewAircraftForm
+      ? 'CANCEL'
+      : '+ ADD AIRCRAFT'}
+  </button>
+</div>
+{showNewAircraftForm && (
+  <div
+    style={{
+      marginBottom: '20px',
+      padding: '20px',
+      borderRadius: '12px',
+      background: 'rgba(79,140,255,0.04)',
+      border: '1px solid rgba(79,140,255,0.15)'
+    }}
+  >
+    <div
+      style={{
+        color: '#4f8cff',
+        fontSize: '11px',
+        fontWeight: '700',
+        letterSpacing: '1.3px',
+        marginBottom: '18px'
+      }}
+    >
+      AIRCRAFT MASTER DATA
+    </div>
+
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(5, 1fr)',
+        gap: '14px'
+      }}
+    >
+      {[
+        ['registration', 'REGISTRATION', 'LV-XXX'],
+        ['manufacturer', 'MANUFACTURER', 'Boeing'],
+        ['model', 'MODEL', '737'],
+        ['variant', 'VARIANT', '800CF'],
+        ['aircraftType', 'AIRCRAFT TYPE', 'B737-800CF']
+      ].map(([field, label, placeholder]) => (
+        <div key={field}>
+          <div
+            style={{
+              color: '#8fa0b7',
+              fontSize: '9px',
+              fontWeight: '700',
+              letterSpacing: '0.7px',
+              marginBottom: '7px'
+            }}
+          >
+            {label}
+          </div>
+
+          <input
+            type="text"
+            value={newAircraft[field]}
+            placeholder={placeholder}
+            onChange={(e) =>
+              setNewAircraft(current => ({
+                ...current,
+                [field]: e.target.value
+              }))
+            }
+            style={{
+              width: '100%',
+              boxSizing: 'border-box',
+              padding: '10px',
+              borderRadius: '7px',
+              border:
+                '1px solid rgba(255,255,255,0.10)',
+              background: 'rgba(0,0,0,0.20)',
+              color: '#ffffff',
+              outline: 'none'
+            }}
+          />
+        </div>
+      ))}
+    </div>
+
+    {/* WEIGHTS */}
+
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(5, 1fr)',
+        gap: '14px',
+        marginTop: '16px'
+      }}
+    >
+      {[
+        ['dow', 'DOW'],
+        ['mzfw', 'MZFW'],
+        ['mtow', 'MTOW'],
+        ['mlw', 'MLW'],
+        ['mrw', 'MRW']
+      ].map(([field, label]) => (
+        <div key={field}>
+          <div
+            style={{
+              color: '#8fa0b7',
+              fontSize: '9px',
+              fontWeight: '700',
+              letterSpacing: '0.7px',
+              marginBottom: '7px'
+            }}
+          >
+            {label} · KG
+          </div>
+
+          <input
+            type="number"
+            min="0"
+            value={newAircraft[field]}
+            onChange={(e) =>
+              setNewAircraft(current => ({
+                ...current,
+                [field]: e.target.value
+              }))
+            }
+            style={{
+              width: '100%',
+              boxSizing: 'border-box',
+              padding: '10px',
+              borderRadius: '7px',
+              border:
+                '1px solid rgba(255,255,255,0.10)',
+              background: 'rgba(0,0,0,0.20)',
+              color: '#ffffff',
+              outline: 'none'
+            }}
+          />
+        </div>
+      ))}
+    </div>
+
+    {/* CREATE */}
+
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'flex-end',
+        marginTop: '20px'
+      }}
+    >
+      <button
+        type="button"
+        disabled={
+          creatingAircraft ||
+          !newAircraft.registration.trim() ||
+          !newAircraft.manufacturer.trim() ||
+          !newAircraft.model.trim() ||
+          !newAircraft.variant.trim() ||
+          !newAircraft.aircraftType.trim() ||
+          !newAircraft.dow ||
+          !newAircraft.mzfw ||
+          !newAircraft.mtow ||
+          !newAircraft.mlw ||
+          !newAircraft.mrw
+        }
+        onClick={async () => {
+          try {
+            setCreatingAircraft(true)
+
+            const created =
+              await createAircraft({
+                organizationId:
+                  selectedPlatformOrganization.id,
+                ...newAircraft
+              })
+
+            setPlatformOrganizationAircraft(
+              current =>
+                [...current, created].sort(
+                  (a, b) =>
+                    a.registration.localeCompare(
+                      b.registration
+                    )
+                )
+            )
+
+            console.log(
+              'AIRCRAFT CREATED:',
+              created
+            )
+
+            setNewAircraft({
+              registration: '',
+              manufacturer: '',
+              model: '',
+              variant: '',
+              aircraftType: '',
+              dow: '',
+              mzfw: '',
+              mtow: '',
+              mlw: '',
+              mrw: ''
+            })
+
+            setShowNewAircraftForm(false)
+
+          } catch (error) {
+            console.error(
+              'CREATE AIRCRAFT ERROR:',
+              error
+            )
+          } finally {
+            setCreatingAircraft(false)
+          }
+        }}
+        style={{
+          padding: '10px 16px',
+          borderRadius: '8px',
+          border:
+            '1px solid rgba(79,140,255,0.40)',
+          background:
+            'rgba(79,140,255,0.15)',
+          color: '#ffffff',
+          fontSize: '10px',
+          fontWeight: '700',
+          letterSpacing: '0.7px',
+          cursor:
+            creatingAircraft
+              ? 'wait'
+              : 'pointer',
+          opacity:
+            creatingAircraft ||
+            !newAircraft.registration.trim() ||
+            !newAircraft.manufacturer.trim() ||
+            !newAircraft.model.trim() ||
+            !newAircraft.variant.trim() ||
+            !newAircraft.aircraftType.trim() ||
+            !newAircraft.dow ||
+            !newAircraft.mzfw ||
+            !newAircraft.mtow ||
+            !newAircraft.mlw ||
+            !newAircraft.mrw
+              ? 0.45
+              : 1
+        }}
+      >
+        {creatingAircraft
+          ? 'CREATING...'
+          : 'CREATE AIRCRAFT'}
+      </button>
+    </div>
+  </div>
+)}
 
     {/* FLEET */}
 
