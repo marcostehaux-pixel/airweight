@@ -3,7 +3,8 @@ function AircraftTechnicalConfiguration({
   fullData,
   onClose,
   onConfigure,
-  onConfigureEnvelopes
+  onConfigureEnvelopes,
+  onConfigureCargoPositions
 }) {
   if (!aircraft || !fullData) return null
 
@@ -442,7 +443,64 @@ function AircraftTechnicalConfiguration({
 
 )}
 </div>
+{(fullData.cargoPositions || []).length === 0 && (
 
+  <div
+    style={{
+      marginTop: '18px',
+      padding: '20px',
+      borderRadius: '12px',
+      background: 'rgba(255,255,255,0.025)',
+      border: '1px solid rgba(255,255,255,0.07)'
+    }}
+  >
+    <div
+      style={{
+        color: '#ffffff',
+        fontSize: '13px',
+        fontWeight: '700',
+        marginBottom: '6px'
+      }}
+    >
+      CARGO POSITIONS PENDING
+    </div>
+
+    <div
+      style={{
+        color: '#8fa0b7',
+        fontSize: '12px',
+        marginBottom: '14px'
+      }}
+    >
+      No cargo positions have been configured for this aircraft.
+    </div>
+
+    {onConfigureCargoPositions && (
+      <button
+        type="button"
+        onClick={() =>
+          onConfigureCargoPositions(aircraft)
+        }
+        style={{
+          padding: '10px 15px',
+          borderRadius: '8px',
+          border:
+            '1px solid rgba(79,140,255,0.40)',
+          background:
+            'rgba(79,140,255,0.15)',
+          color: '#ffffff',
+          fontSize: '10px',
+          fontWeight: '700',
+          letterSpacing: '0.7px',
+          cursor: 'pointer'
+        }}
+      >
+        CONFIGURE CARGO POSITIONS
+      </button>
+    )}
+  </div>
+
+)}
 
 {/* CARGO POSITIONS */}
 

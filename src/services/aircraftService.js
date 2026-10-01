@@ -307,6 +307,51 @@ export async function createAircraftEnvelopes({
 
   return data
 }
+export async function createCargoPositions({
+  aircraftId,
+  mainDeck,
+  lowerDeck
+}) {
+  const rows = [
+    ...mainDeck.map(position => ({
+      aircraft_id: aircraftId,
+      deck: 'MAIN',
+      position_code: position.positionCode.trim(),
+      max_weight: Number(position.maxWeight),
+      arm: Number(position.arm)
+    })),
+
+    ...lowerDeck.map(position => ({
+      aircraft_id: aircraftId,
+      deck: 'LOWER',
+      position_code: position.positionCode.trim(),
+      max_weight: Number(position.maxWeight),
+      arm: Number(position.arm)
+    }))
+  ]
+
+  if (rows.length === 0) {
+    throw new Error(
+      'At least one cargo position is required'
+    )
+  }
+
+  const { data, error } = await supabase
+    .from('cargo_positions')
+    .insert(rows)
+    .select()
+
+  if (error) {
+    console.error(
+      'CARGO POSITIONS CREATE ERROR:',
+      error
+    )
+
+    throw error
+  }
+
+  return data
+}
 export async function getCargoAircraftFleet() {
   const aircraftList = await getAircraft()
 

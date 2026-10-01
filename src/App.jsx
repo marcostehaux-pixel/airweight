@@ -94,6 +94,7 @@ import {
    createAircraft,
    createAircraftConfiguration,
    createAircraftEnvelopes,
+   createCargoPositions,
   adaptSupabaseAircraft
 } from './services/aircraftService'
 import {
@@ -112,6 +113,86 @@ import {
 import aircraftImage from './assets/a320.png'
 
 console.log('APP FILE LOADED - SUPABASE TEST')
+function CargoPositionEditorRow({
+  position,
+  onChange,
+  onRemove
+}) {
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr 1fr 90px',
+        gap: '12px',
+        alignItems: 'center',
+        padding: '7px 0'
+      }}
+    >
+      <input
+        type="text"
+        value={position.positionCode}
+        onChange={(e) =>
+          onChange(
+            'positionCode',
+            e.target.value.toUpperCase()
+          )
+        }
+        placeholder="A1"
+        style={cargoEditorInputStyle}
+      />
+
+      <input
+        type="number"
+        step="any"
+        value={position.maxWeight}
+        onChange={(e) =>
+          onChange('maxWeight', e.target.value)
+        }
+        placeholder="kg"
+        style={cargoEditorInputStyle}
+      />
+
+      <input
+        type="number"
+        step="any"
+        value={position.arm}
+        onChange={(e) =>
+          onChange('arm', e.target.value)
+        }
+        placeholder="Arm"
+        style={cargoEditorInputStyle}
+      />
+
+      <button
+        type="button"
+        onClick={onRemove}
+        style={{
+          padding: '9px 8px',
+          borderRadius: '7px',
+          border: '1px solid rgba(255,255,255,0.10)',
+          background: 'rgba(255,255,255,0.04)',
+          color: '#8fa0b7',
+          fontSize: '9px',
+          fontWeight: '700',
+          cursor: 'pointer'
+        }}
+      >
+        REMOVE
+      </button>
+    </div>
+  )
+}
+
+const cargoEditorInputStyle = {
+  width: '100%',
+  boxSizing: 'border-box',
+  padding: '10px',
+  borderRadius: '7px',
+  border: '1px solid rgba(255,255,255,0.10)',
+  background: 'rgba(0,0,0,0.20)',
+  color: '#ffffff',
+  outline: 'none'
+}
 function App() {
   
 const [logged,setLogged]=useState(false)
@@ -346,6 +427,23 @@ const [
 const [
   showAircraftEnvelopesForm,
   setShowAircraftEnvelopesForm
+] = useState(false)
+const [
+  newCargoPositions,
+  setNewCargoPositions
+] = useState({
+  mainDeck: [],
+  lowerDeck: []
+})
+
+const [
+  showCargoPositionsForm,
+  setShowCargoPositionsForm
+] = useState(false)
+
+const [
+  creatingCargoPositions,
+  setCreatingCargoPositions
 ] = useState(false)
 const [tripFuel, setTripFuel] = useState(0)
 const [taxiFuel,setTaxiFuel ]= useState(0)
@@ -8042,7 +8140,417 @@ aftInfants
 onConfigureEnvelopes={() => {
   setShowAircraftEnvelopesForm(true)
 }}
+onConfigureCargoPositions={() => {
+  setShowCargoPositionsForm(true)
+}}
 />
+{showCargoPositionsForm &&
+ selectedPlatformAircraft &&
+ (selectedPlatformAircraftFullData?.cargoPositions || []).length === 0 && (
+
+  <div
+    style={{
+      marginTop: '18px',
+      padding: '24px',
+      borderRadius: '16px',
+      background:
+        'linear-gradient(145deg, rgba(10,28,50,0.94), rgba(5,17,32,0.94))',
+      border:
+        '1px solid rgba(79,140,255,0.20)'
+    }}
+  >
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}
+    >
+      <div>
+        <div
+          style={{
+            color: '#4f8cff',
+            fontSize: '11px',
+            fontWeight: '700',
+            letterSpacing: '1.3px'
+          }}
+        >
+          CARGO POSITIONS CONFIGURATION
+        </div>
+
+        <div
+          style={{
+            color: '#8fa0b7',
+            fontSize: '12px',
+            marginTop: '6px'
+          }}
+        >
+          {selectedPlatformAircraft.registration}
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => {
+          setShowCargoPositionsForm(false)
+        }}
+        style={{
+          padding: '8px 12px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background:
+            'rgba(255,255,255,0.04)',
+          color: '#8fa0b7',
+          fontSize: '9px',
+          fontWeight: '700',
+          cursor: 'pointer'
+        }}
+      >
+        CANCEL
+      </button>
+    </div>
+
+   {/* MAIN DECK */}
+
+<div
+  style={{
+    marginTop: '24px',
+    padding: '18px',
+    borderRadius: '12px',
+    background: 'rgba(255,255,255,0.025)',
+    border: '1px solid rgba(255,255,255,0.07)'
+  }}
+>
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: '16px'
+    }}
+  >
+    <div
+      style={{
+        color: '#4f8cff',
+        fontSize: '11px',
+        fontWeight: '700',
+        letterSpacing: '1.2px'
+      }}
+    >
+      MAIN DECK
+    </div>
+
+    <button
+      type="button"
+      onClick={() => {
+        setNewCargoPositions(current => ({
+          ...current,
+          mainDeck: [
+            ...current.mainDeck,
+            {
+              positionCode: '',
+              maxWeight: '',
+              arm: ''
+            }
+          ]
+        }))
+      }}
+      style={{
+        padding: '8px 12px',
+        borderRadius: '7px',
+        border: '1px solid rgba(79,140,255,0.40)',
+        background: 'rgba(79,140,255,0.15)',
+        color: '#ffffff',
+        fontSize: '9px',
+        fontWeight: '700',
+        cursor: 'pointer'
+      }}
+    >
+      + ADD POSITION
+    </button>
+  </div>
+
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr 1fr 90px',
+      gap: '12px',
+      marginBottom: '8px',
+      color: '#7f8da0',
+      fontSize: '9px',
+      fontWeight: '700'
+    }}
+  >
+    <div>POSITION</div>
+    <div>MAX WEIGHT</div>
+    <div>ARM</div>
+    <div></div>
+  </div>
+
+  {newCargoPositions.mainDeck.map((position, index) => (
+    <CargoPositionEditorRow
+      key={`main-${index}`}
+      position={position}
+      onChange={(field, value) => {
+        setNewCargoPositions(current => ({
+          ...current,
+          mainDeck: current.mainDeck.map((item, itemIndex) =>
+            itemIndex === index
+              ? { ...item, [field]: value }
+              : item
+          )
+        }))
+      }}
+      onRemove={() => {
+        setNewCargoPositions(current => ({
+          ...current,
+          mainDeck: current.mainDeck.filter(
+            (_, itemIndex) => itemIndex !== index
+          )
+        }))
+      }}
+    />
+  ))}
+</div>
+
+
+{/* LOWER DECK */}
+
+<div
+  style={{
+    marginTop: '18px',
+    padding: '18px',
+    borderRadius: '12px',
+    background: 'rgba(255,255,255,0.025)',
+    border: '1px solid rgba(255,255,255,0.07)'
+  }}
+>
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: '16px'
+    }}
+  >
+    <div
+      style={{
+        color: '#4f8cff',
+        fontSize: '11px',
+        fontWeight: '700',
+        letterSpacing: '1.2px'
+      }}
+    >
+      LOWER DECK
+    </div>
+
+    <button
+      type="button"
+      onClick={() => {
+        setNewCargoPositions(current => ({
+          ...current,
+          lowerDeck: [
+            ...current.lowerDeck,
+            {
+              positionCode: '',
+              maxWeight: '',
+              arm: ''
+            }
+          ]
+        }))
+      }}
+      style={{
+        padding: '8px 12px',
+        borderRadius: '7px',
+        border: '1px solid rgba(79,140,255,0.40)',
+        background: 'rgba(79,140,255,0.15)',
+        color: '#ffffff',
+        fontSize: '9px',
+        fontWeight: '700',
+        cursor: 'pointer'
+      }}
+    >
+      + ADD POSITION
+    </button>
+  </div>
+
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr 1fr 90px',
+      gap: '12px',
+      marginBottom: '8px',
+      color: '#7f8da0',
+      fontSize: '9px',
+      fontWeight: '700'
+    }}
+  >
+    <div>POSITION</div>
+    <div>MAX WEIGHT</div>
+    <div>ARM</div>
+    <div></div>
+  </div>
+
+  {newCargoPositions.lowerDeck.map((position, index) => (
+    <CargoPositionEditorRow
+      key={`lower-${index}`}
+      position={position}
+      onChange={(field, value) => {
+        setNewCargoPositions(current => ({
+          ...current,
+          lowerDeck: current.lowerDeck.map((item, itemIndex) =>
+            itemIndex === index
+              ? { ...item, [field]: value }
+              : item
+          )
+        }))
+      }}
+      onRemove={() => {
+        setNewCargoPositions(current => ({
+          ...current,
+          lowerDeck: current.lowerDeck.filter(
+            (_, itemIndex) => itemIndex !== index
+          )
+        }))
+      }}
+    />
+  ))}
+  {/* CARGO ACTIONS */}
+
+<div
+  style={{
+    display: 'flex',
+    justifyContent: 'flex-end',
+    gap: '10px',
+    marginTop: '22px'
+  }}
+>
+  <button
+    type="button"
+    onClick={() => {
+      setShowCargoPositionsForm(false)
+    }}
+    style={{
+      padding: '10px 14px',
+      borderRadius: '8px',
+      border: '1px solid rgba(255,255,255,0.10)',
+      background: 'rgba(255,255,255,0.04)',
+      color: '#8fa0b7',
+      fontSize: '10px',
+      fontWeight: '700',
+      cursor: 'pointer'
+    }}
+  >
+    CANCEL
+  </button>
+
+  <button
+    type="button"
+    disabled={
+      creatingCargoPositions ||
+      (
+        newCargoPositions.mainDeck.length === 0 &&
+        newCargoPositions.lowerDeck.length === 0
+      ) ||
+      [
+        ...newCargoPositions.mainDeck,
+        ...newCargoPositions.lowerDeck
+      ].some(position =>
+        String(position.positionCode).trim() === '' ||
+        String(position.maxWeight).trim() === '' ||
+        String(position.arm).trim() === ''
+      )
+    }
+    onClick={async () => {
+      try {
+        setCreatingCargoPositions(true)
+
+        await createCargoPositions({
+          aircraftId: selectedPlatformAircraft.id,
+          mainDeck: newCargoPositions.mainDeck,
+          lowerDeck: newCargoPositions.lowerDeck
+        })
+
+        const refreshedFullData =
+          await getAircraftFullData(
+            selectedPlatformAircraft.id
+          )
+
+        setSelectedPlatformAircraftFullData(
+          refreshedFullData
+        )
+
+        setShowCargoPositionsForm(false)
+
+        setNewCargoPositions({
+          mainDeck: [],
+          lowerDeck: []
+        })
+
+      } catch (error) {
+        console.error(
+          'CREATE CARGO POSITIONS ERROR:',
+          error
+        )
+      } finally {
+        setCreatingCargoPositions(false)
+      }
+    }}
+    style={{
+      padding: '10px 16px',
+      borderRadius: '8px',
+      border: '1px solid rgba(79,140,255,0.40)',
+      background: 'rgba(79,140,255,0.15)',
+      color: '#ffffff',
+      fontSize: '10px',
+      fontWeight: '700',
+      letterSpacing: '0.7px',
+
+      cursor:
+        creatingCargoPositions ||
+        (
+          newCargoPositions.mainDeck.length === 0 &&
+          newCargoPositions.lowerDeck.length === 0
+        ) ||
+        [
+          ...newCargoPositions.mainDeck,
+          ...newCargoPositions.lowerDeck
+        ].some(position =>
+          String(position.positionCode).trim() === '' ||
+          String(position.maxWeight).trim() === '' ||
+          String(position.arm).trim() === ''
+        )
+          ? 'not-allowed'
+          : 'pointer',
+
+      opacity:
+        creatingCargoPositions ||
+        (
+          newCargoPositions.mainDeck.length === 0 &&
+          newCargoPositions.lowerDeck.length === 0
+        ) ||
+        [
+          ...newCargoPositions.mainDeck,
+          ...newCargoPositions.lowerDeck
+        ].some(position =>
+          String(position.positionCode).trim() === '' ||
+          String(position.maxWeight).trim() === '' ||
+          String(position.arm).trim() === ''
+        )
+          ? 0.45
+          : 1
+    }}
+  >
+    {creatingCargoPositions
+      ? 'SAVING...'
+      : 'SAVE CARGO POSITIONS'}
+  </button>
+</div>
+</div>
+
+  </div>
+)}
 {showAircraftEnvelopesForm &&
  selectedPlatformAircraft &&
  selectedPlatformAircraftFullData?.configuration &&
@@ -8135,76 +8643,215 @@ onConfigureEnvelopes={() => {
     </div>
 
     {[
-      ['zfw', 'ZFW'],
-      ['tow', 'TOW'],
-      ['ldw', 'LDW']
-    ].map(([phase, label]) => (
+  ['zfw', 'ZFW'],
+  ['tow', 'TOW'],
+  ['ldw', 'LDW']
+].map(([phase, label]) => (
 
-      <div
-        key={phase}
+  <div
+    key={phase}
+    style={{
+      display: 'grid',
+      gridTemplateColumns:
+        '0.7fr 1fr 1fr 1fr 1fr',
+      gap: '12px',
+      alignItems: 'center',
+      padding: '10px 0',
+      borderTop:
+        '1px solid rgba(255,255,255,0.05)'
+    }}
+  >
+    <div
+      style={{
+        color: '#ffffff',
+        fontSize: '12px',
+        fontWeight: '700'
+      }}
+    >
+      {label}
+    </div>
+
+    {[
+      'indexMin',
+      'indexMax',
+      'cgMin',
+      'cgMax'
+    ].map(field => (
+
+      <input
+        key={field}
+        type="number"
+        step="any"
+        value={
+          newAircraftEnvelopes[phase][field]
+        }
+        onChange={(e) =>
+          setNewAircraftEnvelopes(current => ({
+            ...current,
+            [phase]: {
+              ...current[phase],
+              [field]: e.target.value
+            }
+          }))
+        }
         style={{
-          display: 'grid',
-          gridTemplateColumns:
-            '0.7fr 1fr 1fr 1fr 1fr',
-          gap: '12px',
-          alignItems: 'center',
-          padding: '10px 0',
-          borderTop:
-            '1px solid rgba(255,255,255,0.05)'
+          width: '100%',
+          boxSizing: 'border-box',
+          padding: '10px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background: 'rgba(0,0,0,0.20)',
+          color: '#ffffff',
+          outline: 'none'
         }}
-      >
-        <div
-          style={{
-            color: '#ffffff',
-            fontSize: '12px',
-            fontWeight: '700'
-          }}
-        >
-          {label}
-        </div>
-
-        {[
-          'indexMin',
-          'indexMax',
-          'cgMin',
-          'cgMax'
-        ].map(field => (
-
-          <input
-            key={field}
-            type="number"
-            step="any"
-            value={
-              newAircraftEnvelopes[phase][field]
-            }
-            onChange={(e) =>
-              setNewAircraftEnvelopes(current => ({
-                ...current,
-                [phase]: {
-                  ...current[phase],
-                  [field]: e.target.value
-                }
-              }))
-            }
-            style={{
-              width: '100%',
-              boxSizing: 'border-box',
-              padding: '10px',
-              borderRadius: '7px',
-              border:
-                '1px solid rgba(255,255,255,0.10)',
-              background: 'rgba(0,0,0,0.20)',
-              color: '#ffffff',
-              outline: 'none'
-            }}
-          />
-
-        ))}
-      </div>
+      />
 
     ))}
 
   </div>
+
+))}
+
+{/* ENVELOPE ACTIONS */}
+
+<div
+  style={{
+    display: 'flex',
+    justifyContent: 'flex-end',
+    gap: '10px',
+    marginTop: '22px'
+  }}
+>
+  <button
+    type="button"
+    onClick={() => {
+      setShowAircraftEnvelopesForm(false)
+    }}
+    style={{
+      padding: '10px 14px',
+      borderRadius: '8px',
+      border:
+        '1px solid rgba(255,255,255,0.10)',
+      background:
+        'rgba(255,255,255,0.04)',
+      color: '#8fa0b7',
+      fontSize: '10px',
+      fontWeight: '700',
+      cursor: 'pointer'
+    }}
+  >
+    CANCEL
+  </button>
+
+  <button
+    type="button"
+    disabled={
+      creatingAircraftEnvelopes ||
+      Object.values(newAircraftEnvelopes)
+        .some(phase =>
+          Object.values(phase).some(
+            value =>
+              String(value).trim() === ''
+          )
+        )
+    }
+    onClick={async () => {
+      try {
+        setCreatingAircraftEnvelopes(true)
+
+        const created =
+          await createAircraftEnvelopes({
+            aircraftId:
+              selectedPlatformAircraft.id,
+            ...newAircraftEnvelopes
+          })
+
+        const refreshedFullData =
+          await getAircraftFullData(
+            selectedPlatformAircraft.id
+          )
+
+        setSelectedPlatformAircraftFullData(
+          refreshedFullData
+        )
+
+        setShowAircraftEnvelopesForm(false)
+
+        setNewAircraftEnvelopes({
+          zfw: {
+            indexMin: '',
+            indexMax: '',
+            cgMin: '',
+            cgMax: ''
+          },
+          tow: {
+            indexMin: '',
+            indexMax: '',
+            cgMin: '',
+            cgMax: ''
+          },
+          ldw: {
+            indexMin: '',
+            indexMax: '',
+            cgMin: '',
+            cgMax: ''
+          }
+        })
+
+      } catch (error) {
+        console.error(
+          'CREATE AIRCRAFT ENVELOPES ERROR:',
+          error
+        )
+      } finally {
+        setCreatingAircraftEnvelopes(false)
+      }
+    }}
+    style={{
+      padding: '10px 16px',
+      borderRadius: '8px',
+      border:
+        '1px solid rgba(79,140,255,0.40)',
+      background:
+        'rgba(79,140,255,0.15)',
+      color: '#ffffff',
+      fontSize: '10px',
+      fontWeight: '700',
+      letterSpacing: '0.7px',
+
+      cursor:
+        creatingAircraftEnvelopes ||
+        Object.values(newAircraftEnvelopes)
+          .some(phase =>
+            Object.values(phase).some(
+              value =>
+                String(value).trim() === ''
+            )
+          )
+          ? 'not-allowed'
+          : 'pointer',
+
+      opacity:
+        creatingAircraftEnvelopes ||
+        Object.values(newAircraftEnvelopes)
+          .some(phase =>
+            Object.values(phase).some(
+              value =>
+                String(value).trim() === ''
+            )
+          )
+          ? 0.45
+          : 1
+    }}
+  >
+    {creatingAircraftEnvelopes
+      ? 'SAVING...'
+      : 'SAVE ENVELOPES'}
+  </button>
+</div>
+
+</div>
 )}
 {showAircraftConfigurationForm &&
  selectedPlatformAircraft &&
