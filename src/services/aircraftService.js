@@ -513,3 +513,182 @@ export async function getAircraftConfigurationStatus(
 
   return results
 }
+export async function getAircraftTechnicalRevisions(
+  aircraftId
+) {
+  const { data, error } = await supabase
+    .from('aircraft_technical_revisions')
+    .select('*')
+    .eq('aircraft_id', aircraftId)
+    .order('revision_number', {
+      ascending: false
+    })
+
+  if (error) {
+    console.error(
+      'TECHNICAL REVISIONS LOAD ERROR:',
+      error
+    )
+
+    throw error
+  }
+
+  return data || []
+}
+export async function createAircraftTechnicalRevision({
+  aircraftId,
+  changeScope,
+  changeReason,
+  sourceDocument,
+  sourceRevision,
+  effectiveDate
+}) {
+  const existing =
+    await getAircraftTechnicalRevisions(
+      aircraftId
+    )
+
+  const nextRevision =
+    existing.length > 0
+      ? Math.max(
+          ...existing.map(
+            revision =>
+              Number(revision.revision_number)
+          )
+        ) + 1
+      : 1
+
+  const { data, error } = await supabase
+    .from('aircraft_technical_revisions')
+    .insert({
+      aircraft_id: aircraftId,
+      revision_number: nextRevision,
+      status: 'active',
+
+      change_scope: changeScope,
+
+      change_reason:
+        changeReason?.trim() || null,
+
+      source_document:
+        sourceDocument?.trim() || null,
+
+      source_revision:
+        sourceRevision?.trim() || null,
+
+      effective_date: effectiveDate
+    })
+    .select()
+    .single()
+
+  if (error) {
+    console.error(
+      'TECHNICAL REVISION CREATE ERROR:',
+      error
+    )
+
+    throw error
+  }
+
+  return data
+}
+export async function createWeightBalanceRevision({
+  aircraftId,
+
+  datum,
+  mac,
+  lemac,
+
+  basicWeight,
+  basicIndex,
+
+  indexReferenceArm,
+  indexConstant,
+  indexOffset,
+
+  basicConfig,
+  basicCrew,
+
+  seatArmFwd,
+  seatArmMid,
+  seatArmAft,
+
+  fuelArm,
+  forwardCargoArm,
+  aftCargoArm,
+
+  changeReason,
+  sourceDocument,
+  sourceRevision,
+  effectiveDate
+}) {
+  const { data, error } = await supabase.rpc(
+    'create_weight_balance_revision',
+    {
+      p_aircraft_id: aircraftId,
+
+      p_datum: Number(datum),
+      p_mac: Number(mac),
+      p_lemac: Number(lemac),
+
+      p_basic_weight: Number(basicWeight),
+      p_basic_index: Number(basicIndex),
+
+      p_index_reference_arm:
+        Number(indexReferenceArm),
+
+      p_index_constant:
+        Number(indexConstant),
+
+      p_index_offset:
+        Number(indexOffset),
+
+      p_basic_config:
+        basicConfig.trim(),
+
+      p_basic_crew:
+        basicCrew.trim(),
+
+      p_seat_arm_fwd:
+        Number(seatArmFwd),
+
+      p_seat_arm_mid:
+        Number(seatArmMid),
+
+      p_seat_arm_aft:
+        Number(seatArmAft),
+
+      p_fuel_arm:
+        Number(fuelArm),
+
+      p_forward_cargo_arm:
+        Number(forwardCargoArm),
+
+      p_aft_cargo_arm:
+        Number(aftCargoArm),
+
+      p_change_reason:
+        changeReason?.trim() || null,
+
+      p_source_document:
+        sourceDocument?.trim() || null,
+
+      p_source_revision:
+        sourceRevision?.trim() || null,
+
+      p_effective_date:
+        effectiveDate
+    }
+  )
+
+  if (error) {
+    console.error(
+      'WEIGHT & BALANCE REVISION ERROR:',
+      error
+    )
+
+    throw error
+  }
+
+  return data?.[0] || null
+}

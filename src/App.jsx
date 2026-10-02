@@ -97,6 +97,9 @@ import {
    createAircraftConfiguration,
    createAircraftEnvelopes,
    createCargoPositions,
+   getAircraftTechnicalRevisions,
+createAircraftTechnicalRevision,
+createWeightBalanceRevision,
   adaptSupabaseAircraft
 } from './services/aircraftService'
 import {
@@ -262,6 +265,15 @@ const [
   selectedPlatformAircraftFullData,
   setSelectedPlatformAircraftFullData
 ] = useState(null)
+const [
+  selectedAircraftTechnicalRevisions,
+  setSelectedAircraftTechnicalRevisions
+] = useState([])
+
+const [
+  showTechnicalRevisionHistory,
+  setShowTechnicalRevisionHistory
+] = useState(false)
 const [
   selectedAdminAircraftFullData,
   setSelectedAdminAircraftFullData
@@ -514,6 +526,25 @@ const [
   updatingAircraft,
   setUpdatingAircraft
 ] = useState(false)
+const [
+  editingWeightBalance,
+  setEditingWeightBalance
+] = useState(null)
+
+const [
+  savingWeightBalanceRevision,
+  setSavingWeightBalanceRevision
+] = useState(false)
+const [
+  weightBalanceRevisionMeta,
+  setWeightBalanceRevisionMeta
+] = useState({
+    changeReason: '',
+    sourceDocument: '',
+    sourceRevision: '',
+    effectiveDate:
+      new Date().toISOString().slice(0, 10)
+  })
 const [
   newAircraft,
   setNewAircraft
@@ -8159,7 +8190,674 @@ onConfigureEnvelopes={() => {
 onConfigureCargoPositions={() => {
   setShowCargoPositionsForm(true)
 }}
+onEditAircraftData={() => {
+  console.log('EDIT TECHNICAL AIRCRAFT DATA')
+}}
+
+onEditWeightBalance={() => {
+  const config =
+    selectedPlatformAircraftFullData?.configuration
+
+  if (!config) return
+
+  setEditingWeightBalance({
+    datum: config.datum ?? '',
+    mac: config.mac ?? '',
+    lemac: config.lemac ?? '',
+
+    basicWeight: config.basic_weight ?? '',
+    basicIndex: config.basic_index ?? '',
+
+    indexReferenceArm:
+      config.index_reference_arm ?? '',
+
+    indexConstant:
+      config.index_constant ?? '',
+
+    indexOffset:
+      config.index_offset ?? '',
+
+    basicConfig:
+      config.basic_config ?? '',
+
+    basicCrew:
+      config.basic_crew ?? '',
+
+    seatArmFwd:
+      config.seat_arm_fwd ?? '',
+
+    seatArmMid:
+      config.seat_arm_mid ?? '',
+
+    seatArmAft:
+      config.seat_arm_aft ?? '',
+
+    fuelArm:
+      config.fuel_arm ?? '',
+
+    forwardCargoArm:
+      config.forward_cargo_arm ?? '',
+
+    aftCargoArm:
+      config.aft_cargo_arm ?? ''
+  })
+
+  setWeightBalanceRevisionMeta({
+    changeReason: '',
+    sourceDocument: '',
+    sourceRevision: '',
+    effectiveDate:
+      new Date().toISOString().slice(0, 10)
+  })
+}}
+onEditEnvelopes={() => {
+  console.log('EDIT OPERATIONAL ENVELOPES')
+}}
+
+onEditCargoPositions={() => {
+  console.log('EDIT CARGO POSITIONS')
+}}
+technicalRevisions={
+  selectedAircraftTechnicalRevisions
+}
+showRevisionHistory={
+  showTechnicalRevisionHistory
+}
+onShowRevisionHistory={() => {
+  setShowTechnicalRevisionHistory(
+    current => !current
+  )
+}}
 />
+{editingWeightBalance &&
+ selectedPlatformAircraft && (
+
+  <div
+    style={{
+      marginTop: '18px',
+      padding: '24px',
+      borderRadius: '16px',
+      background:
+        'linear-gradient(145deg, rgba(10,28,50,0.94), rgba(5,17,32,0.94))',
+      border:
+        '1px solid rgba(79,140,255,0.20)'
+    }}
+  >
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}
+    >
+      <div>
+        <div
+          style={{
+            color: '#4f8cff',
+            fontSize: '11px',
+            fontWeight: '700',
+            letterSpacing: '1.3px'
+          }}
+        >
+          WEIGHT & BALANCE REVISION
+        </div>
+
+        <div
+          style={{
+            marginTop: '6px',
+            color: '#ffffff',
+            fontSize: '18px',
+            fontWeight: '700'
+          }}
+        >
+          {selectedPlatformAircraft.registration}
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() =>
+          setEditingWeightBalance(null)
+        }
+        style={{
+          padding: '8px 12px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background:
+            'rgba(255,255,255,0.04)',
+          color: '#8fa0b7',
+          fontSize: '9px',
+          fontWeight: '700',
+          cursor: 'pointer'
+        }}
+      >
+        CANCEL
+      </button>
+    </div>
+    <div
+  style={{
+    marginTop: '24px'
+  }}
+>
+  <div
+    style={{
+      color: '#ffffff',
+      fontSize: '11px',
+      fontWeight: '700',
+      marginBottom: '14px'
+    }}
+  >
+    BASIC CONFIGURATION
+  </div>
+
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns:
+        'repeat(4, minmax(0, 1fr))',
+      gap: '14px'
+    }}
+  >
+    {[
+      ['Basic Weight', 'basicWeight'],
+      ['Basic Index', 'basicIndex'],
+      ['Basic Configuration', 'basicConfig'],
+      ['Basic Crew', 'basicCrew']
+    ].map(([label, field]) => (
+      <label
+        key={field}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '7px'
+        }}
+      >
+        <span
+          style={{
+            color: '#8fa0b7',
+            fontSize: '9px',
+            fontWeight: '700'
+          }}
+        >
+          {label.toUpperCase()}
+        </span>
+
+        <input
+          type={
+            field === 'basicConfig' ||
+            field === 'basicCrew'
+              ? 'text'
+              : 'number'
+          }
+          step="any"
+          value={editingWeightBalance[field]}
+          onChange={(e) =>
+            setEditingWeightBalance(current => ({
+              ...current,
+              [field]: e.target.value
+            }))
+          }
+          style={{
+            width: '100%',
+            boxSizing: 'border-box',
+            padding: '10px',
+            borderRadius: '7px',
+            border:
+              '1px solid rgba(255,255,255,0.10)',
+            background: 'rgba(0,0,0,0.20)',
+            color: '#ffffff',
+            outline: 'none'
+          }}
+        />
+      </label>
+    ))}
+  </div>
+</div>
+<div
+  style={{
+    marginTop: '22px'
+  }}
+>
+  <div
+    style={{
+      color: '#ffffff',
+      fontSize: '11px',
+      fontWeight: '700',
+      marginBottom: '14px'
+    }}
+  >
+    AIRCRAFT GEOMETRY
+  </div>
+
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns:
+        'repeat(3, minmax(0, 1fr))',
+      gap: '14px'
+    }}
+  >
+    {[
+      ['Datum', 'datum'],
+      ['MAC', 'mac'],
+      ['LEMAC', 'lemac']
+    ].map(([label, field]) => (
+      <RevisionInput
+        key={field}
+        label={label}
+        field={field}
+        value={editingWeightBalance[field]}
+        setValue={setEditingWeightBalance}
+      />
+    ))}
+  </div>
+</div>
+<div
+  style={{
+    marginTop: '22px'
+  }}
+>
+  <div
+    style={{
+      color: '#ffffff',
+      fontSize: '11px',
+      fontWeight: '700',
+      marginBottom: '14px'
+    }}
+  >
+    INDEX SYSTEM
+  </div>
+
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns:
+        'repeat(3, minmax(0, 1fr))',
+      gap: '14px'
+    }}
+  >
+    {[
+      ['Reference Arm', 'indexReferenceArm'],
+      ['Index Constant', 'indexConstant'],
+      ['Index Offset', 'indexOffset']
+    ].map(([label, field]) => (
+      <RevisionInput
+        key={field}
+        label={label}
+        field={field}
+        value={editingWeightBalance[field]}
+        setValue={setEditingWeightBalance}
+      />
+    ))}
+  </div>
+</div>
+<div
+  style={{
+    marginTop: '22px'
+  }}
+>
+  <div
+    style={{
+      color: '#ffffff',
+      fontSize: '11px',
+      fontWeight: '700',
+      marginBottom: '14px'
+    }}
+  >
+    STATION ARMS
+  </div>
+
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns:
+        'repeat(3, minmax(0, 1fr))',
+      gap: '14px'
+    }}
+  >
+    {[
+      ['Seat Arm FWD', 'seatArmFwd'],
+      ['Seat Arm MID', 'seatArmMid'],
+      ['Seat Arm AFT', 'seatArmAft'],
+      ['Fuel Arm', 'fuelArm'],
+      ['Forward Cargo Arm', 'forwardCargoArm'],
+      ['Aft Cargo Arm', 'aftCargoArm']
+    ].map(([label, field]) => (
+      <RevisionInput
+        key={field}
+        label={label}
+        field={field}
+        value={editingWeightBalance[field]}
+        setValue={setEditingWeightBalance}
+      />
+    ))}
+  </div>
+  <div
+  style={{
+    marginTop: '26px',
+    paddingTop: '22px',
+    borderTop:
+      '1px solid rgba(255,255,255,0.08)'
+  }}
+>
+  <div
+    style={{
+      color: '#4f8cff',
+      fontSize: '11px',
+      fontWeight: '700',
+      letterSpacing: '1.2px',
+      marginBottom: '14px'
+    }}
+  >
+    REVISION TRACEABILITY
+  </div>
+
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns:
+        '2fr 1fr 1fr 1fr',
+      gap: '14px'
+    }}
+  >
+    <label
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '7px'
+      }}
+    >
+      <span
+        style={{
+          color: '#8fa0b7',
+          fontSize: '9px',
+          fontWeight: '700'
+        }}
+      >
+        CHANGE REASON
+      </span>
+
+      <input
+        type="text"
+        value={
+          weightBalanceRevisionMeta.changeReason
+        }
+        onChange={(e) =>
+          setWeightBalanceRevisionMeta(
+            current => ({
+              ...current,
+              changeReason: e.target.value
+            })
+          )
+        }
+        placeholder="Reason for technical revision"
+        style={{
+          width: '100%',
+          boxSizing: 'border-box',
+          padding: '10px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background: 'rgba(0,0,0,0.20)',
+          color: '#ffffff',
+          outline: 'none'
+        }}
+      />
+    </label>
+
+    <label
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '7px'
+      }}
+    >
+      <span
+        style={{
+          color: '#8fa0b7',
+          fontSize: '9px',
+          fontWeight: '700'
+        }}
+      >
+        SOURCE DOCUMENT
+      </span>
+
+      <input
+        type="text"
+        value={
+          weightBalanceRevisionMeta.sourceDocument
+        }
+        onChange={(e) =>
+          setWeightBalanceRevisionMeta(
+            current => ({
+              ...current,
+              sourceDocument: e.target.value
+            })
+          )
+        }
+        placeholder="WBM / AFM / Weight Report"
+        style={{
+          width: '100%',
+          boxSizing: 'border-box',
+          padding: '10px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background: 'rgba(0,0,0,0.20)',
+          color: '#ffffff',
+          outline: 'none'
+        }}
+      />
+    </label>
+
+    <label
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '7px'
+      }}
+    >
+      <span
+        style={{
+          color: '#8fa0b7',
+          fontSize: '9px',
+          fontWeight: '700'
+        }}
+      >
+        SOURCE REVISION
+      </span>
+
+      <input
+        type="text"
+        value={
+          weightBalanceRevisionMeta.sourceRevision
+        }
+        onChange={(e) =>
+          setWeightBalanceRevisionMeta(
+            current => ({
+              ...current,
+              sourceRevision: e.target.value
+            })
+          )
+        }
+        placeholder="REV 01"
+        style={{
+          width: '100%',
+          boxSizing: 'border-box',
+          padding: '10px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background: 'rgba(0,0,0,0.20)',
+          color: '#ffffff',
+          outline: 'none'
+        }}
+      />
+    </label>
+
+    <label
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '7px'
+      }}
+    >
+      <span
+        style={{
+          color: '#8fa0b7',
+          fontSize: '9px',
+          fontWeight: '700'
+        }}
+      >
+        EFFECTIVE DATE
+      </span>
+
+      <input
+        type="date"
+        value={
+          weightBalanceRevisionMeta.effectiveDate
+        }
+        onChange={(e) =>
+          setWeightBalanceRevisionMeta(
+            current => ({
+              ...current,
+              effectiveDate: e.target.value
+            })
+          )
+        }
+        style={{
+          width: '100%',
+          boxSizing: 'border-box',
+          padding: '10px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background: '#08182a',
+          color: '#ffffff',
+          outline: 'none'
+        }}
+      />
+    </label>
+  </div>
+</div>
+<div
+  style={{
+    display: 'flex',
+    justifyContent: 'flex-end',
+    gap: '10px',
+    marginTop: '22px'
+  }}
+>
+  <button
+    type="button"
+    onClick={() =>
+      setEditingWeightBalance(null)
+    }
+    style={{
+      padding: '10px 14px',
+      borderRadius: '8px',
+      border:
+        '1px solid rgba(255,255,255,0.10)',
+      background:
+        'rgba(255,255,255,0.04)',
+      color: '#8fa0b7',
+      fontSize: '10px',
+      fontWeight: '700',
+      cursor: 'pointer'
+    }}
+  >
+    CANCEL
+  </button>
+
+  <button
+    type="button"
+    disabled={
+      savingWeightBalanceRevision ||
+      !weightBalanceRevisionMeta.changeReason.trim() ||
+      !weightBalanceRevisionMeta.sourceDocument.trim() ||
+      !weightBalanceRevisionMeta.effectiveDate
+    }
+    onClick={async () => {
+      try {
+        setSavingWeightBalanceRevision(true)
+
+        const revision =
+          await createWeightBalanceRevision({
+            aircraftId:
+              selectedPlatformAircraft.id,
+
+            ...editingWeightBalance,
+            ...weightBalanceRevisionMeta
+          })
+
+        console.log(
+          'W&B REVISION CREATED:',
+          revision
+        )
+
+        const refreshed =
+          await getAircraftFullData(
+            selectedPlatformAircraft.id
+          )
+
+        setSelectedPlatformAircraftFullData(
+          refreshed
+        )
+const refreshedRevisions =
+  await getAircraftTechnicalRevisions(
+    selectedPlatformAircraft.id
+  )
+
+setSelectedAircraftTechnicalRevisions(
+  refreshedRevisions
+)
+        await refreshCargoFleet()
+
+        setEditingWeightBalance(null)
+
+      } catch (error) {
+        console.error(
+          'SAVE W&B REVISION ERROR:',
+          error
+        )
+      } finally {
+        setSavingWeightBalanceRevision(false)
+      }
+    }}
+    style={{
+      padding: '10px 16px',
+      borderRadius: '8px',
+      border:
+        '1px solid rgba(79,140,255,0.40)',
+      background:
+        'rgba(79,140,255,0.15)',
+      color: '#ffffff',
+      fontSize: '10px',
+      fontWeight: '700',
+      letterSpacing: '0.7px',
+      cursor:
+        savingWeightBalanceRevision
+          ? 'not-allowed'
+          : 'pointer',
+      opacity:
+        savingWeightBalanceRevision ||
+        !weightBalanceRevisionMeta.changeReason.trim() ||
+        !weightBalanceRevisionMeta.sourceDocument.trim() ||
+        !weightBalanceRevisionMeta.effectiveDate
+          ? 0.45
+          : 1
+    }}
+  >
+    {savingWeightBalanceRevision
+      ? 'SAVING REVISION...'
+      : 'SAVE REVISION'}
+  </button>
+</div>
+</div>
+  </div>
+
+)}
 {showCargoPositionsForm &&
  selectedPlatformAircraft &&
  (selectedPlatformAircraftFullData?.cargoPositions || []).length === 0 && (
@@ -9634,6 +10332,16 @@ onConfigureCargoPositions={() => {
     setSelectedPlatformAircraftFullData(
       fullData
     )
+    const revisions =
+  await getAircraftTechnicalRevisions(
+    aircraft.id
+  )
+
+setSelectedAircraftTechnicalRevisions(
+  revisions
+)
+
+setShowTechnicalRevisionHistory(false)
   } catch (error) {
     console.error(
       'PLATFORM AIRCRAFT CONFIGURATION ERROR:',
@@ -11966,5 +12674,53 @@ maxWidth: '100%',
 )
 
 }
+function RevisionInput({
+  label,
+  field,
+  value,
+  setValue
+}) {
+  return (
+    <label
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '7px'
+      }}
+    >
+      <span
+        style={{
+          color: '#8fa0b7',
+          fontSize: '9px',
+          fontWeight: '700'
+        }}
+      >
+        {label.toUpperCase()}
+      </span>
 
+      <input
+        type="number"
+        step="any"
+        value={value}
+        onChange={(e) =>
+          setValue(current => ({
+            ...current,
+            [field]: e.target.value
+          }))
+        }
+        style={{
+          width: '100%',
+          boxSizing: 'border-box',
+          padding: '10px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background: 'rgba(0,0,0,0.20)',
+          color: '#ffffff',
+          outline: 'none'
+        }}
+      />
+    </label>
+  )
+}
 export default App

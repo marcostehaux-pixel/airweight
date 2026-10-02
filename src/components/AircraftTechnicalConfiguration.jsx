@@ -4,7 +4,14 @@ function AircraftTechnicalConfiguration({
   onClose,
   onConfigure,
   onConfigureEnvelopes,
-  onConfigureCargoPositions
+  onConfigureCargoPositions,
+  onEditAircraftData,
+  onEditEnvelopes,
+  onEditCargoPositions,
+  technicalRevisions,
+onShowRevisionHistory,
+showRevisionHistory,
+  onEditWeightBalance
 }) {
   if (!aircraft || !fullData) return null
 
@@ -238,6 +245,48 @@ function AircraftTechnicalConfiguration({
             }}
           >
             {aircraft.aircraft_type}
+            {technicalRevisions?.length > 0 && (
+  <div
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      marginTop: '10px'
+    }}
+  >
+    <span
+      style={{
+        color: '#59d98e',
+        fontSize: '10px',
+        fontWeight: '700',
+        letterSpacing: '0.8px'
+      }}
+    >
+      CURRENT TECHNICAL REVISION · REV{' '}
+      {technicalRevisions[0].revision_number}
+    </span>
+
+    <button
+      type="button"
+      onClick={onShowRevisionHistory}
+      style={{
+        padding: '5px 9px',
+        borderRadius: '6px',
+        border:
+          '1px solid rgba(79,140,255,0.30)',
+        background:
+          'rgba(79,140,255,0.08)',
+        color: '#8fb5ff',
+        fontSize: '8px',
+        fontWeight: '700',
+        letterSpacing: '0.5px',
+        cursor: 'pointer'
+      }}
+    >
+      REVISION HISTORY
+    </button>
+  </div>
+)}
           </div>
         </div>
 
@@ -266,7 +315,108 @@ function AircraftTechnicalConfiguration({
           </button>
         )}
       </div>
+{showRevisionHistory &&
+ technicalRevisions?.length > 0 && (
 
+  <div
+    style={{
+      marginBottom: '24px',
+      padding: '18px',
+      borderRadius: '12px',
+      background:
+        'rgba(79,140,255,0.035)',
+      border:
+        '1px solid rgba(79,140,255,0.16)'
+    }}
+  >
+    <div
+      style={{
+        color: '#4f8cff',
+        fontSize: '11px',
+        fontWeight: '700',
+        letterSpacing: '1.2px',
+        marginBottom: '16px'
+      }}
+    >
+      TECHNICAL REVISION HISTORY
+    </div>
+
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns:
+          '0.6fr 1.2fr 2fr 1.5fr 1fr 1fr',
+        gap: '12px',
+        paddingBottom: '9px',
+        color: '#7f8da0',
+        fontSize: '9px',
+        fontWeight: '700',
+        letterSpacing: '0.6px'
+      }}
+    >
+      <div>REV</div>
+      <div>SCOPE</div>
+      <div>CHANGE REASON</div>
+      <div>SOURCE</div>
+      <div>SOURCE REV</div>
+      <div>EFFECTIVE</div>
+    </div>
+
+    {technicalRevisions.map(
+      (revision, index) => (
+
+        <div
+          key={revision.id}
+          style={{
+            display: 'grid',
+            gridTemplateColumns:
+              '0.6fr 1.2fr 2fr 1.5fr 1fr 1fr',
+            gap: '12px',
+            alignItems: 'center',
+            padding: '11px 0',
+            borderTop:
+              '1px solid rgba(255,255,255,0.05)',
+            fontSize: '11px'
+          }}
+        >
+          <div
+            style={{
+              color:
+                index === 0
+                  ? '#59d98e'
+                  : '#ffffff',
+              fontWeight: '700'
+            }}
+          >
+            REV {revision.revision_number}
+          </div>
+
+          <div>
+            {revision.change_scope || '----'}
+          </div>
+
+          <div>
+            {revision.change_reason || '----'}
+          </div>
+
+          <div>
+            {revision.source_document || '----'}
+          </div>
+
+          <div>
+            {revision.source_revision || '----'}
+          </div>
+
+          <div>
+            {revision.effective_date || '----'}
+          </div>
+        </div>
+
+      )
+    )}
+  </div>
+
+)}
       {/* AIRCRAFT DATA + W&B */}
 
       <div
@@ -278,8 +428,9 @@ function AircraftTechnicalConfiguration({
       >
 
         <TechnicalPanel
-          title="AIRCRAFT DATA"
-          rows={[
+  title="AIRCRAFT DATA"
+  onEdit={onEditAircraftData}
+  rows={[
             ['DOW', fullData.aircraft.dow, 'kg'],
             ['MZFW', fullData.aircraft.mzfw, 'kg'],
             ['MTOW', fullData.aircraft.mtow, 'kg'],
@@ -289,8 +440,9 @@ function AircraftTechnicalConfiguration({
         />
 
         <TechnicalPanel
-          title="WEIGHT & BALANCE CONFIGURATION"
-          rows={[
+  title="WEIGHT & BALANCE CONFIGURATION"
+  onEdit={onEditWeightBalance}
+  rows={[
             ['Basic Weight', configuration.basic_weight],
             ['Basic Index', configuration.basic_index],
             ['Basic Configuration', configuration.basic_config],
@@ -323,16 +475,46 @@ function AircraftTechnicalConfiguration({
   }}
 >
   <div
+  style={{
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '18px'
+  }}
+>
+  <div
     style={{
       color: '#4f8cff',
       fontSize: '11px',
       fontWeight: '700',
-      letterSpacing: '1.3px',
-      marginBottom: '18px'
+      letterSpacing: '1.3px'
     }}
   >
     OPERATIONAL ENVELOPES
   </div>
+
+  {onEditEnvelopes && (
+    <button
+      type="button"
+      onClick={onEditEnvelopes}
+      style={{
+        padding: '6px 10px',
+        borderRadius: '7px',
+        border:
+          '1px solid rgba(79,140,255,0.35)',
+        background:
+          'rgba(79,140,255,0.10)',
+        color: '#8fb5ff',
+        fontSize: '9px',
+        fontWeight: '700',
+        letterSpacing: '0.6px',
+        cursor: 'pointer'
+      }}
+    >
+      EDIT
+    </button>
+  )}
+</div>
 
   <div
     style={{
@@ -503,7 +685,36 @@ function AircraftTechnicalConfiguration({
 )}
 
 {/* CARGO POSITIONS */}
-
+<div
+  style={{
+    display: 'flex',
+    justifyContent: 'flex-end',
+    marginTop: '18px',
+    marginBottom: '8px'
+  }}
+>
+  {onEditCargoPositions && (
+    <button
+      type="button"
+      onClick={onEditCargoPositions}
+      style={{
+        padding: '6px 10px',
+        borderRadius: '7px',
+        border:
+          '1px solid rgba(79,140,255,0.35)',
+        background:
+          'rgba(79,140,255,0.10)',
+        color: '#8fb5ff',
+        fontSize: '9px',
+        fontWeight: '700',
+        letterSpacing: '0.6px',
+        cursor: 'pointer'
+      }}
+    >
+      EDIT CARGO POSITIONS
+    </button>
+  )}
+</div>
 <div
   style={{
     marginTop: '18px',
@@ -537,7 +748,11 @@ function AircraftTechnicalConfiguration({
 }
 
 
-function TechnicalPanel({ title, rows }) {
+function TechnicalPanel({
+  title,
+  rows,
+  onEdit
+}) {
   return (
     <div
       style={{
@@ -548,16 +763,46 @@ function TechnicalPanel({ title, rows }) {
       }}
     >
       <div
-        style={{
-          color: '#4f8cff',
-          fontSize: '11px',
-          fontWeight: '700',
-          letterSpacing: '1.3px',
-          marginBottom: '18px'
-        }}
-      >
-        {title}
-      </div>
+  style={{
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '18px'
+  }}
+>
+  <div
+    style={{
+      color: '#4f8cff',
+      fontSize: '11px',
+      fontWeight: '700',
+      letterSpacing: '1.3px'
+    }}
+  >
+    {title}
+  </div>
+
+  {onEdit && (
+    <button
+      type="button"
+      onClick={onEdit}
+      style={{
+        padding: '6px 10px',
+        borderRadius: '7px',
+        border:
+          '1px solid rgba(79,140,255,0.35)',
+        background:
+          'rgba(79,140,255,0.10)',
+        color: '#8fb5ff',
+        fontSize: '9px',
+        fontWeight: '700',
+        letterSpacing: '0.6px',
+        cursor: 'pointer'
+      }}
+    >
+      EDIT
+    </button>
+  )}
+</div>
 
       {rows.map(([label, value, unit]) => (
         <div
