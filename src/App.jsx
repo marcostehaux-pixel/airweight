@@ -479,18 +479,18 @@ async function refreshCargoFleet() {
     setCargoAircraftFleet(fleet || [])
 
     setSelectedCargoAircraft((current) => {
-      if (!fleet || fleet.length === 0) {
-        return null
-      }
+  if (!fleet || fleet.length === 0) {
+    return current || aircraftCargoDatabase[0]
+  }
 
-      const currentStillAvailable =
-        fleet.find(
-          aircraft =>
-            aircraft.id === current?.id
-        )
+  const currentStillAvailable =
+    fleet.find(
+      aircraft =>
+        aircraft.id === current?.id
+    )
 
-      return currentStillAvailable || fleet[0]
-    })
+  return currentStillAvailable || fleet[0]
+})
 
   } catch (error) {
     console.error(
@@ -499,8 +499,12 @@ async function refreshCargoFleet() {
     )
 
     setCargoAircraftFleet(
-      aircraftCargoDatabase
-    )
+  aircraftCargoDatabase
+)
+
+setSelectedCargoAircraft((current) =>
+  current || aircraftCargoDatabase[0]
+)
   }
 }
 
@@ -8528,7 +8532,7 @@ onShowRevisionHistory={() => {
         key={field}
         label={label}
         field={field}
-        value={editingWeightBalance[field]}
+        value={editingWeightBalance?.[field] ?? ''}
         setValue={setEditingWeightBalance}
       />
     ))}

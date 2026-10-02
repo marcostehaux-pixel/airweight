@@ -308,6 +308,7 @@ export function calculateCargoBalance(
   cargoWeights,
   takeoffFuel
 )
+
  {
 
   const mainCargo = getMainCargo( selectedCargoAircraft, cargoWeights)
