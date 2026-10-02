@@ -179,6 +179,40 @@ export async function createAircraft({
 
   return data
 }
+export async function updateAircraft({
+  aircraftId,
+  registration,
+  manufacturer,
+  model,
+  variant,
+  aircraftType,
+  status
+}) {
+  const { data, error } = await supabase
+    .from('aircraft')
+    .update({
+      registration: registration.trim().toUpperCase(),
+      manufacturer: manufacturer.trim(),
+      model: model.trim(),
+      variant: variant.trim(),
+      aircraft_type: aircraftType.trim(),
+      status
+    })
+    .eq('id', aircraftId)
+    .select()
+    .single()
+
+  if (error) {
+    console.error(
+      'AIRCRAFT UPDATE ERROR:',
+      error
+    )
+
+    throw error
+  }
+
+  return data
+}
 export async function createAircraftConfiguration({
   aircraftId,
   datum,
@@ -355,22 +389,44 @@ export async function createCargoPositions({
 export async function getCargoAircraftFleet() {
   const aircraftList = await getAircraft()
 
-  const cargoAircraft = aircraftList.filter(
-    (item) =>
-      item.aircraft_type === 'B737-800CF' &&
-      item.status === 'active'
+  // Only active aircraft are candidates for operational use
+  const activeAircraft = aircraftList.filter(
+    (item) => item.status === 'active'
   )
 
   const adaptedFleet = []
 
-  for (const aircraft of cargoAircraft) {
+  for (const aircraft of activeAircraft) {
     try {
       const fullData =
         await getAircraftFullData(aircraft.id)
 
+      // W&B configuration required
       if (!fullData?.configuration) {
         console.warn(
-          `AIRCRAFT ${aircraft.registration} SKIPPED: configuration incomplete`
+          `AIRCRAFT ${aircraft.registration} SKIPPED: W&B configuration missing`
+        )
+        continue
+      }
+
+      // Operational envelopes required
+      if (
+        !fullData?.envelopes ||
+        fullData.envelopes.length === 0
+      ) {
+        console.warn(
+          `AIRCRAFT ${aircraft.registration} SKIPPED: operational envelopes missing`
+        )
+        continue
+      }
+
+      // Cargo positions required
+      if (
+        !fullData?.cargoPositions ||
+        fullData.cargoPositions.length === 0
+      ) {
+        console.warn(
+          `AIRCRAFT ${aircraft.registration} SKIPPED: cargo positions missing`
         )
         continue
       }
@@ -382,11 +438,78 @@ export async function getCargoAircraftFleet() {
 
     } catch (error) {
       console.warn(
-        `AIRCRAFT ${aircraft.registration} SKIPPED: configuration incomplete`,
+        `AIRCRAFT ${aircraft.registration} SKIPPED: technical data incomplete`,
         error
       )
     }
   }
 
   return adaptedFleet
+}
+export async function getAircraftConfigurationStatus(
+  aircraftList
+) {
+  const results = await Promise.all(
+    aircraftList.map(async (aircraft) => {
+      try {
+        const fullData =
+          await getAircraftFullData(aircraft.id)
+
+        const hasConfiguration =
+          Boolean(fullData?.configuration)
+
+        const hasEnvelopes =
+          (fullData?.envelopes || []).length > 0
+
+        const hasCargoPositions =
+          (fullData?.cargoPositions || []).length > 0
+
+        const missing = []
+
+        if (!hasConfiguration) {
+          missing.push('W&B')
+        }
+
+        if (!hasEnvelopes) {
+          missing.push('ENVELOPES')
+        }
+
+        if (!hasCargoPositions) {
+          missing.push('CARGO')
+        }
+
+        return {
+          ...aircraft,
+
+          configurationStatus:
+            missing.length === 0
+              ? 'READY'
+              : 'PENDING',
+
+          configurationMissing: missing,
+
+          hasConfiguration,
+          hasEnvelopes,
+          hasCargoPositions
+        }
+
+      } catch (error) {
+        console.error(
+          `AIRCRAFT ${aircraft.registration} STATUS ERROR:`,
+          error
+        )
+
+        return {
+          ...aircraft,
+          configurationStatus: 'ERROR',
+          configurationMissing: [],
+          hasConfiguration: false,
+          hasEnvelopes: false,
+          hasCargoPositions: false
+        }
+      }
+    })
+  )
+
+  return results
 }

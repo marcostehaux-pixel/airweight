@@ -91,6 +91,8 @@ import {
   getAircraft,
   getCargoAircraftFleet,
   getAircraftFullData,
+  getAircraftConfigurationStatus,
+  updateAircraft,
    createAircraft,
    createAircraftConfiguration,
    createAircraftEnvelopes,
@@ -458,45 +460,60 @@ function clearCargo(){setCargoWeights(
 const [cargoAircraftFleet, setCargoAircraftFleet] =
   useState(aircraftCargoDatabase)
 
-useEffect(() => {
-  async function loadCargoFleet() {
-    try {
-      const fleet = await getCargoAircraftFleet()
+async function refreshCargoFleet() {
+  try {
+    const fleet = await getCargoAircraftFleet()
 
-      if (fleet && fleet.length > 0) {
-        setCargoAircraftFleet(fleet)
+    setCargoAircraftFleet(fleet || [])
 
-        setSelectedCargoAircraft((current) => {
-          const supabaseAircraft = fleet.find(
-            aircraft =>
-              aircraft.registration === current?.registration
-          )
-
-          return supabaseAircraft || fleet[0]
-        })
-
-        console.log(
-          'CARGO FLEET SOURCE: SUPABASE',
-          fleet
-        )
+    setSelectedCargoAircraft((current) => {
+      if (!fleet || fleet.length === 0) {
+        return null
       }
-    } catch (error) {
-      console.error(
-        'CARGO FLEET SUPABASE ERROR - USING LOCAL FALLBACK:',
-        error
-      )
 
-      setCargoAircraftFleet(aircraftCargoDatabase)
-    }
+      const currentStillAvailable =
+        fleet.find(
+          aircraft =>
+            aircraft.id === current?.id
+        )
+
+      return currentStillAvailable || fleet[0]
+    })
+
+  } catch (error) {
+    console.error(
+      'CARGO FLEET SUPABASE ERROR - USING LOCAL FALLBACK:',
+      error
+    )
+
+    setCargoAircraftFleet(
+      aircraftCargoDatabase
+    )
   }
+}
 
-  loadCargoFleet()
+useEffect(() => {
+  refreshCargoFleet()
 }, [])
+
 const [
   showNewAircraftForm,
   setShowNewAircraftForm
 ] = useState(false)
+const [
+  editingAircraftId,
+  setEditingAircraftId
+] = useState(null)
 
+const [
+  editingAircraft,
+  setEditingAircraft
+] = useState(null)
+
+const [
+  updatingAircraft,
+  setUpdatingAircraft
+] = useState(false)
 const [
   newAircraft,
   setNewAircraft
@@ -7683,19 +7700,18 @@ aftInfants
         const aircraft = await getAircraft()
 
         const organizationAircraft = aircraft.filter(
-          item =>
-            item.organization_id === organization.id
-        )
+  item =>
+    item.organization_id === organization.id
+)
 
-        setPlatformOrganizationAircraft(
-          organizationAircraft
-        )
+const aircraftWithStatus =
+  await getAircraftConfigurationStatus(
+    organizationAircraft
+  )
 
-        console.log(
-          'PLATFORM ORGANIZATION AIRCRAFT:',
-          organizationAircraft
-        )
-
+setPlatformOrganizationAircraft(
+  aircraftWithStatus
+)
       } catch (error) {
         console.error(
           'PLATFORM ORGANIZATION AIRCRAFT ERROR:',
@@ -9618,12 +9634,6 @@ onConfigureCargoPositions={() => {
     setSelectedPlatformAircraftFullData(
       fullData
     )
-
-    console.log(
-      'PLATFORM AIRCRAFT FULL DATA:',
-      fullData
-    )
-
   } catch (error) {
     console.error(
       'PLATFORM AIRCRAFT CONFIGURATION ERROR:',
@@ -9635,7 +9645,7 @@ onConfigureCargoPositions={() => {
             display: 'grid',
             cursor: 'pointer',
             gridTemplateColumns:
-              '1fr 1.5fr 1fr 1fr',
+  '1fr 1.5fr 1fr 0.8fr 1.2fr 0.7fr',
             gap: '16px',
             padding: '14px 0',
             alignItems: 'center',
@@ -9679,7 +9689,77 @@ onConfigureCargoPositions={() => {
             {(aircraft.status || '----')
               .toUpperCase()}
           </div>
+<div>
+  <div
+  style={{
+    display: 'flex',
+    justifyContent: 'flex-end'
+  }}
+>
+  <button
+    type="button"
+    onClick={(e) => {
+      e.stopPropagation()
 
+      setEditingAircraftId(aircraft.id)
+
+      setEditingAircraft({
+        registration: aircraft.registration || '',
+        manufacturer: aircraft.manufacturer || '',
+        model: aircraft.model || '',
+        variant: aircraft.variant || '',
+        aircraftType: aircraft.aircraft_type || '',
+        status: aircraft.status || 'active'
+      })
+    }}
+    style={{
+      padding: '7px 12px',
+      borderRadius: '7px',
+      border:
+        '1px solid rgba(79,140,255,0.35)',
+      background:
+        'rgba(79,140,255,0.10)',
+      color: '#8fb5ff',
+      fontSize: '9px',
+      fontWeight: '700',
+      letterSpacing: '0.6px',
+      cursor: 'pointer'
+    }}
+  >
+    EDIT
+  </button>
+</div>
+  <div
+    style={{
+      fontSize: '11px',
+      fontWeight: '700',
+      color:
+        aircraft.configurationStatus === 'READY'
+          ? '#59d98e'
+          : aircraft.configurationStatus === 'ERROR'
+            ? '#ff6b6b'
+            : '#f0b95a'
+    }}
+  >
+    {aircraft.configurationStatus || 'PENDING'}
+  </div>
+
+  {aircraft.configurationStatus === 'PENDING' &&
+   aircraft.configurationMissing?.length > 0 && (
+    <div
+      style={{
+        marginTop: '4px',
+        color: '#8fa0b7',
+        fontSize: '9px',
+        lineHeight: '1.4'
+      }}
+    >
+      MISSING:{' '}
+      {aircraft.configurationMissing.join(', ')}
+    </div>
+    
+  )}
+</div>
         </div>
 
       )
@@ -9688,9 +9768,307 @@ onConfigureCargoPositions={() => {
   </div>
 
 )}
+{editingAircraftId && editingAircraft && (
+
+  <div
+    style={{
+      marginTop: '20px',
+      padding: '22px',
+      borderRadius: '12px',
+      background: 'rgba(255,255,255,0.025)',
+      border: '1px solid rgba(79,140,255,0.20)'
+    }}
+  >
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '20px'
+      }}
+    >
+      <div>
+        <div
+          style={{
+            color: '#4f8cff',
+            fontSize: '11px',
+            fontWeight: '700',
+            letterSpacing: '1.3px'
+          }}
+        >
+          EDIT AIRCRAFT
+        </div>
+
+        <div
+          style={{
+            color: '#ffffff',
+            fontSize: '18px',
+            fontWeight: '700',
+            marginTop: '6px'
+          }}
+        >
+          {editingAircraft.registration}
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => {
+          setEditingAircraftId(null)
+          setEditingAircraft(null)
+        }}
+        style={{
+          padding: '8px 12px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background:
+            'rgba(255,255,255,0.04)',
+          color: '#8fa0b7',
+          fontSize: '9px',
+          fontWeight: '700',
+          cursor: 'pointer'
+        }}
+      >
+        CANCEL
+      </button>
+    </div>
+
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns:
+          'repeat(2, minmax(0, 1fr))',
+        gap: '14px'
+      }}
+    >
+
+      {[
+        ['Registration', 'registration'],
+        ['Manufacturer', 'manufacturer'],
+        ['Model', 'model'],
+        ['Variant', 'variant'],
+        ['Aircraft Type', 'aircraftType']
+      ].map(([label, field]) => (
+
+        <label
+          key={field}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '7px'
+          }}
+        >
+          <span
+            style={{
+              color: '#8fa0b7',
+              fontSize: '10px',
+              fontWeight: '700'
+            }}
+          >
+            {label}
+          </span>
+
+          <input
+            type="text"
+            value={editingAircraft[field]}
+            onChange={(e) =>
+              setEditingAircraft(current => ({
+                ...current,
+                [field]: e.target.value
+              }))
+            }
+            style={{
+              width: '100%',
+              boxSizing: 'border-box',
+              padding: '10px',
+              borderRadius: '7px',
+              border:
+                '1px solid rgba(255,255,255,0.10)',
+              background: 'rgba(0,0,0,0.20)',
+              color: '#ffffff',
+              outline: 'none'
+            }}
+          />
+        </label>
+
+      ))}
+
+      <label
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '7px'
+        }}
+      >
+        <span
+          style={{
+            color: '#8fa0b7',
+            fontSize: '10px',
+            fontWeight: '700'
+          }}
+        >
+          STATUS
+        </span>
+
+        <select
+          value={editingAircraft.status}
+          onChange={(e) =>
+            setEditingAircraft(current => ({
+              ...current,
+              status: e.target.value
+            }))
+          }
+          style={{
+            width: '100%',
+            boxSizing: 'border-box',
+            padding: '10px',
+            borderRadius: '7px',
+            border:
+              '1px solid rgba(255,255,255,0.10)',
+            background: '#0a1c32',
+            color: '#ffffff',
+            outline: 'none'
+          }}
+        >
+          <option value="active">
+            ACTIVE
+          </option>
+
+          <option value="inactive">
+            INACTIVE
+          </option>
+        </select>
+      </label>
+
+    </div>
+
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'flex-end',
+        gap: '10px',
+        marginTop: '22px'
+      }}
+    >
+      <button
+        type="button"
+        onClick={() => {
+          setEditingAircraftId(null)
+          setEditingAircraft(null)
+        }}
+        style={{
+          padding: '10px 14px',
+          borderRadius: '8px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background:
+            'rgba(255,255,255,0.04)',
+          color: '#8fa0b7',
+          fontSize: '10px',
+          fontWeight: '700',
+          cursor: 'pointer'
+        }}
+      >
+        CANCEL
+      </button>
+
+      <button
+        type="button"
+        disabled={
+          updatingAircraft ||
+          !editingAircraft.registration.trim() ||
+          !editingAircraft.manufacturer.trim() ||
+          !editingAircraft.aircraftType.trim()
+        }
+        onClick={async () => {
+          try {
+            setUpdatingAircraft(true)
+
+            const updated =
+              await updateAircraft({
+                aircraftId: editingAircraftId,
+                ...editingAircraft
+              })
+
+            const updatedFleet =
+              platformOrganizationAircraft.map(
+                aircraft =>
+                  aircraft.id === updated.id
+                    ? {
+                        ...aircraft,
+                        ...updated
+                      }
+                    : aircraft
+              )
+
+            setPlatformOrganizationAircraft(
+              updatedFleet
+            )
+await refreshCargoFleet()
+            if (
+              selectedPlatformAircraft?.id ===
+              updated.id
+            ) {
+              setSelectedPlatformAircraft(
+                current => ({
+                  ...current,
+                  ...updated
+                })
+              )
+            }
+
+            setEditingAircraftId(null)
+            setEditingAircraft(null)
+
+          } catch (error) {
+            console.error(
+              'AIRCRAFT UPDATE ERROR:',
+              error
+            )
+          } finally {
+            setUpdatingAircraft(false)
+          }
+        }}
+        style={{
+          padding: '10px 16px',
+          borderRadius: '8px',
+          border:
+            '1px solid rgba(79,140,255,0.40)',
+          background:
+            'rgba(79,140,255,0.15)',
+          color: '#ffffff',
+          fontSize: '10px',
+          fontWeight: '700',
+          letterSpacing: '0.7px',
+          cursor:
+            updatingAircraft
+              ? 'not-allowed'
+              : 'pointer',
+          opacity:
+            updatingAircraft
+              ? 0.45
+              : 1
+        }}
+      >
+        {updatingAircraft
+          ? 'SAVING...'
+          : 'SAVE CHANGES'}
+      </button>
+    </div>
+
   </div>
+
 )}
-{(userRole ===  userRole === 'super_admin' ||'freighter' || userRole === 'admin') &&
+  </div>
+  
+)}
+
+{(
+  userRole === 'freighter' ||
+  userRole === 'admin' ||
+  userRole === 'super_admin'
+) &&
  activeMenu === 'Flight Records' && (
 
   <div
