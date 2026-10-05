@@ -3,14 +3,12 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import dotenv from 'dotenv'
 import { createClient } from '@supabase/supabase-js'
-
+import { supabaseAdmin } from './src/services/supabaseAdmin.js'
 dotenv.config({
   path: '.env.local'
 })
 
-const { supabaseAdmin } = await import(
-  './src/services/supabaseAdmin.js'
-)
+
 
 const app = express()
 app.use(express.json())
