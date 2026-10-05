@@ -264,3 +264,55 @@ export async function closeFreighterFlightInSupabase(
 
   return data
 }
+export async function saveFreighterCargoLoads({
+  flightId,
+  aircraftId,
+  cargoWeights,
+  mainDeck = [],
+  lowerDeck = []
+}) {
+  const positions = [
+    ...mainDeck.map(position => ({
+      positionCode: position.id,
+      deck: 'MAIN'
+    })),
+
+    ...lowerDeck.map(position => ({
+      positionCode: position.id,
+      deck: 'LOWER'
+    }))
+  ]
+
+  const rows = positions.map(position => ({
+    flight_id: flightId,
+    aircraft_id: aircraftId,
+    position_code: position.positionCode,
+    deck: position.deck,
+    load_weight:
+      Number(
+        cargoWeights?.[
+          position.positionCode
+        ]
+      ) || 0
+  }))
+
+  if (rows.length === 0) {
+    return []
+  }
+
+  const { data, error } = await supabase
+    .from('flight_cargo_loads')
+    .insert(rows)
+    .select()
+
+  if (error) {
+    console.error(
+      'CREATE FLIGHT CARGO LOADS ERROR:',
+      error
+    )
+
+    throw error
+  }
+
+  return data || []
+}

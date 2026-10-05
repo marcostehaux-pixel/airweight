@@ -115,7 +115,8 @@ import {
   updateFreighterFlight,
   closeFreighterFlightInSupabase,
   adaptFreighterFlightToSupabase,
-  adaptSupabaseFlightToOperdat
+  adaptSupabaseFlightToOperdat,
+  saveFreighterCargoLoads
 } from './services/flightService'
 import {
   getOrganizations,
@@ -516,8 +517,10 @@ setSelectedCargoAircraft((current) =>
 }
 
 useEffect(() => {
+  if (!logged || !currentUser) return
+
   refreshCargoFleet()
-}, [])
+}, [logged, currentUser?.id])
 
 const [
   showNewAircraftForm,
@@ -2005,7 +2008,17 @@ if (activeFreighterFlightId) {
 
   return
 }
-
+console.log(
+  'FLIGHT INSERT DEBUG:',
+  {
+    currentUser,
+    organizationId:
+      currentUser?.organizationId,
+    userId:
+      currentUser?.id,
+    supabaseFlight
+  }
+)
 
 // ======================================================
 // CREATE NEW FLIGHT
@@ -2038,6 +2051,29 @@ try {
 
   return
 }
+await saveFreighterCargoLoads({
+  flightId: savedFlight.id,
+
+  aircraftId:
+    selectedCargoAircraft?.id,
+
+  cargoWeights,
+
+  mainDeck:
+    selectedCargoAircraft
+      ?.cargoConfig
+      ?.mainDeck || [],
+
+  lowerDeck:
+    selectedCargoAircraft
+      ?.cargoConfig
+      ?.lowerDeck || []
+})
+
+console.log(
+  'FLIGHT CARGO LOADS SAVED:',
+  savedFlight.id
+)
  const newFlight =
   adaptSupabaseFlightToOperdat(
     savedFlight
