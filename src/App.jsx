@@ -123,6 +123,10 @@ import {
   createOrganization,
   updateOrganization
 } from './services/organizationService'
+import {
+  createPlatformUser,
+  getPlatformUsers
+} from './services/userService'
 import aircraftImage from './assets/a320.png'
 
 console.log('APP FILE LOADED - SUPABASE TEST')
@@ -227,7 +231,60 @@ const [
   newOrganizationCode,
   setNewOrganizationCode
 ] = useState('')
+// ============================
+// PLATFORM USER MANAGEMENT
+// ============================
+const [
+  platformUsers,
+  setPlatformUsers
+] = useState([])
 
+const [
+  loadingPlatformUsers,
+  setLoadingPlatformUsers
+] = useState(false)
+const [
+  showNewUserForm,
+  setShowNewUserForm
+] = useState(false)
+
+const [
+  newUserFullName,
+  setNewUserFullName
+] = useState('')
+const [
+  newUserUsername,
+  setNewUserUsername
+] = useState('')
+const [
+  newUserEmail,
+  setNewUserEmail
+] = useState('')
+
+const [
+  newUserPassword,
+  setNewUserPassword
+] = useState('')
+
+const [
+  newUserRole,
+  setNewUserRole
+] = useState('freighter')
+
+const [
+  newUserOrganizationId,
+  setNewUserOrganizationId
+] = useState('')
+
+const [
+  creatingUser,
+  setCreatingUser
+] = useState(false)
+
+const [
+  userCreationMessage,
+  setUserCreationMessage
+] = useState('')
 const [
   creatingOrganization,
   setCreatingOrganization
@@ -394,6 +451,21 @@ if (profile.role === 'super_admin') {
   restoreSession()
 }, [])
 useEffect(() => {
+  if (
+    !logged ||
+    !currentUser ||
+    userRole !== 'super_admin'
+  ) {
+    return
+  }
+
+  refreshPlatformUsers()
+}, [
+  logged,
+  currentUser?.id,
+  userRole
+])
+useEffect(() => {
   if (!logged || userRole !== 'admin') return
 
   async function loadAdminAircraft() {
@@ -419,6 +491,32 @@ console.log(
   loadAdminAircraft()
 
 }, [logged, userRole])
+const refreshPlatformUsers = async () => {
+  if (userRole !== 'super_admin') {
+    setPlatformUsers([])
+    return
+  }
+
+  try {
+    setLoadingPlatformUsers(true)
+
+    const users =
+      await getPlatformUsers()
+
+    setPlatformUsers(users)
+
+  } catch (error) {
+    console.error(
+      'LOAD PLATFORM USERS ERROR:',
+      error
+    )
+
+    setPlatformUsers([])
+
+  } finally {
+    setLoadingPlatformUsers(false)
+  }
+}
 const [
   newAircraftEnvelopes,
   setNewAircraftEnvelopes
@@ -8182,6 +8280,599 @@ setPlatformOrganizationAircraft(
       ))}
 
     </div>
+    {/* USERS */}
+
+<div
+  style={{
+    marginTop: '22px',
+    borderRadius: '16px',
+    overflow: 'hidden',
+    background:
+      'linear-gradient(145deg, rgba(10,28,50,0.94), rgba(5,17,32,0.94))',
+    border: '1px solid rgba(255,255,255,0.08)',
+    boxShadow: '0 8px 24px rgba(0,0,0,0.18)'
+  }}
+>
+  {/* USERS HEADER */}
+
+  <div
+    style={{
+      padding: '20px 22px',
+      borderBottom:
+        '1px solid rgba(255,255,255,0.07)',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center'
+    }}
+  >
+    <div
+      style={{
+        color: '#4f8cff',
+        fontSize: '11px',
+        fontWeight: '700',
+        letterSpacing: '1.5px'
+      }}
+    >
+      USERS
+    </div>
+
+    <button
+      type="button"
+      onClick={() => {
+        setShowNewUserForm(
+          current => !current
+        )
+
+        setUserCreationMessage('')
+      }}
+      style={{
+        padding: '9px 14px',
+        borderRadius: '8px',
+        border:
+          '1px solid rgba(79,140,255,0.35)',
+        background:
+          'rgba(79,140,255,0.10)',
+        color: '#4f8cff',
+        fontSize: '10px',
+        fontWeight: '700',
+        letterSpacing: '0.7px',
+        cursor: 'pointer'
+      }}
+    >
+      {showNewUserForm
+        ? 'CANCEL'
+        : '+ NEW USER'}
+    </button>
+  </div>
+
+  {/* NEW USER FORM */}
+
+  {showNewUserForm && (
+    <div
+      style={{
+        padding: '20px 22px',
+        background:
+          'rgba(79,140,255,0.04)'
+      }}
+    >
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns:
+  '1.3fr 1.1fr 1.5fr 0.9fr 1.2fr',
+          gap: '14px'
+        }}
+      >
+        {/* FULL NAME */}
+
+        <div>
+          <div
+            style={{
+              color: '#8fa0b7',
+              fontSize: '10px',
+              fontWeight: '700',
+              marginBottom: '7px'
+            }}
+          >
+            FULL NAME
+          </div>
+
+          <input
+            type="text"
+            value={newUserFullName}
+            onChange={(e) =>
+              setNewUserFullName(e.target.value)
+            }
+            placeholder="User name"
+            style={{
+              width: '100%',
+              boxSizing: 'border-box',
+              padding: '11px 12px',
+              borderRadius: '8px',
+              border:
+                '1px solid rgba(255,255,255,0.10)',
+              background:
+                'rgba(0,0,0,0.20)',
+              color: '#ffffff',
+              outline: 'none'
+            }}
+          />
+        </div>
+{/* USERNAME */}
+
+<div>
+  <div
+    style={{
+      color: '#8fa0b7',
+      fontSize: '10px',
+      fontWeight: '700',
+      marginBottom: '7px'
+    }}
+  >
+    USERNAME
+  </div>
+
+  <input
+    type="text"
+    value={newUserUsername}
+    onChange={(e) =>
+      setNewUserUsername(
+        e.target.value
+          .toLowerCase()
+          .replace(/[^a-z0-9._-]/g, '')
+      )
+    }
+    placeholder="aca.dispatch01"
+    autoComplete="off"
+    maxLength={40}
+    style={{
+      width: '100%',
+      boxSizing: 'border-box',
+      padding: '11px 12px',
+      borderRadius: '8px',
+      border:
+        '1px solid rgba(255,255,255,0.10)',
+      background:
+        'rgba(0,0,0,0.20)',
+      color: '#ffffff',
+      outline: 'none'
+    }}
+  />
+</div>
+        {/* EMAIL */}
+
+        <div>
+          <div
+            style={{
+              color: '#8fa0b7',
+              fontSize: '10px',
+              fontWeight: '700',
+              marginBottom: '7px'
+            }}
+          >
+            EMAIL
+          </div>
+
+          <input
+            type="email"
+            value={newUserEmail}
+            onChange={(e) =>
+              setNewUserEmail(e.target.value)
+            }
+            placeholder="user@example.com"
+            style={{
+              width: '100%',
+              boxSizing: 'border-box',
+              padding: '11px 12px',
+              borderRadius: '8px',
+              border:
+                '1px solid rgba(255,255,255,0.10)',
+              background:
+                'rgba(0,0,0,0.20)',
+              color: '#ffffff',
+              outline: 'none'
+            }}
+          />
+        </div>
+
+        {/* ROLE */}
+
+        <div>
+          <div
+            style={{
+              color: '#8fa0b7',
+              fontSize: '10px',
+              fontWeight: '700',
+              marginBottom: '7px'
+            }}
+          >
+            ROLE
+          </div>
+
+          <select
+            value={newUserRole}
+            onChange={(e) =>
+              setNewUserRole(e.target.value)
+            }
+            style={{
+              width: '100%',
+              padding: '11px 12px',
+              borderRadius: '8px',
+              border:
+                '1px solid rgba(255,255,255,0.10)',
+              background: '#071526',
+              color: '#ffffff',
+              outline: 'none'
+            }}
+          >
+            <option value="admin">
+              Admin
+            </option>
+
+            <option value="freighter">
+              Freighter
+            </option>
+
+            <option value="student">
+              Student
+            </option>
+          </select>
+        </div>
+
+        {/* ORGANIZATION */}
+
+        <div>
+          <div
+            style={{
+              color: '#8fa0b7',
+              fontSize: '10px',
+              fontWeight: '700',
+              marginBottom: '7px'
+            }}
+          >
+            ORGANIZATION
+          </div>
+
+          <select
+            value={newUserOrganizationId}
+            onChange={(e) =>
+              setNewUserOrganizationId(
+                e.target.value
+              )
+            }
+            style={{
+              width: '100%',
+              padding: '11px 12px',
+              borderRadius: '8px',
+              border:
+                '1px solid rgba(255,255,255,0.10)',
+              background: '#071526',
+              color: '#ffffff',
+              outline: 'none'
+            }}
+          >
+            <option value="">
+              Select organization
+            </option>
+
+            {platformOrganizations
+              .filter(
+                organization =>
+                  organization.status ===
+                  'active'
+              )
+              .map(organization => (
+                <option
+                  key={organization.id}
+                  value={organization.id}
+                >
+                  {organization.name}
+                </option>
+              ))}
+          </select>
+        </div>
+      </div>
+
+      {/* PASSWORD + CREATE */}
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr auto',
+          gap: '14px',
+          alignItems: 'end',
+          marginTop: '14px'
+        }}
+      >
+        <div>
+          <div
+            style={{
+              color: '#8fa0b7',
+              fontSize: '10px',
+              fontWeight: '700',
+              marginBottom: '7px'
+            }}
+          >
+            TEMPORARY PASSWORD
+          </div>
+
+          <input
+            type="password"
+            value={newUserPassword}
+            onChange={(e) =>
+              setNewUserPassword(
+                e.target.value
+              )
+            }
+            placeholder="Minimum 8 characters"
+            autoComplete="new-password"
+            style={{
+              width: '100%',
+              boxSizing: 'border-box',
+              padding: '11px 12px',
+              borderRadius: '8px',
+              border:
+                '1px solid rgba(255,255,255,0.10)',
+              background:
+                'rgba(0,0,0,0.20)',
+              color: '#ffffff',
+              outline: 'none'
+            }}
+          />
+        </div>
+
+        <button
+          type="button"
+          disabled={
+            creatingUser ||
+            !newUserFullName.trim() ||
+            newUserUsername.trim().length < 3 ||
+            !newUserEmail.trim() ||
+            newUserPassword.length < 8 ||
+            !newUserOrganizationId
+          }
+          onClick={async () => {
+            try {
+              setCreatingUser(true)
+              setUserCreationMessage('')
+
+              const createdUser =
+                await createPlatformUser({
+                  fullName:
+                    newUserFullName.trim(),
+                    username:
+      newUserUsername
+        .trim()
+        .toLowerCase(),
+                  email:
+                    newUserEmail
+                      .trim()
+                      .toLowerCase(),
+                  password:
+                    newUserPassword,
+                  role:
+                    newUserRole,
+                  organizationId:
+                    Number(
+                      newUserOrganizationId
+                    )
+                })
+
+              console.log(
+                'PLATFORM USER CREATED:',
+                createdUser
+              )
+
+              setUserCreationMessage(
+                `User ${createdUser.fullName} created successfully`
+              )
+
+              setNewUserFullName('')
+              setNewUserUsername('')
+              setNewUserEmail('')
+              setNewUserPassword('')
+              setNewUserRole('freighter')
+              setNewUserOrganizationId('')
+await refreshPlatformUsers()
+            } catch (error) {
+              console.error(
+                'CREATE PLATFORM USER ERROR:',
+                error
+              )
+
+              setUserCreationMessage(
+                error.message ||
+                'Could not create user'
+              )
+            } finally {
+              setCreatingUser(false)
+            }
+          }}
+          style={{
+            padding: '11px 18px',
+            borderRadius: '8px',
+            border:
+              '1px solid rgba(79,140,255,0.40)',
+            background:
+              'rgba(79,140,255,0.15)',
+            color: '#ffffff',
+            fontSize: '10px',
+            fontWeight: '700',
+            letterSpacing: '0.7px',
+            cursor:
+              creatingUser
+                ? 'wait'
+                : 'pointer',
+            opacity:
+              creatingUser ||
+              !newUserFullName.trim() ||
+              newUserUsername.trim().length < 3 ||
+              !newUserEmail.trim() ||
+              newUserPassword.length < 8 ||
+              !newUserOrganizationId
+                ? 0.45
+                : 1
+          }}
+        >
+          {creatingUser
+            ? 'CREATING...'
+            : 'CREATE USER'}
+        </button>
+      </div>
+
+      {userCreationMessage && (
+        <div
+          style={{
+            marginTop: '14px',
+            color: '#8fa0b7',
+            fontSize: '12px'
+          }}
+        >
+          {userCreationMessage}
+        </div>
+      )}
+      {/* PLATFORM USERS LIST */}
+
+<div
+  style={{
+    marginTop: 18,
+    borderTop: '1px solid #334155',
+    paddingTop: 16
+  }}
+>
+  {loadingPlatformUsers ? (
+    <div
+      style={{
+        color: '#94a3b8',
+        fontSize: 13
+      }}
+    >
+      Loading users...
+    </div>
+  ) : platformUsers.length === 0 ? (
+    <div
+      style={{
+        color: '#94a3b8',
+        fontSize: 13
+      }}
+    >
+      No users found.
+    </div>
+  ) : (
+    <div
+      style={{
+        overflowX: 'auto'
+      }}
+    >
+      <table
+        style={{
+          width: '100%',
+          borderCollapse: 'collapse',
+          fontSize: 13
+        }}
+      >
+        <thead>
+          <tr
+            style={{
+              borderBottom:
+                '1px solid #334155',
+              color: '#94a3b8',
+              textAlign: 'left'
+            }}
+          >
+            <th style={{ padding: '10px 8px' }}>
+              NAME
+            </th>
+
+            <th style={{ padding: '10px 8px' }}>
+              USERNAME
+            </th>
+
+            <th style={{ padding: '10px 8px' }}>
+              ORGANIZATION
+            </th>
+
+            <th style={{ padding: '10px 8px' }}>
+              ROLE
+            </th>
+
+            <th style={{ padding: '10px 8px' }}>
+              STATUS
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {platformUsers.map((user) => (
+            <tr
+              key={user.id}
+              style={{
+                borderBottom:
+                  '1px solid #1e293b'
+              }}
+            >
+              <td
+                style={{
+                  padding: '12px 8px',
+                  color: '#e2e8f0',
+                  fontWeight: 600
+                }}
+              >
+                {user.fullName}
+              </td>
+
+              <td
+                style={{
+                  padding: '12px 8px',
+                  color: '#cbd5e1'
+                }}
+              >
+                {user.username || '—'}
+              </td>
+
+              <td
+                style={{
+                  padding: '12px 8px',
+                  color: '#cbd5e1'
+                }}
+              >
+                {user.organizationName}
+              </td>
+
+              <td
+                style={{
+                  padding: '12px 8px',
+                  color: '#cbd5e1',
+                  textTransform: 'uppercase'
+                }}
+              >
+                {user.role}
+              </td>
+
+              <td
+                style={{
+                  padding: '12px 8px',
+                  fontWeight: 700,
+                  color:
+                    user.status === 'active'
+                      ? '#22c55e'
+                      : '#ef4444',
+                  textTransform: 'uppercase'
+                }}
+              >
+                {user.status}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+</div>
+    </div>
+    
+  )}
+</div>
 {/* SELECTED ORGANIZATION */}
 
 {selectedPlatformOrganization && (

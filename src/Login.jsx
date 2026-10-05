@@ -72,7 +72,86 @@ console.log('OPERDAT LOGIN ROLE:', profile.role)
 })
       return
     }
+// ==========================================
+// 3. REAL USER — USERNAME AUTH
+// ==========================================
 
+const normalizedUsername =
+  user.trim().toLowerCase()
+
+const response = await fetch(
+  '/api/auth/login',
+  {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      username: normalizedUsername,
+      password
+    })
+  }
+)
+
+if (response.ok) {
+  const result = await response.json()
+
+  if (
+    !result?.session?.access_token ||
+    !result?.session?.refresh_token ||
+    !result?.profile
+  ) {
+    alert('Unable to authenticate user')
+    return
+  }
+
+  const {
+    error: sessionError
+  } = await supabase.auth.setSession({
+    access_token:
+      result.session.access_token,
+    refresh_token:
+      result.session.refresh_token
+  })
+
+  if (sessionError) {
+    console.error(
+      'USERNAME SESSION ERROR:',
+      sessionError
+    )
+
+    alert('Unable to create user session')
+    return
+  }
+
+  console.log(
+    'OPERDAT USERNAME LOGIN:',
+    result.profile.username
+  )
+
+  console.log(
+    'OPERDAT LOGIN ROLE:',
+    result.profile.role
+  )
+
+  onLogin(
+    result.profile.role,
+    {
+      id: result.profile.id,
+      email: null,
+      username:
+        result.profile.username,
+      fullName:
+        result.profile.fullName,
+      role:
+        result.profile.role,
+      organizationId:
+        result.profile.organizationId
+    }
+  )
+
+  return
+}
     // ==========================================
     // 3. TEMPORARY LEGACY USERS
     // ==========================================
