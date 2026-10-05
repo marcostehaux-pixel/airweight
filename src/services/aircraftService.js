@@ -692,3 +692,151 @@ export async function createWeightBalanceRevision({
 
   return data?.[0] || null
 }
+export async function createAircraftDataRevision({
+  aircraftId,
+
+  dow,
+  mzfw,
+  mtow,
+  mrw,
+  mlw,
+
+  changeReason,
+  sourceDocument,
+  sourceRevision,
+  effectiveDate
+}) {
+  const { data, error } = await supabase.rpc(
+    'create_aircraft_data_revision',
+    {
+      p_aircraft_id: aircraftId,
+
+      p_dow: Number(dow),
+      p_mzfw: Number(mzfw),
+      p_mtow: Number(mtow),
+      p_mrw: Number(mrw),
+      p_mlw: Number(mlw),
+
+      p_change_reason:
+        changeReason?.trim() || null,
+
+      p_source_document:
+        sourceDocument?.trim() || null,
+
+      p_source_revision:
+        sourceRevision?.trim() || null,
+
+      p_effective_date:
+        effectiveDate
+    }
+  )
+
+  if (error) {
+    console.error(
+      'AIRCRAFT DATA REVISION ERROR:',
+      error
+    )
+    throw error
+  }
+
+  return data?.[0] || null
+}
+export async function createEnvelopesRevision({
+  aircraftId,
+  zf,
+  tow,
+  lw,
+  changeReason,
+  sourceDocument,
+  sourceRevision,
+  effectiveDate
+}) {
+  const { data, error } = await supabase.rpc(
+    'create_envelopes_revision',
+    {
+      p_aircraft_id: aircraftId,
+
+      p_zfw_index_min: Number(zf.indexMin),
+      p_zfw_index_max: Number(zf.indexMax),
+      p_zfw_cg_min: Number(zf.cgMin),
+      p_zfw_cg_max: Number(zf.cgMax),
+
+      p_tow_index_min: Number(tow.indexMin),
+      p_tow_index_max: Number(tow.indexMax),
+      p_tow_cg_min: Number(tow.cgMin),
+      p_tow_cg_max: Number(tow.cgMax),
+
+      p_ldw_index_min: Number(lw.indexMin),
+      p_ldw_index_max: Number(lw.indexMax),
+      p_ldw_cg_min: Number(lw.cgMin),
+      p_ldw_cg_max: Number(lw.cgMax),
+
+      p_change_reason:
+        changeReason?.trim() || null,
+
+      p_source_document:
+        sourceDocument?.trim() || null,
+
+      p_source_revision:
+        sourceRevision?.trim() || null,
+
+      p_effective_date: effectiveDate
+    }
+  )
+
+  if (error) {
+    console.error(
+      'ENVELOPES REVISION ERROR:',
+      error
+    )
+    throw error
+  }
+
+  return data?.[0] || null
+}
+export async function createCargoPositionsRevision({
+  aircraftId,
+  positions,
+  changeReason,
+  sourceDocument,
+  sourceRevision,
+  effectiveDate
+}) {
+  const formattedPositions = positions.map(
+    position => ({
+      position_code: position.positionCode,
+      deck: position.deck,
+      max_weight: Number(position.maxWeight),
+      arm: Number(position.arm)
+    })
+  )
+
+  const { data, error } = await supabase.rpc(
+    'create_cargo_positions_revision',
+    {
+      p_aircraft_id: aircraftId,
+      p_positions: formattedPositions,
+
+      p_change_reason:
+        changeReason?.trim() || null,
+
+      p_source_document:
+        sourceDocument?.trim() || null,
+
+      p_source_revision:
+        sourceRevision?.trim() || null,
+
+      p_effective_date: effectiveDate
+    }
+  )
+
+  if (error) {
+    console.error(
+      'CARGO POSITIONS REVISION ERROR:',
+      error
+    )
+    throw error
+  }
+
+  return data?.[0] || null
+}

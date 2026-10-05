@@ -14,7 +14,11 @@ import {getZeroFuelIndex,getTakeoffIndex,getLandingIndex,getCG} from './utilit/c
 import { getCgFromIndex } from './utilit/indexToCG'
 import { calculateWeight } from './utilit/weightCalculator'
 import {getTotalMoment, getArm} from './utilit/passengerMomentCalculator.js'
-import { useState, useEffect } from 'react'
+import {
+  Fragment,
+  useEffect,
+  useState
+} from 'react'
 import { calculateFuel,getFuelIndex} from './utilit/fuelCalculator'
 import './App.css'
 import StatusCard from './components/StatusCard'
@@ -100,6 +104,9 @@ import {
    getAircraftTechnicalRevisions,
 createAircraftTechnicalRevision,
 createWeightBalanceRevision,
+createAircraftDataRevision,
+createEnvelopesRevision,
+createCargoPositionsRevision,
   adaptSupabaseAircraft
 } from './services/aircraftService'
 import {
@@ -534,7 +541,66 @@ const [
   editingWeightBalance,
   setEditingWeightBalance
 ] = useState(null)
+const [
+  editingAircraftData,
+  setEditingAircraftData
+] = useState(null)
 
+const [
+  savingAircraftDataRevision,
+  setSavingAircraftDataRevision
+] = useState(false)
+
+const [
+  aircraftDataRevisionMeta,
+  setAircraftDataRevisionMeta
+] = useState({
+  changeReason: '',
+  sourceDocument: '',
+  sourceRevision: '',
+  effectiveDate:
+    new Date().toISOString().slice(0, 10)
+})
+const [
+  editingEnvelopes,
+  setEditingEnvelopes
+] = useState(null)
+
+const [
+  savingEnvelopesRevision,
+  setSavingEnvelopesRevision
+] = useState(false)
+
+const [
+  envelopesRevisionMeta,
+  setEnvelopesRevisionMeta
+] = useState({
+    changeReason: '',
+    sourceDocument: '',
+    sourceRevision: '',
+    effectiveDate:
+      new Date().toISOString().slice(0, 10)
+})
+const [
+  editingCargoPositions,
+  setEditingCargoPositions
+] = useState(null)
+
+const [
+  savingCargoPositionsRevision,
+  setSavingCargoPositionsRevision
+] = useState(false)
+
+const [
+  cargoPositionsRevisionMeta,
+  setCargoPositionsRevisionMeta
+] = useState({
+  changeReason: '',
+  sourceDocument: '',
+  sourceRevision: '',
+  effectiveDate:
+    new Date().toISOString().slice(0, 10)
+})
 const [
   savingWeightBalanceRevision,
   setSavingWeightBalanceRevision
@@ -8195,7 +8261,26 @@ onConfigureCargoPositions={() => {
   setShowCargoPositionsForm(true)
 }}
 onEditAircraftData={() => {
-  console.log('EDIT TECHNICAL AIRCRAFT DATA')
+  const aircraft =
+    selectedPlatformAircraftFullData?.aircraft
+
+  if (!aircraft) return
+
+  setEditingAircraftData({
+    dow: aircraft.dow ?? '',
+    mzfw: aircraft.mzfw ?? '',
+    mtow: aircraft.mtow ?? '',
+    mrw: aircraft.mrw ?? '',
+    mlw: aircraft.mlw ?? ''
+  })
+
+  setAircraftDataRevisionMeta({
+    changeReason: '',
+    sourceDocument: '',
+    sourceRevision: '',
+    effectiveDate:
+      new Date().toISOString().slice(0, 10)
+  })
 }}
 
 onEditWeightBalance={() => {
@@ -8255,11 +8340,83 @@ onEditWeightBalance={() => {
   })
 }}
 onEditEnvelopes={() => {
-  console.log('EDIT OPERATIONAL ENVELOPES')
+  const envelopes =
+    selectedPlatformAircraftFullData?.envelopes
+
+  if (!envelopes?.length) return
+
+ const zf = envelopes.find(
+  item =>
+    String(item.phase).trim().toUpperCase() === 'ZFW'
+)
+
+const tow = envelopes.find(
+  item =>
+    String(item.phase).trim().toUpperCase() === 'TOW'
+)
+
+const lw = envelopes.find(
+  item =>
+    String(item.phase).trim().toUpperCase() === 'LDW'
+)
+
+  setEditingEnvelopes({
+    zf: {
+      indexMin: zf?.index_min ?? '',
+      indexMax: zf?.index_max ?? '',
+      cgMin: zf?.cg_min ?? '',
+      cgMax: zf?.cg_max ?? ''
+    },
+
+    tow: {
+      indexMin: tow?.index_min ?? '',
+      indexMax: tow?.index_max ?? '',
+      cgMin: tow?.cg_min ?? '',
+      cgMax: tow?.cg_max ?? ''
+    },
+
+    lw: {
+      indexMin: lw?.index_min ?? '',
+      indexMax: lw?.index_max ?? '',
+      cgMin: lw?.cg_min ?? '',
+      cgMax: lw?.cg_max ?? ''
+    }
+  })
+
+  setEnvelopesRevisionMeta({
+    changeReason: '',
+    sourceDocument: '',
+    sourceRevision: '',
+    effectiveDate:
+      new Date().toISOString().slice(0, 10)
+  })
 }}
 
 onEditCargoPositions={() => {
-  console.log('EDIT CARGO POSITIONS')
+  const cargoPositions =
+    selectedPlatformAircraftFullData?.cargoPositions
+
+  if (!cargoPositions?.length) return
+
+  setEditingCargoPositions(
+    cargoPositions.map(position => ({
+      id: position.id,
+      positionCode:
+        position.position_code,
+      deck: position.deck,
+      maxWeight:
+        position.max_weight,
+      arm: position.arm
+    }))
+  )
+
+  setCargoPositionsRevisionMeta({
+    changeReason: '',
+    sourceDocument: '',
+    sourceRevision: '',
+    effectiveDate:
+      new Date().toISOString().slice(0, 10)
+  })
 }}
 technicalRevisions={
   selectedAircraftTechnicalRevisions
@@ -8273,6 +8430,1396 @@ onShowRevisionHistory={() => {
   )
 }}
 />
+{editingEnvelopes &&
+ selectedPlatformAircraft && (
+  <div
+    style={{
+      marginTop: '20px',
+      marginBottom: '24px',
+      padding: '22px',
+      borderRadius: '12px',
+      background: 'rgba(12,22,38,0.92)',
+      border:
+        '1px solid rgba(79,140,255,0.20)'
+    }}
+  >
+    {/* HEADER */}
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '20px'
+      }}
+    >
+      <div>
+        <div
+          style={{
+            color: '#4f8cff',
+            fontSize: '12px',
+            fontWeight: '700',
+            letterSpacing: '1px'
+          }}
+        >
+          OPERATIONAL ENVELOPES REVISION
+        </div>
+
+        <div
+          style={{
+            color: '#ffffff',
+            fontSize: '18px',
+            fontWeight: '700',
+            marginTop: '4px'
+          }}
+        >
+          {selectedPlatformAircraft.registration}
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() =>
+          setEditingEnvelopes(null)
+        }
+        style={{
+          padding: '7px 12px',
+          borderRadius: '6px',
+          border:
+            '1px solid rgba(255,255,255,0.12)',
+          background: 'transparent',
+          color: '#9aa8ba',
+          fontSize: '9px',
+          fontWeight: '700',
+          cursor: 'pointer'
+        }}
+      >
+        CANCEL
+      </button>
+    </div>
+
+    {/* TABLE HEADER */}
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns:
+          '0.7fr 1fr 1fr 1fr 1fr',
+        gap: '12px',
+        marginBottom: '8px',
+        color: '#8fa0b7',
+        fontSize: '9px',
+        fontWeight: '700'
+      }}
+    >
+      <div>PHASE</div>
+      <div>INDEX MIN</div>
+      <div>INDEX MAX</div>
+      <div>CG MIN</div>
+      <div>CG MAX</div>
+    </div>
+
+    {/* ENVELOPE ROWS */}
+    {[
+  ['ZFW', 'zf'],
+  ['TOW', 'tow'],
+  ['LDW', 'lw']
+].map(([label, phase]) => (
+      <div
+        key={phase}
+        style={{
+          display: 'grid',
+          gridTemplateColumns:
+            '0.7fr 1fr 1fr 1fr 1fr',
+          gap: '12px',
+          alignItems: 'center',
+          marginBottom: '10px'
+        }}
+      >
+        <div
+          style={{
+            color: '#4f8cff',
+            fontSize: '11px',
+            fontWeight: '700'
+          }}
+        >
+          {label}
+        </div>
+
+        {[
+          'indexMin',
+          'indexMax',
+          'cgMin',
+          'cgMax'
+        ].map(field => (
+          <input
+            key={field}
+            type="number"
+            step="any"
+            value={
+              editingEnvelopes?.[phase]?.[field] ??
+              ''
+            }
+            onChange={(e) =>
+              setEditingEnvelopes(current => ({
+                ...current,
+                [phase]: {
+                  ...current[phase],
+                  [field]: e.target.value
+                }
+              }))
+            }
+            style={{
+              width: '100%',
+              boxSizing: 'border-box',
+              padding: '10px',
+              borderRadius: '7px',
+              border:
+                '1px solid rgba(255,255,255,0.10)',
+              background:
+                'rgba(0,0,0,0.20)',
+              color: '#ffffff',
+              outline: 'none'
+            }}
+          />
+        ))}
+      </div>
+    ))}
+    {/* REVISION TRACEABILITY */}
+<div
+  style={{
+    marginTop: '24px',
+    paddingTop: '20px',
+    borderTop:
+      '1px solid rgba(255,255,255,0.07)'
+  }}
+>
+  <div
+    style={{
+      color: '#8fa0b7',
+      fontSize: '9px',
+      fontWeight: '700',
+      letterSpacing: '1px',
+      marginBottom: '12px'
+    }}
+  >
+    REVISION TRACEABILITY
+  </div>
+
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns:
+        '2fr 1.5fr 1fr 1fr',
+      gap: '12px'
+    }}
+  >
+    <label
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '7px'
+      }}
+    >
+      <span
+        style={{
+          color: '#8fa0b7',
+          fontSize: '9px',
+          fontWeight: '700'
+        }}
+      >
+        CHANGE REASON
+      </span>
+
+      <input
+        type="text"
+        value={envelopesRevisionMeta.changeReason}
+        onChange={(e) =>
+          setEnvelopesRevisionMeta(current => ({
+            ...current,
+            changeReason: e.target.value
+          }))
+        }
+        placeholder="Reason for technical revision"
+        style={{
+          width: '100%',
+          boxSizing: 'border-box',
+          padding: '10px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background: 'rgba(0,0,0,0.20)',
+          color: '#ffffff',
+          outline: 'none'
+        }}
+      />
+    </label>
+
+    <label
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '7px'
+      }}
+    >
+      <span
+        style={{
+          color: '#8fa0b7',
+          fontSize: '9px',
+          fontWeight: '700'
+        }}
+      >
+        SOURCE DOCUMENT
+      </span>
+
+      <input
+        type="text"
+        value={envelopesRevisionMeta.sourceDocument}
+        onChange={(e) =>
+          setEnvelopesRevisionMeta(current => ({
+            ...current,
+            sourceDocument: e.target.value
+          }))
+        }
+        placeholder="WBM / AFM / approved document"
+        style={{
+          width: '100%',
+          boxSizing: 'border-box',
+          padding: '10px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background: 'rgba(0,0,0,0.20)',
+          color: '#ffffff',
+          outline: 'none'
+        }}
+      />
+    </label>
+
+    <label
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '7px'
+      }}
+    >
+      <span
+        style={{
+          color: '#8fa0b7',
+          fontSize: '9px',
+          fontWeight: '700'
+        }}
+      >
+        SOURCE REVISION
+      </span>
+
+      <input
+        type="text"
+        value={envelopesRevisionMeta.sourceRevision}
+        onChange={(e) =>
+          setEnvelopesRevisionMeta(current => ({
+            ...current,
+            sourceRevision: e.target.value
+          }))
+        }
+        placeholder="Revision"
+        style={{
+          width: '100%',
+          boxSizing: 'border-box',
+          padding: '10px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background: 'rgba(0,0,0,0.20)',
+          color: '#ffffff',
+          outline: 'none'
+        }}
+      />
+    </label>
+
+    <label
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '7px'
+      }}
+    >
+      <span
+        style={{
+          color: '#8fa0b7',
+          fontSize: '9px',
+          fontWeight: '700'
+        }}
+      >
+        EFFECTIVE DATE
+      </span>
+
+      <input
+        type="date"
+        value={envelopesRevisionMeta.effectiveDate}
+        onChange={(e) =>
+          setEnvelopesRevisionMeta(current => ({
+            ...current,
+            effectiveDate: e.target.value
+          }))
+        }
+        style={{
+          width: '100%',
+          boxSizing: 'border-box',
+          padding: '10px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background: 'rgba(0,0,0,0.20)',
+          color: '#ffffff',
+          outline: 'none'
+        }}
+      />
+    </label>
+  </div>
+<div
+  style={{
+    display: 'flex',
+    justifyContent: 'flex-end',
+    marginTop: '20px'
+  }}
+>
+  <button
+    type="button"
+    disabled={
+      savingEnvelopesRevision ||
+      !envelopesRevisionMeta.changeReason.trim() ||
+      !envelopesRevisionMeta.sourceDocument.trim() ||
+      !envelopesRevisionMeta.effectiveDate
+    }
+    onClick={async () => {
+      try {
+        const phases = [
+          ['ZFW', editingEnvelopes.zf],
+          ['TOW', editingEnvelopes.tow],
+          ['LDW', editingEnvelopes.lw]
+        ]
+
+        for (const [phase, values] of phases) {
+          const indexMin = Number(values.indexMin)
+          const indexMax = Number(values.indexMax)
+          const cgMin = Number(values.cgMin)
+          const cgMax = Number(values.cgMax)
+
+          if (
+            !Number.isFinite(indexMin) ||
+            !Number.isFinite(indexMax) ||
+            !Number.isFinite(cgMin) ||
+            !Number.isFinite(cgMax)
+          ) {
+            alert(
+              `${phase}: all envelope values are required.`
+            )
+            return
+          }
+
+          if (indexMin >= indexMax) {
+            alert(
+              `${phase}: INDEX MIN must be lower than INDEX MAX.`
+            )
+            return
+          }
+
+          if (cgMin >= cgMax) {
+            alert(
+              `${phase}: CG MIN must be lower than CG MAX.`
+            )
+            return
+          }
+        }
+
+        setSavingEnvelopesRevision(true)
+
+        const revision =
+          await createEnvelopesRevision({
+            aircraftId:
+              selectedPlatformAircraft.id,
+
+            ...editingEnvelopes,
+            ...envelopesRevisionMeta
+          })
+
+        console.log(
+          'ENVELOPES REVISION CREATED:',
+          revision
+        )
+
+        const refreshed =
+          await getAircraftFullData(
+            selectedPlatformAircraft.id
+          )
+
+        setSelectedPlatformAircraftFullData(
+          refreshed
+        )
+
+        const refreshedRevisions =
+          await getAircraftTechnicalRevisions(
+            selectedPlatformAircraft.id
+          )
+
+        setSelectedAircraftTechnicalRevisions(
+          refreshedRevisions
+        )
+
+        await refreshCargoFleet()
+
+        setEditingEnvelopes(null)
+
+      } catch (error) {
+        console.error(
+          'SAVE ENVELOPES REVISION ERROR:',
+          error
+        )
+      } finally {
+        setSavingEnvelopesRevision(false)
+      }
+    }}
+    style={{
+      padding: '10px 16px',
+      borderRadius: '7px',
+      border: 'none',
+      background:
+        savingEnvelopesRevision ||
+        !envelopesRevisionMeta.changeReason.trim() ||
+        !envelopesRevisionMeta.sourceDocument.trim() ||
+        !envelopesRevisionMeta.effectiveDate
+          ? 'rgba(79,140,255,0.25)'
+          : '#4f8cff',
+      color: '#ffffff',
+      fontSize: '10px',
+      fontWeight: '700',
+      letterSpacing: '0.6px',
+      cursor:
+        savingEnvelopesRevision ||
+        !envelopesRevisionMeta.changeReason.trim() ||
+        !envelopesRevisionMeta.sourceDocument.trim() ||
+        !envelopesRevisionMeta.effectiveDate
+          ? 'not-allowed'
+          : 'pointer'
+    }}
+  >
+    {savingEnvelopesRevision
+      ? 'SAVING...'
+      : 'SAVE REVISION'}
+  </button>
+</div>
+</div>
+  </div>
+)}
+{editingCargoPositions &&
+ selectedPlatformAircraft && (
+  <div
+    style={{
+      marginTop: '20px',
+      padding: '20px',
+      borderRadius: '10px',
+      background: 'rgba(8,18,32,0.95)',
+      border: '1px solid rgba(255,255,255,0.08)'
+    }}
+  >
+    {/* HEADER */}
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '20px'
+      }}
+    >
+      <div>
+        <div
+          style={{
+            color: '#ffffff',
+            fontSize: '14px',
+            fontWeight: '700'
+          }}
+        >
+          CARGO POSITIONS REVISION
+        </div>
+
+        <div
+          style={{
+            color: '#8fa0b7',
+            fontSize: '10px',
+            marginTop: '4px'
+          }}
+        >
+          {selectedPlatformAircraft.registration}
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() =>
+          setEditingCargoPositions(null)
+        }
+        style={{
+          padding: '8px 12px',
+          borderRadius: '6px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background: 'transparent',
+          color: '#ffffff',
+          cursor: 'pointer'
+        }}
+      >
+        CANCEL
+      </button>
+    </div>
+
+    {/* DECKS */}
+    {['MAIN', 'LOWER'].map(deck => {
+      const deckPositions =
+        editingCargoPositions.filter(
+          position => position.deck === deck
+        )
+
+      return (
+        <div
+          key={deck}
+          style={{
+            marginBottom: '24px'
+          }}
+        >
+          <div
+            style={{
+              color: '#8fa0b7',
+              fontSize: '9px',
+              fontWeight: '700',
+              letterSpacing: '1px',
+              marginBottom: '10px'
+            }}
+          >
+            {deck} DECK
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns:
+                '120px 1fr 1fr',
+              gap: '8px',
+              alignItems: 'center'
+            }}
+          >
+            <div
+              style={{
+                color: '#708198',
+                fontSize: '9px',
+                fontWeight: '700'
+              }}
+            >
+              POSITION
+            </div>
+
+            <div
+              style={{
+                color: '#708198',
+                fontSize: '9px',
+                fontWeight: '700'
+              }}
+            >
+              MAX WEIGHT (KG)
+            </div>
+
+            <div
+              style={{
+                color: '#708198',
+                fontSize: '9px',
+                fontWeight: '700'
+              }}
+            >
+              ARM
+            </div>
+
+            {deckPositions.map(position => {
+              const positionIndex =
+                editingCargoPositions.findIndex(
+                  item => item.id === position.id
+                )
+
+              return (
+                <Fragment
+  key={position.id}
+>
+                  <div
+                    style={{
+                      color: '#ffffff',
+                      fontSize: '11px',
+                      fontWeight: '700'
+                    }}
+                  >
+                    {position.positionCode}
+                  </div>
+
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={position.maxWeight}
+                    onChange={(e) => {
+                      const value = e.target.value
+
+                      setEditingCargoPositions(
+                        current =>
+                          current.map(
+                            (item, index) =>
+                              index === positionIndex
+                                ? {
+                                    ...item,
+                                    maxWeight: value
+                                  }
+                                : item
+                          )
+                      )
+                    }}
+                    style={{
+                      width: '100%',
+                      boxSizing: 'border-box',
+                      padding: '9px',
+                      borderRadius: '6px',
+                      border:
+                        '1px solid rgba(255,255,255,0.10)',
+                      background:
+                        'rgba(0,0,0,0.20)',
+                      color: '#ffffff',
+                      outline: 'none'
+                    }}
+                  />
+
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={position.arm}
+                    onChange={(e) => {
+                      const value = e.target.value
+
+                      setEditingCargoPositions(
+                        current =>
+                          current.map(
+                            (item, index) =>
+                              index === positionIndex
+                                ? {
+                                    ...item,
+                                    arm: value
+                                  }
+                                : item
+                          )
+                      )
+                    }}
+                    style={{
+                      width: '100%',
+                      boxSizing: 'border-box',
+                      padding: '9px',
+                      borderRadius: '6px',
+                      border:
+                        '1px solid rgba(255,255,255,0.10)',
+                      background:
+                        'rgba(0,0,0,0.20)',
+                      color: '#ffffff',
+                      outline: 'none'
+                    }}
+                  />
+                </Fragment>
+              )
+            })}
+          </div>
+        </div>
+      )
+    })}
+
+    {/* REVISION TRACEABILITY */}
+    <div
+      style={{
+        marginTop: '24px',
+        paddingTop: '20px',
+        borderTop:
+          '1px solid rgba(255,255,255,0.07)'
+      }}
+    >
+      <div
+        style={{
+          color: '#8fa0b7',
+          fontSize: '9px',
+          fontWeight: '700',
+          letterSpacing: '1px',
+          marginBottom: '12px'
+        }}
+      >
+        REVISION TRACEABILITY
+      </div>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns:
+            '2fr 1.5fr 1fr 1fr',
+          gap: '12px'
+        }}
+      >
+        {[
+  ['CHANGE REASON', 'changeReason'],
+  ['SOURCE DOCUMENT', 'sourceDocument'],
+  ['SOURCE REVISION', 'sourceRevision']
+].map(([label, field]) => (
+  <label
+    key={field}
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '7px'
+    }}
+  >
+    <span
+      style={{
+        color: '#8fa0b7',
+        fontSize: '9px',
+        fontWeight: '700'
+      }}
+    >
+      {label}
+    </span>
+
+    <input
+      type="text"
+      value={
+        cargoPositionsRevisionMeta[field]
+      }
+      onChange={(e) =>
+        setCargoPositionsRevisionMeta(
+          current => ({
+            ...current,
+            [field]: e.target.value
+          })
+        )
+      }
+      style={{
+        width: '100%',
+        boxSizing: 'border-box',
+        padding: '10px',
+        borderRadius: '7px',
+        border:
+          '1px solid rgba(255,255,255,0.10)',
+        background: 'rgba(0,0,0,0.20)',
+        color: '#ffffff',
+        outline: 'none'
+      }}
+    />
+  </label>
+))}
+
+        <label
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '7px'
+          }}
+        >
+          <span
+            style={{
+              color: '#8fa0b7',
+              fontSize: '9px',
+              fontWeight: '700'
+            }}
+          >
+            EFFECTIVE DATE
+          </span>
+
+          <input
+            type="date"
+            value={
+              cargoPositionsRevisionMeta.effectiveDate
+            }
+            onChange={(e) =>
+              setCargoPositionsRevisionMeta(
+                current => ({
+                  ...current,
+                  effectiveDate:
+                    e.target.value
+                })
+              )
+            }
+            style={{
+              width: '100%',
+              boxSizing: 'border-box',
+              padding: '10px',
+              borderRadius: '7px',
+              border:
+                '1px solid rgba(255,255,255,0.10)',
+              background:
+                'rgba(0,0,0,0.20)',
+              color: '#ffffff',
+              outline: 'none'
+            }}
+          />
+        </label>
+      </div>
+      <div
+  style={{
+    display: 'flex',
+    justifyContent: 'flex-end',
+    marginTop: '20px'
+  }}
+>
+  <button
+    type="button"
+    disabled={
+      savingCargoPositionsRevision ||
+      !cargoPositionsRevisionMeta.changeReason.trim() ||
+      !cargoPositionsRevisionMeta.sourceDocument.trim() ||
+      !cargoPositionsRevisionMeta.effectiveDate
+    }
+    onClick={async () => {
+      try {
+        /*
+          Validate complete cargo configuration
+          before sending anything to Supabase.
+        */
+        for (const position of editingCargoPositions) {
+          const maxWeight =
+            Number(position.maxWeight)
+
+          const arm =
+            Number(position.arm)
+
+          if (
+            position.maxWeight === '' ||
+            position.arm === '' ||
+            !Number.isFinite(maxWeight) ||
+            !Number.isFinite(arm)
+          ) {
+            alert(
+              `${position.positionCode}: all technical values are required.`
+            )
+            return
+          }
+
+          if (maxWeight <= 0) {
+            alert(
+              `${position.positionCode}: MAX WEIGHT must be greater than zero.`
+            )
+            return
+          }
+        }
+
+        if (
+          editingCargoPositions.length === 0
+        ) {
+          alert(
+            'Cargo position configuration is empty.'
+          )
+          return
+        }
+
+        setSavingCargoPositionsRevision(true)
+
+        const revision =
+          await createCargoPositionsRevision({
+            aircraftId:
+              selectedPlatformAircraft.id,
+
+            positions:
+              editingCargoPositions,
+
+            ...cargoPositionsRevisionMeta
+          })
+
+        console.log(
+          'CARGO POSITIONS REVISION CREATED:',
+          revision
+        )
+
+        const refreshed =
+          await getAircraftFullData(
+            selectedPlatformAircraft.id
+          )
+
+        setSelectedPlatformAircraftFullData(
+          refreshed
+        )
+
+        const refreshedRevisions =
+          await getAircraftTechnicalRevisions(
+            selectedPlatformAircraft.id
+          )
+
+        setSelectedAircraftTechnicalRevisions(
+          refreshedRevisions
+        )
+
+        await refreshCargoFleet()
+
+        setEditingCargoPositions(null)
+
+      } catch (error) {
+        console.error(
+          'SAVE CARGO POSITIONS REVISION ERROR:',
+          error
+        )
+
+        alert(
+          error?.message ||
+          'Unable to save cargo positions revision.'
+        )
+      } finally {
+        setSavingCargoPositionsRevision(false)
+      }
+    }}
+    style={{
+      padding: '10px 16px',
+      borderRadius: '7px',
+      border: 'none',
+
+      background:
+        savingCargoPositionsRevision ||
+        !cargoPositionsRevisionMeta.changeReason.trim() ||
+        !cargoPositionsRevisionMeta.sourceDocument.trim() ||
+        !cargoPositionsRevisionMeta.effectiveDate
+          ? 'rgba(79,140,255,0.25)'
+          : '#4f8cff',
+
+      color: '#ffffff',
+      fontSize: '10px',
+      fontWeight: '700',
+      letterSpacing: '0.6px',
+
+      cursor:
+        savingCargoPositionsRevision ||
+        !cargoPositionsRevisionMeta.changeReason.trim() ||
+        !cargoPositionsRevisionMeta.sourceDocument.trim() ||
+        !cargoPositionsRevisionMeta.effectiveDate
+          ? 'not-allowed'
+          : 'pointer'
+    }}
+  >
+    {savingCargoPositionsRevision
+      ? 'SAVING...'
+      : 'SAVE REVISION'}
+  </button>
+</div>
+    </div>
+  </div>
+)}
+{editingAircraftData &&
+ selectedPlatformAircraft && (
+  <div
+    style={{
+      marginTop: '20px',
+      marginBottom: '24px',
+      padding: '22px',
+      borderRadius: '12px',
+      background:
+        'rgba(12,22,38,0.92)',
+      border:
+        '1px solid rgba(79,140,255,0.20)'
+    }}
+  >
+    {/* HEADER */}
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '20px'
+      }}
+    >
+      <div>
+        <div
+          style={{
+            color: '#4f8cff',
+            fontSize: '12px',
+            fontWeight: '700',
+            letterSpacing: '1px'
+          }}
+        >
+          AIRCRAFT DATA REVISION
+        </div>
+
+        <div
+          style={{
+            color: '#ffffff',
+            fontSize: '18px',
+            fontWeight: '700',
+            marginTop: '4px'
+          }}
+        >
+          {selectedPlatformAircraft.registration}
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() =>
+          setEditingAircraftData(null)
+        }
+        style={{
+          padding: '7px 12px',
+          borderRadius: '6px',
+          border:
+            '1px solid rgba(255,255,255,0.12)',
+          background: 'transparent',
+          color: '#9aa8ba',
+          fontSize: '9px',
+          fontWeight: '700',
+          cursor: 'pointer'
+        }}
+      >
+        CANCEL
+      </button>
+    </div>
+
+    {/* CERTIFIED WEIGHTS */}
+    <div
+      style={{
+        color: '#8fa0b7',
+        fontSize: '9px',
+        fontWeight: '700',
+        letterSpacing: '1px',
+        marginBottom: '12px'
+      }}
+    >
+      CERTIFIED WEIGHTS
+    </div>
+
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns:
+          'repeat(auto-fit, minmax(150px, 1fr))',
+        gap: '12px'
+      }}
+    >
+      {[
+        ['DOW', 'dow'],
+        ['MZFW', 'mzfw'],
+        ['MTOW', 'mtow'],
+        ['MRW', 'mrw'],
+        ['MLW', 'mlw']
+      ].map(([label, field]) => (
+        <RevisionInput
+          key={field}
+          label={label}
+          field={field}
+          value={
+            editingAircraftData?.[field] ?? ''
+          }
+          setValue={setEditingAircraftData}
+        />
+      ))}
+    </div>
+   {/* REVISION TRACEABILITY */}
+<div
+  style={{
+    marginTop: '24px',
+    paddingTop: '20px',
+    borderTop:
+      '1px solid rgba(255,255,255,0.07)'
+  }}
+>
+  <div
+    style={{
+      color: '#8fa0b7',
+      fontSize: '9px',
+      fontWeight: '700',
+      letterSpacing: '1px',
+      marginBottom: '12px'
+    }}
+  >
+    REVISION TRACEABILITY
+    <div
+  style={{
+    display: 'flex',
+    justifyContent: 'flex-end',
+    marginTop: '20px'
+  }}
+>
+  <button
+    type="button"
+    disabled={
+      savingAircraftDataRevision ||
+      !aircraftDataRevisionMeta.changeReason.trim() ||
+      !aircraftDataRevisionMeta.sourceDocument.trim() ||
+      !aircraftDataRevisionMeta.effectiveDate
+    }
+    onClick={async () => {
+      try {
+        setSavingAircraftDataRevision(true)
+
+        const revision =
+          await createAircraftDataRevision({
+            aircraftId:
+              selectedPlatformAircraft.id,
+
+            ...editingAircraftData,
+            ...aircraftDataRevisionMeta
+          })
+
+        console.log(
+          'AIRCRAFT DATA REVISION CREATED:',
+          revision
+        )
+
+        const refreshed =
+          await getAircraftFullData(
+            selectedPlatformAircraft.id
+          )
+
+        setSelectedPlatformAircraftFullData(
+          refreshed
+        )
+
+        const refreshedRevisions =
+          await getAircraftTechnicalRevisions(
+            selectedPlatformAircraft.id
+          )
+
+        setSelectedAircraftTechnicalRevisions(
+          refreshedRevisions
+        )
+
+        await refreshCargoFleet()
+
+        setEditingAircraftData(null)
+
+      } catch (error) {
+        console.error(
+          'SAVE AIRCRAFT DATA REVISION ERROR:',
+          error
+        )
+      } finally {
+        setSavingAircraftDataRevision(false)
+      }
+    }}
+    style={{
+      padding: '10px 16px',
+      borderRadius: '7px',
+      border: 'none',
+      background:
+        savingAircraftDataRevision ||
+        !aircraftDataRevisionMeta.changeReason.trim() ||
+        !aircraftDataRevisionMeta.sourceDocument.trim() ||
+        !aircraftDataRevisionMeta.effectiveDate
+          ? 'rgba(79,140,255,0.25)'
+          : '#4f8cff',
+      color: '#ffffff',
+      fontSize: '10px',
+      fontWeight: '700',
+      letterSpacing: '0.6px',
+      cursor:
+        savingAircraftDataRevision ||
+        !aircraftDataRevisionMeta.changeReason.trim() ||
+        !aircraftDataRevisionMeta.sourceDocument.trim() ||
+        !aircraftDataRevisionMeta.effectiveDate
+          ? 'not-allowed'
+          : 'pointer'
+    }}
+  >
+    {savingAircraftDataRevision
+      ? 'SAVING...'
+      : 'SAVE REVISION'}
+  </button>
+</div>
+  </div>
+
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns:
+        '2fr 1.5fr 1fr 1fr',
+      gap: '12px'
+    }}
+  >
+    {/* CHANGE REASON */}
+    <label
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '7px'
+      }}
+    >
+      <span
+        style={{
+          color: '#8fa0b7',
+          fontSize: '9px',
+          fontWeight: '700'
+        }}
+      >
+        CHANGE REASON
+      </span>
+
+      <input
+        type="text"
+        value={
+          aircraftDataRevisionMeta.changeReason
+        }
+        onChange={(e) =>
+          setAircraftDataRevisionMeta(
+            current => ({
+              ...current,
+              changeReason: e.target.value
+            })
+          )
+        }
+        placeholder="Reason for technical revision"
+        style={{
+          width: '100%',
+          boxSizing: 'border-box',
+          padding: '10px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background: 'rgba(0,0,0,0.20)',
+          color: '#ffffff',
+          outline: 'none'
+        }}
+      />
+    </label>
+
+    {/* SOURCE DOCUMENT */}
+    <label
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '7px'
+      }}
+    >
+      <span
+        style={{
+          color: '#8fa0b7',
+          fontSize: '9px',
+          fontWeight: '700'
+        }}
+      >
+        SOURCE DOCUMENT
+      </span>
+
+      <input
+        type="text"
+        value={
+          aircraftDataRevisionMeta.sourceDocument
+        }
+        onChange={(e) =>
+          setAircraftDataRevisionMeta(
+            current => ({
+              ...current,
+              sourceDocument: e.target.value
+            })
+          )
+        }
+        placeholder="WBM / AFM / approved document"
+        style={{
+          width: '100%',
+          boxSizing: 'border-box',
+          padding: '10px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background: 'rgba(0,0,0,0.20)',
+          color: '#ffffff',
+          outline: 'none'
+        }}
+      />
+    </label>
+
+    {/* SOURCE REVISION */}
+    <label
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '7px'
+      }}
+    >
+      <span
+        style={{
+          color: '#8fa0b7',
+          fontSize: '9px',
+          fontWeight: '700'
+        }}
+      >
+        SOURCE REVISION
+      </span>
+
+      <input
+        type="text"
+        value={
+          aircraftDataRevisionMeta.sourceRevision
+        }
+        onChange={(e) =>
+          setAircraftDataRevisionMeta(
+            current => ({
+              ...current,
+              sourceRevision: e.target.value
+            })
+          )
+        }
+        placeholder="Revision"
+        style={{
+          width: '100%',
+          boxSizing: 'border-box',
+          padding: '10px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background: 'rgba(0,0,0,0.20)',
+          color: '#ffffff',
+          outline: 'none'
+        }}
+      />
+    </label>
+
+    {/* EFFECTIVE DATE */}
+    <label
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '7px'
+      }}
+    >
+      <span
+        style={{
+          color: '#8fa0b7',
+          fontSize: '9px',
+          fontWeight: '700'
+        }}
+      >
+        EFFECTIVE DATE
+      </span>
+
+      <input
+        type="date"
+        value={
+          aircraftDataRevisionMeta.effectiveDate
+        }
+        onChange={(e) =>
+          setAircraftDataRevisionMeta(
+            current => ({
+              ...current,
+              effectiveDate: e.target.value
+            })
+          )
+        }
+        style={{
+          width: '100%',
+          boxSizing: 'border-box',
+          padding: '10px',
+          borderRadius: '7px',
+          border:
+            '1px solid rgba(255,255,255,0.10)',
+          background: 'rgba(0,0,0,0.20)',
+          color: '#ffffff',
+          outline: 'none'
+        }}
+      />
+        </label>
+  </div>
+</div>
+
+  </div>
+)}
+
 {editingWeightBalance &&
  selectedPlatformAircraft && (
 
@@ -8799,7 +10346,26 @@ onShowRevisionHistory={() => {
           'W&B REVISION CREATED:',
           revision
         )
+const [
+  editingAircraftData,
+  setEditingAircraftData
+] = useState(null)
 
+const [
+  savingAircraftDataRevision,
+  setSavingAircraftDataRevision
+] = useState(false)
+
+const [
+  aircraftDataRevisionMeta,
+  setAircraftDataRevisionMeta
+] = useState({
+    changeReason: '',
+    sourceDocument: '',
+    sourceRevision: '',
+    effectiveDate:
+      new Date().toISOString().slice(0, 10)
+  })
         const refreshed =
           await getAircraftFullData(
             selectedPlatformAircraft.id
