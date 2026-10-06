@@ -201,21 +201,7 @@ async function requireSuperAdmin(req, res, next) {
     })
   }
 }
-// ============================
-// ADMIN AUTH TEST
-// ============================
 
-app.get(
-  '/api/admin/test',
-  requireSuperAdmin,
-  async (req, res) => {
-    return res.status(200).json({
-      ok: true,
-      message: 'Super Admin authenticated',
-      userId: req.authUser.id
-    })
-  }
-)
 // ============================
 // LIST PLATFORM USERS
 // ============================
