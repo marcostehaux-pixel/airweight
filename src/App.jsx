@@ -2032,7 +2032,7 @@ console.log(
   const flightData = {
 
     status: 'OPEN',
-
+operationType: 'FREIGHTER',
     updatedAt: now,
 
     flightNumber:
@@ -2456,7 +2456,9 @@ return (
  {/* FLIGHT RECORDS */}
 
 {(
+  userRole === 'passenger' ||
   userRole === 'freighter' ||
+  userRole === 'student' ||
   userRole === 'admin' ||
   userRole === 'super_admin'
 ) && (

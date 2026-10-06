@@ -123,7 +123,9 @@ export function adaptSupabaseFlightToOperdat(row) {
       row.status ||
       savedData.status ||
       'OPEN',
-
+operationType:
+  savedData.operationType ||
+  'FREIGHTER',
     // Operational values
     zfw:
       row.zfw ?? savedData.zfw ?? 0,
