@@ -3,6 +3,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import dotenv from 'dotenv'
 import { createClient } from '@supabase/supabase-js'
+import rateLimit from 'express-rate-limit'
 import { supabaseAdmin } from './src/services/supabaseAdmin.js'
 dotenv.config({
   path: '.env.local'
@@ -14,11 +15,26 @@ const app = express()
 app.use(express.json())
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
+
+// ============================
+// LOGIN RATE LIMIT
+// ============================
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: {
+    error:
+      'Too many login attempts. Please try again later.'
+  }
+})
 // ============================
 // USERNAME LOGIN
 // ============================
 
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', loginLimiter, async (req, res) => {
   try {
     const username =
       String(req.body?.username || '')
