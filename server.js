@@ -333,11 +333,12 @@ app.post(
       const numericOrganizationId =
         Number(organizationId)
 
-      const allowedRoles = [
-        'admin',
-        'freighter',
-        'student'
-      ]
+    const allowedRoles = [
+  'admin',
+  'passenger',
+  'freighter',
+  'student'
+]
 
       // ============================
       // REQUIRED FIELDS

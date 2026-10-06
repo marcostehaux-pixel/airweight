@@ -488,9 +488,17 @@ setCurrentUser({
     if (profile.role === 'freighter') {
       setActiveMenu('FreighterLoadsheet')
     }
+    if (
+  profile.role === 'passenger' ||
+  profile.role === 'student' ||
+  profile.role === 'admin'
+) {
+  setActiveMenu('Loadsheet')
+}
 if (profile.role === 'super_admin') {
   setActiveMenu('Flight History')
 }
+
 if (passwordRecoveryRef.current) {
   setLogged(false)
   setUserRole(null)
@@ -1994,9 +2002,17 @@ return(
     setUserRole(role)
     setCurrentUser(userData)
 
-    if (role === 'freighter') {
-      setActiveMenu('FreighterLoadsheet')
-    }
+   if (role === 'freighter') {
+  setActiveMenu('FreighterLoadsheet')
+}
+
+if (
+  role === 'passenger' ||
+  role === 'student' ||
+  role === 'admin'
+) {
+  setActiveMenu('Loadsheet')
+}
 
     setLogged(true)
   }}
@@ -2577,7 +2593,12 @@ return (
 
   {/* FREIGHTER LOADSHEET */}
 
-  {userRole !== 'student' && (
+  {(
+  userRole === 'freighter' ||
+  userRole === 'admin' ||
+  userRole === 'student' ||
+  userRole === 'super_admin'
+) && (
     <div
       onClick={() =>
         setActiveMenu('FreighterLoadsheet')
@@ -2613,7 +2634,12 @@ return (
 
   {/* PASSENGER LOADSHEET */}
 
-  {userRole !== 'freighter' && (
+  {(
+  userRole === 'passenger' ||
+  userRole === 'admin' ||
+  userRole === 'student' ||
+  userRole === 'super_admin'
+) && (
     <div
       onClick={() => setActiveMenu('Loadsheet')}
       style={{
@@ -8566,16 +8592,20 @@ setPlatformOrganizationAircraft(
             }}
           >
             <option value="admin">
-              Admin
-            </option>
+  Admin
+</option>
 
-            <option value="freighter">
-              Freighter
-            </option>
+<option value="passenger">
+  Passenger
+</option>
 
-            <option value="student">
-              Student
-            </option>
+<option value="freighter">
+  Freighter
+</option>
+
+<option value="student">
+  Student
+</option>
           </select>
         </div>
 
