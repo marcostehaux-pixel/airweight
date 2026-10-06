@@ -607,6 +607,7 @@ app.post(
     }
   }
 )
+
 // ============================
 // METAR API
 // ============================
@@ -690,7 +691,125 @@ app.get('/api/taf', async (req, res) => {
     })
   }
 })
+// ============================
+// UPDATE PLATFORM USER STATUS
+// ============================
 
+app.patch(
+  '/api/admin/users/:userId/status',
+  requireSuperAdmin,
+  async (req, res) => {
+    try {
+      const userId =
+        String(req.params?.userId || '').trim()
+
+      const status =
+        String(req.body?.status || '')
+          .trim()
+          .toLowerCase()
+
+      if (!userId) {
+        return res.status(400).json({
+          error: 'User ID is required'
+        })
+      }
+
+      if (
+        status !== 'active' &&
+        status !== 'inactive'
+      ) {
+        return res.status(400).json({
+          error: 'Invalid user status'
+        })
+      }
+
+      // Prevent Super Admin from disabling itself
+      if (userId === req.authUser.id) {
+        return res.status(400).json({
+          error:
+            'Super Admin cannot disable its own account'
+        })
+      }
+
+      const {
+        data: targetProfile,
+        error: targetError
+      } = await supabaseAdmin
+        .from('profiles')
+        .select('id, role, status')
+        .eq('id', userId)
+        .single()
+
+      if (targetError || !targetProfile) {
+        return res.status(404).json({
+          error: 'User not found'
+        })
+      }
+
+      if (targetProfile.role === 'super_admin') {
+        return res.status(403).json({
+          error:
+            'Super Admin accounts cannot be modified here'
+        })
+      }
+
+      const {
+        data: updatedProfile,
+        error: updateError
+      } = await supabaseAdmin
+        .from('profiles')
+        .update({
+          status
+        })
+        .eq('id', userId)
+        .select(`
+          id,
+          full_name,
+          username,
+          role,
+          status,
+          organization_id
+        `)
+        .single()
+
+      if (updateError || !updatedProfile) {
+        console.error(
+          'UPDATE USER STATUS ERROR:',
+          updateError
+        )
+
+        return res.status(500).json({
+          error:
+            'Could not update user status'
+        })
+      }
+
+      return res.status(200).json({
+        ok: true,
+        user: {
+          id: updatedProfile.id,
+          fullName: updatedProfile.full_name,
+          username: updatedProfile.username,
+          role: updatedProfile.role,
+          status: updatedProfile.status,
+          organizationId:
+            updatedProfile.organization_id
+        }
+      })
+
+    } catch (error) {
+      console.error(
+        'UPDATE PLATFORM USER STATUS ERROR:',
+        error
+      )
+
+      return res.status(500).json({
+        error:
+          'Could not update platform user status'
+      })
+    }
+  }
+)
 // ============================
 // VITE PRODUCTION BUILD
 // ============================

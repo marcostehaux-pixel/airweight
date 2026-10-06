@@ -94,3 +94,48 @@ export async function getPlatformUsers() {
 
   return result.users || []
 }
+export async function updatePlatformUserStatus(
+  userId,
+  status
+) {
+  const {
+    data: { session },
+    error: sessionError
+  } = await supabase.auth.getSession()
+
+  if (sessionError) {
+    throw sessionError
+  }
+
+  if (!session?.access_token) {
+    throw new Error(
+      'No active authenticated session'
+    )
+  }
+
+  const response = await fetch(
+    `/api/admin/users/${userId}/status`,
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization:
+          `Bearer ${session.access_token}`
+      },
+      body: JSON.stringify({
+        status
+      })
+    }
+  )
+
+  const result = await response.json()
+
+  if (!response.ok) {
+    throw new Error(
+      result?.error ||
+      'Could not update user status'
+    )
+  }
+
+  return result.user
+}

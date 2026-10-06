@@ -125,7 +125,8 @@ import {
 } from './services/organizationService'
 import {
   createPlatformUser,
-  getPlatformUsers
+  getPlatformUsers,
+  updatePlatformUserStatus
 } from './services/userService'
 import aircraftImage from './assets/a320.png'
 
@@ -243,6 +244,10 @@ const [
   loadingPlatformUsers,
   setLoadingPlatformUsers
 ] = useState(false)
+const [
+  updatingUserId,
+  setUpdatingUserId
+] = useState(null)
 const [
   showNewUserForm,
   setShowNewUserForm
@@ -8799,6 +8804,9 @@ await refreshPlatformUsers()
             <th style={{ padding: '10px 8px' }}>
               STATUS
             </th>
+            <th style={{ padding: '10px 8px' }}>
+  ACTION
+</th>
           </tr>
         </thead>
 
@@ -8862,6 +8870,97 @@ await refreshPlatformUsers()
               >
                 {user.status}
               </td>
+              <td
+  style={{
+    padding: '12px 8px'
+  }}
+>
+  {user.role === 'super_admin' ? (
+    <span
+      style={{
+        color: '#64748b',
+        fontSize: 12,
+        fontWeight: 600
+      }}
+    >
+      PROTECTED
+    </span>
+  ) : (
+    <button
+      type="button"
+      disabled={updatingUserId === user.id}
+      onClick={async () => {
+        const nextStatus =
+          user.status === 'active'
+            ? 'inactive'
+            : 'active'
+
+        const action =
+          nextStatus === 'inactive'
+            ? 'deactivate'
+            : 'activate'
+
+        const confirmed =
+          window.confirm(
+            `Are you sure you want to ${action} ${user.fullName}?`
+          )
+
+        if (!confirmed) return
+
+        try {
+          setUpdatingUserId(user.id)
+
+          await updatePlatformUserStatus(
+            user.id,
+            nextStatus
+          )
+
+          await refreshPlatformUsers()
+
+        } catch (error) {
+          console.error(
+            'UPDATE USER STATUS ERROR:',
+            error
+          )
+
+          alert(
+            error.message ||
+            'Could not update user status'
+          )
+
+        } finally {
+          setUpdatingUserId(null)
+        }
+      }}
+      style={{
+        padding: '7px 11px',
+        borderRadius: 6,
+        border: '1px solid #475569',
+        background:
+          user.status === 'active'
+            ? '#7f1d1d'
+            : '#14532d',
+        color: '#ffffff',
+        fontSize: 11,
+        fontWeight: 700,
+        cursor:
+          updatingUserId === user.id
+            ? 'wait'
+            : 'pointer',
+        opacity:
+          updatingUserId === user.id
+            ? 0.6
+            : 1
+      }}
+    >
+      {updatingUserId === user.id
+        ? 'UPDATING...'
+        : user.status === 'active'
+          ? 'DEACTIVATE'
+          : 'ACTIVATE'}
+    </button>
+  )}
+</td>
             </tr>
           ))}
         </tbody>
