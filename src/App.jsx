@@ -17,6 +17,7 @@ import {getTotalMoment, getArm} from './utilit/passengerMomentCalculator.js'
 import {
   Fragment,
   useEffect,
+  useRef,
   useState
 } from 'react'
 import { calculateFuel,getFuelIndex} from './utilit/fuelCalculator'
@@ -215,6 +216,8 @@ function App() {
   
 const [logged,setLogged]=useState(false)
 const [userRole, setUserRole] = useState(null)
+const [passwordRecoveryMode, setPasswordRecoveryMode] = useState(false)
+const passwordRecoveryRef = useRef(false)
 const [adminAircraft, setAdminAircraft] =
   useState([])
   const [platformOrganizations, setPlatformOrganizations] = useState([])
@@ -350,6 +353,28 @@ const [
 ] = useState(null)
 const [currentUser, setCurrentUser] = useState(null)
 useEffect(() => {
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange(
+    (event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+  passwordRecoveryRef.current = true
+  setPasswordRecoveryMode(true)
+
+  // Recovery sessions must never open
+  // the operational application
+  setLogged(false)
+  setUserRole(null)
+  setCurrentUser(null)
+}
+    }
+  )
+
+  return () => {
+    subscription.unsubscribe()
+  }
+}, [])
+useEffect(() => {
   if (!logged || !currentUser) return
 
   async function loadFreighterFlights() {
@@ -412,7 +437,30 @@ useEffect(() => {
     if (!session?.user) {
       return
     }
+    if (passwordRecoveryRef.current) {
+  setPasswordRecoveryMode(true)
+  setLogged(false)
+  return
+}
+const hashParams =
+  new URLSearchParams(
+    window.location.hash.substring(1)
+  )
 
+const queryParams =
+  new URLSearchParams(
+    window.location.search
+  )
+
+const isPasswordRecovery =
+  hashParams.get('type') === 'recovery' ||
+  queryParams.get('type') === 'recovery'
+
+if (isPasswordRecovery) {
+  setPasswordRecoveryMode(true)
+  setLogged(false)
+  return
+}
     const { data: profile, error } = await supabase
       .from('profiles')
       .select('role, status, organization_id, full_name')
@@ -443,7 +491,14 @@ setCurrentUser({
 if (profile.role === 'super_admin') {
   setActiveMenu('Flight History')
 }
-    setLogged(true)
+if (passwordRecoveryRef.current) {
+  setLogged(false)
+  setUserRole(null)
+  setCurrentUser(null)
+  return
+}
+
+setLogged(true)
     setCurrentUser({
   id: session.user.id,
   email: session.user.email,
@@ -452,8 +507,7 @@ if (profile.role === 'super_admin') {
   organizationId: profile.organization_id
 })
   }
-
-  restoreSession()
+restoreSession()
 }, [])
 useEffect(() => {
   if (
@@ -1934,17 +1988,18 @@ if(
 
 return(
 
-<Login 
-  onLogin={(role, userData) => { 
+<Login
+  passwordRecoveryMode={passwordRecoveryMode}
+  onLogin={(role, userData) => {
     setUserRole(role)
     setCurrentUser(userData)
 
-    if (role === 'freighter') { 
-      setActiveMenu('FreighterLoadsheet') 
+    if (role === 'freighter') {
+      setActiveMenu('FreighterLoadsheet')
     }
 
-    setLogged(true) 
-  }} 
+    setLogged(true)
+  }}
 />
 
 )

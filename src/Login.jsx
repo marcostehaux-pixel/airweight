@@ -1,13 +1,162 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './Login.css'
 import loginAircraft from './assets/login-aircraft.png'
 import operdatLogo from './assets/airweight-Logo.png'
 import { supabase } from './lib/supabase'
-export default function Login({ onLogin }) {
+export default function Login({
+  onLogin,
+  passwordRecoveryMode: appPasswordRecoveryMode
+}) {
   const [user, setUser] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+const [showPasswordRecovery, setShowPasswordRecovery] = useState(false)
+const [recoveryEmail, setRecoveryEmail] = useState('')
+const [recoveryMessage, setRecoveryMessage] = useState('')
+const [passwordRecoveryMode, setPasswordRecoveryMode] = useState(false)
+const [newPassword, setNewPassword] = useState('')
+const [confirmNewPassword, setConfirmNewPassword] = useState('')
+const [passwordUpdateMessage, setPasswordUpdateMessage] = useState('')
+const [updatingPassword, setUpdatingPassword] = useState(false)
+async function updatePassword() {
+  try {
+    setPasswordUpdateMessage('')
 
+    if (newPassword.length < 8) {
+      setPasswordUpdateMessage(
+        'Password must contain at least 8 characters.'
+      )
+      return
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      setPasswordUpdateMessage(
+        'Passwords do not match.'
+      )
+      return
+    }
+
+    setUpdatingPassword(true)
+
+    const { error } =
+      await supabase.auth.updateUser({
+        password: newPassword
+      })
+
+    if (error) {
+      console.error(
+        'PASSWORD UPDATE ERROR:',
+        error
+      )
+
+      setPasswordUpdateMessage(
+        'Unable to update password. Please request a new recovery link.'
+      )
+      return
+    }
+
+    await supabase.auth.signOut()
+
+    setNewPassword('')
+    setConfirmNewPassword('')
+    setPasswordRecoveryMode(false)
+
+    setPasswordUpdateMessage(
+      'Password updated successfully. You can now sign in.'
+    )
+
+    window.history.replaceState(
+      {},
+      document.title,
+      window.location.pathname
+    )
+
+  } catch (error) {
+    console.error(
+      'PASSWORD UPDATE ERROR:',
+      error
+    )
+
+    setPasswordUpdateMessage(
+      'Unable to update password. Please try again.'
+    )
+  } finally {
+    setUpdatingPassword(false)
+  }
+}
+async function sendPasswordRecovery() {
+  try {
+    const email = recoveryEmail
+      .trim()
+      .toLowerCase()
+
+    if (!email || !email.includes('@')) {
+      setRecoveryMessage(
+        'Please enter a valid email address.'
+      )
+      return
+    }
+
+    setRecoveryMessage('Sending recovery email...')
+
+    const { error } =
+      await supabase.auth.resetPasswordForEmail(
+        email,
+        {
+          redirectTo:
+            `${window.location.origin}/`
+        }
+      )
+
+    if (error) {
+      console.error(
+        'PASSWORD RECOVERY ERROR:',
+        error
+      )
+
+      setRecoveryMessage(
+        'Unable to send recovery email. Please try again.'
+      )
+      return
+    }
+
+    setRecoveryMessage(
+      'If this email is registered, a password recovery link has been sent.'
+    )
+
+  } catch (error) {
+    console.error(
+      'PASSWORD RECOVERY ERROR:',
+      error
+    )
+
+    setRecoveryMessage(
+      'Unable to send recovery email. Please try again.'
+    )
+  }
+}
+useEffect(() => {
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange(
+    (event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setPasswordRecoveryMode(true)
+        setShowPasswordRecovery(false)
+      }
+    }
+  )
+
+  return () => {
+    subscription.unsubscribe()
+  }
+}, [])
+useEffect(() => {
+  if (appPasswordRecoveryMode) {
+    setPasswordRecoveryMode(true)
+    setShowPasswordRecovery(false)
+  }
+}, [appPasswordRecoveryMode])
   async function login() {
   try {
     // ==========================================
@@ -466,9 +615,141 @@ if (response.ok) {
               marginBottom: '36px',
             }}
           >
+            
             Access your operational workspace
+            
           </p>
+          {passwordRecoveryMode ? (
+  <>
+    <div
+      style={{
+        marginBottom: '24px',
+        fontSize: '13px',
+        lineHeight: 1.6,
+        color: 'rgba(255,255,255,0.68)',
+      }}
+    >
+      Create a new password for your OPERDAT account.
+    </div>
 
+    <label
+      style={{
+        display: 'block',
+        marginBottom: '8px',
+        fontSize: '12px',
+        fontWeight: 700,
+        letterSpacing: '1px',
+        color: 'rgba(255,255,255,0.72)',
+      }}
+    >
+      NEW PASSWORD
+    </label>
+
+    <input
+      type="password"
+      placeholder="Enter new password"
+      value={newPassword}
+      onChange={(e) => {
+        setNewPassword(e.target.value)
+        setPasswordUpdateMessage('')
+      }}
+      style={{
+        width: '100%',
+        boxSizing: 'border-box',
+        padding: '15px 16px',
+        marginBottom: '18px',
+        borderRadius: '8px',
+        border: '1px solid rgba(255,255,255,0.18)',
+        background: 'rgba(255,255,255,0.055)',
+        color: '#ffffff',
+        fontSize: '15px',
+        fontWeight: 500,
+        outline: 'none',
+      }}
+    />
+
+    <label
+      style={{
+        display: 'block',
+        marginBottom: '8px',
+        fontSize: '12px',
+        fontWeight: 700,
+        letterSpacing: '1px',
+        color: 'rgba(255,255,255,0.72)',
+      }}
+    >
+      CONFIRM NEW PASSWORD
+    </label>
+
+    <input
+      type="password"
+      placeholder="Confirm new password"
+      value={confirmNewPassword}
+      onChange={(e) => {
+        setConfirmNewPassword(e.target.value)
+        setPasswordUpdateMessage('')
+      }}
+      style={{
+        width: '100%',
+        boxSizing: 'border-box',
+        padding: '15px 16px',
+        marginBottom: '18px',
+        borderRadius: '8px',
+        border: '1px solid rgba(255,255,255,0.18)',
+        background: 'rgba(255,255,255,0.055)',
+        color: '#ffffff',
+        fontSize: '15px',
+        fontWeight: 500,
+        outline: 'none',
+      }}
+    />
+
+    <button
+      type="button"
+      onClick={updatePassword}
+      disabled={updatingPassword}
+      style={{
+        width: '100%',
+        padding: '16px',
+        border: '1px solid rgba(93,153,255,0.55)',
+        borderRadius: '8px',
+        background:
+          'linear-gradient(90deg, #0d5be9 0%, #1671ff 100%)',
+        color: 'white',
+        fontSize: '13px',
+        fontWeight: 700,
+        letterSpacing: '1.5px',
+        cursor:
+          updatingPassword
+            ? 'not-allowed'
+            : 'pointer',
+        opacity:
+          updatingPassword
+            ? 0.65
+            : 1,
+      }}
+    >
+      {updatingPassword
+        ? 'UPDATING...'
+        : 'SET NEW PASSWORD'}
+    </button>
+
+    {passwordUpdateMessage && (
+      <div
+        style={{
+          marginTop: '16px',
+          fontSize: '12px',
+          lineHeight: 1.6,
+          color: 'rgba(255,255,255,0.68)',
+          textAlign: 'center',
+        }}
+      >
+        {passwordUpdateMessage}
+      </div>
+    )}
+  </>
+) : !showPasswordRecovery ? (
+            <>
           {/* USER */}
           <label
             style={{
@@ -587,6 +868,134 @@ if (response.ok) {
           >
             SIGN IN
           </button>
+          {/* PASSWORD RECOVERY */}
+          <button
+            type="button"
+            onClick={() => {
+              setShowPasswordRecovery(true)
+            }}
+            style={{
+              width: '100%',
+              marginTop: '14px',
+              padding: '4px',
+              border: 'none',
+              background: 'transparent',
+              color: 'rgba(255,255,255,0.65)',
+              fontSize: '12px',
+              letterSpacing: '0.5px',
+              cursor: 'pointer',
+              textAlign: 'center',
+            }}
+                    >
+            Forgot password?
+          </button>
+            </>
+          ) : (
+            <>
+              <div
+                style={{
+                  marginBottom: '24px',
+                  fontSize: '13px',
+                  lineHeight: 1.6,
+                  color: 'rgba(255,255,255,0.68)',
+                }}
+              >
+                Enter the email address associated with your OPERDAT account.
+              </div>
+
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  letterSpacing: '1px',
+                  color: 'rgba(255,255,255,0.72)',
+                }}
+              >
+                EMAIL
+              </label>
+
+              <input
+                type="email"
+                placeholder="Enter your email"
+                value={recoveryEmail}
+                onChange={(e) => {
+                  setRecoveryEmail(e.target.value)
+                  setRecoveryMessage('')
+                }}
+                style={{
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  padding: '15px 16px',
+                  marginBottom: '18px',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(255,255,255,0.18)',
+                  background: 'rgba(255,255,255,0.055)',
+                  color: '#ffffff',
+                  fontSize: '15px',
+                  fontWeight: 500,
+                  outline: 'none',
+                }}
+              />
+
+              <button
+                type="button"
+                onClick={sendPasswordRecovery}
+                style={{
+                  width: '100%',
+                  padding: '16px',
+                  border: '1px solid rgba(93,153,255,0.55)',
+                  borderRadius: '8px',
+                  background:
+                    'linear-gradient(90deg, #0d5be9 0%, #1671ff 100%)',
+                  color: 'white',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  letterSpacing: '1.5px',
+                  cursor: 'pointer',
+                }}
+              >
+                SEND RECOVERY LINK
+              </button>
+
+              {recoveryMessage && (
+                <div
+                  style={{
+                    marginTop: '16px',
+                    fontSize: '12px',
+                    lineHeight: 1.6,
+                    color: 'rgba(255,255,255,0.68)',
+                    textAlign: 'center',
+                  }}
+                >
+                  {recoveryMessage}
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowPasswordRecovery(false)
+                  setRecoveryMessage('')
+                }}
+                style={{
+                  width: '100%',
+                  marginTop: '14px',
+                  padding: '4px',
+                  border: 'none',
+                  background: 'transparent',
+                  color: 'rgba(255,255,255,0.65)',
+                  fontSize: '12px',
+                  letterSpacing: '0.5px',
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                }}
+              >
+                Back to sign in
+              </button>
+            </>
+          )}
 
           <div
   style={{
