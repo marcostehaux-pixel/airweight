@@ -45,12 +45,15 @@ const mapCargoPosition = (position) => ({
   arm: Number(position.arm)
 })
 
+const safeCargoPositions =
+  cargoPositions || []
+
 const cargoConfig = {
-  mainDeck: cargoPositions
+  mainDeck: safeCargoPositions
     .filter((position) => position.deck === 'MAIN')
     .map(mapCargoPosition),
 
-  lowerDeck: cargoPositions
+  lowerDeck: safeCargoPositions
     .filter((position) => position.deck === 'LOWER')
     .map(mapCargoPosition)
 }
@@ -87,7 +90,7 @@ const cargoConfig = {
     seatArmAft: Number(configuration.seat_arm_aft),
 
     fuelArm: Number(configuration.fuel_arm),
-    forwardCargoArm: Number(configuration.foward_cargo_arm),
+    forwardCargoArm: Number(configuration.forward_cargo_arm),
     aftCargoArm: Number(configuration.aft_cargo_arm),
 
     envelope,
@@ -143,6 +146,7 @@ export async function createAircraft({
   model,
   variant,
   aircraftType,
+  operationType,
   dow,
   mzfw,
   mtow,
@@ -158,6 +162,7 @@ export async function createAircraft({
       model: model.trim(),
       variant: variant.trim(),
       aircraft_type: aircraftType.trim(),
+      operation_type: operationType,
       dow: Number(dow),
       mzfw: Number(mzfw),
       mtow: Number(mtow),
@@ -391,8 +396,10 @@ export async function getCargoAircraftFleet() {
 
   // Only active aircraft are candidates for operational use
   const activeAircraft = aircraftList.filter(
-    (item) => item.status === 'active'
-  )
+  (item) =>
+    item.status === 'active' &&
+    item.operation_type === 'FREIGHTER'
+)
 
   const adaptedFleet = []
 
@@ -446,6 +453,57 @@ export async function getCargoAircraftFleet() {
 
   return adaptedFleet
 }
+export async function getPassengerAircraftFleet() {
+  const aircraftList = await getAircraft()
+
+  // Only active passenger aircraft are candidates for operational use
+  const activeAircraft = aircraftList.filter(
+    (item) =>
+      item.status === 'active' &&
+      item.operation_type === 'PASSENGER'
+  )
+
+  const adaptedFleet = []
+
+  for (const aircraft of activeAircraft) {
+    try {
+      const fullData =
+        await getAircraftFullData(aircraft.id)
+
+      // W&B configuration required
+      if (!fullData?.configuration) {
+        console.warn(
+          `AIRCRAFT ${aircraft.registration} SKIPPED: W&B configuration missing`
+        )
+        continue
+      }
+
+      // Operational envelopes required
+      if (
+        !fullData?.envelopes ||
+        fullData.envelopes.length === 0
+      ) {
+        console.warn(
+          `AIRCRAFT ${aircraft.registration} SKIPPED: operational envelopes missing`
+        )
+        continue
+      }
+
+      const adaptedAircraft =
+        adaptSupabaseAircraft(fullData)
+
+      adaptedFleet.push(adaptedAircraft)
+
+    } catch (error) {
+      console.warn(
+        `AIRCRAFT ${aircraft.registration} SKIPPED: technical data incomplete`,
+        error
+      )
+    }
+  }
+
+  return adaptedFleet
+}
 export async function getAircraftConfigurationStatus(
   aircraftList
 ) {
@@ -474,9 +532,12 @@ export async function getAircraftConfigurationStatus(
           missing.push('ENVELOPES')
         }
 
-        if (!hasCargoPositions) {
-          missing.push('CARGO')
-        }
+       if (
+  aircraft.operation_type === 'FREIGHTER' &&
+  !hasCargoPositions
+) {
+  missing.push('CARGO')
+}
 
         return {
           ...aircraft,

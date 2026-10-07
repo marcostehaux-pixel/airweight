@@ -95,6 +95,7 @@ import logo from './assets/logo.png'
 import {
   getAircraft,
   getCargoAircraftFleet,
+  getPassengerAircraftFleet,
   getAircraftFullData,
   getAircraftConfigurationStatus,
   updateAircraft,
@@ -643,9 +644,49 @@ function clearCargo(){setCargoWeights(
 {}
 )
 }
+const [
+  passengerAircraftFleet,
+  setPassengerAircraftFleet
+] = useState([])
 const [cargoAircraftFleet, setCargoAircraftFleet] =
   useState(aircraftCargoDatabase)
+async function refreshPassengerFleet() {
+  try {
+    const fleet =
+      await getPassengerAircraftFleet()
 
+    setPassengerAircraftFleet(
+      fleet || []
+    )
+if (
+  userRole === 'passenger' &&
+  fleet &&
+  fleet.length > 0
+) {
+  setSelectedAircraft((current) => {
+    const currentStillAvailable =
+      fleet.find(
+        aircraft =>
+          aircraft.id === current?.id
+      )
+
+    return currentStillAvailable || fleet[0]
+  })
+}
+    console.log(
+      'PASSENGER AIRCRAFT FLEET:',
+      fleet
+    )
+
+  } catch (error) {
+    console.error(
+      'PASSENGER AIRCRAFT FLEET ERROR:',
+      error
+    )
+
+    setPassengerAircraftFleet([])
+  }
+}
 async function refreshCargoFleet() {
   try {
     const fleet = await getCargoAircraftFleet()
@@ -686,6 +727,7 @@ useEffect(() => {
   if (!logged || !currentUser) return
 
   refreshCargoFleet()
+  refreshPassengerFleet()
 }, [logged, currentUser?.id])
 
 const [
@@ -793,6 +835,7 @@ const [
     model: '',
     variant: '',
     aircraftType: '',
+    operationType: 'PASSENGER',
     dow: '',
     mzfw: '',
     mtow: '',
@@ -1703,6 +1746,40 @@ function printClosedLoadOrder(flight) {
     totalCargo:
       flight.totalCargo || 0
   })
+}
+function newPassengerFlight() {
+
+  setActivePassengerFlightId(null)
+
+  setFlightNumber('')
+  setFlightFrom('')
+  setFlightTo('')
+
+  setSelectedSeats([])
+
+  setFwdAdults(0)
+  setFwdChildren(0)
+  setFwdInfants(0)
+
+  setMidAdults(0)
+  setMidChildren(0)
+  setMidInfants(0)
+
+  setAftAdults(0)
+  setAftChildren(0)
+  setAftInfants(0)
+
+  setForwardCargo(0)
+  setAftCargo(0)
+
+  setExtraCrew(0)
+  setCatering(false)
+
+  setFuel(0)
+  setTaxiFuel(0)
+  setTripFuel(0)
+
+  setActiveMenu('Loadsheet')
 }
 function newFreighterFlight() {
 
@@ -6430,10 +6507,17 @@ value={selectedAircraft.registration}
 
 onChange={(e)=>{
 
+const paxFleet =
+  userRole === 'student'
+    ? aircraftDatabase
+    : passengerAircraftFleet
+
 const paxAircraft =
-aircraftDatabase.find(
-a=>a.registration===e.target.value
-)
+  paxFleet.find(
+    a =>
+      a.registration ===
+      e.target.value
+  )
 
 const cargoAircraft =
   cargoAircraftFleet.find(
@@ -6475,11 +6559,14 @@ outline:'none'
 >
 
 {
-
-[
-  ...aircraftDatabase,
-  ...cargoAircraftFleet
-].map(a => (
+(
+  userRole === 'student'
+    ? [
+        ...aircraftDatabase,
+        ...cargoAircraftFleet
+      ]
+    : passengerAircraftFleet
+).map(a => (
 
 <option
 
@@ -6910,13 +6997,20 @@ width:'120px'
 
         onChange={(e) => {
 
-          const aircraft =
-            aircraftDatabase.find(
-              acft =>
-                acft.registration === e.target.value
-            )
+         const passengerFleet =
+  userRole === 'student'
+    ? aircraftDatabase
+    : passengerAircraftFleet
 
-          setSelectedAircraft(aircraft)
+const aircraft =
+  passengerFleet.find(
+    acft =>
+      acft.registration === e.target.value
+  )
+
+if (aircraft) {
+  setSelectedAircraft(aircraft)
+}
 
         }}
 style={{
@@ -6942,7 +7036,11 @@ boxShadow:
       
 
         {
-        aircraftDatabase.map((aircraft) => (
+  (
+    userRole === 'student'
+      ? aircraftDatabase
+      : passengerAircraftFleet
+  ).map((aircraft) => (
 
           <option
 
@@ -8223,6 +8321,23 @@ value,
     : 'Save Flight'}
 </button>
 </div>
+<button
+  onClick={newPassengerFlight}
+  style={{
+    padding: '16px 32px',
+    background: 'rgba(255,255,255,0.04)',
+    color: '#aeb9c8',
+    border: '1px solid rgba(255,255,255,0.12)',
+    borderRadius: '12px',
+    fontSize: '16px',
+    fontWeight: '700',
+    cursor: 'pointer',
+    marginRight: '12px',
+    letterSpacing: '0.7px'
+  }}
+>
+  NEW FLIGHT
+</button>
     <button
  onMouseEnter={(e) => {
 
@@ -13180,7 +13295,7 @@ setSelectedAircraftTechnicalRevisions(
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(5, 1fr)',
+        gridTemplateColumns: 'repeat(3, 1fr)',
         gap: '14px'
       }}
     >
@@ -13228,6 +13343,48 @@ setSelectedAircraftTechnicalRevisions(
           />
         </div>
       ))}
+      <div>
+  <div
+    style={{
+      color: '#8fa0b7',
+      fontSize: '9px',
+      fontWeight: '700',
+      letterSpacing: '0.7px',
+      marginBottom: '7px'
+    }}
+  >
+    OPERATION TYPE
+  </div>
+
+  <select
+    value={newAircraft.operationType}
+    onChange={(e) =>
+      setNewAircraft(current => ({
+        ...current,
+        operationType: e.target.value
+      }))
+    }
+    style={{
+      width: '100%',
+      boxSizing: 'border-box',
+      padding: '10px',
+      borderRadius: '7px',
+      border:
+        '1px solid rgba(255,255,255,0.10)',
+      background: 'rgba(0,0,0,0.20)',
+      color: '#ffffff',
+      outline: 'none'
+    }}
+  >
+    <option value="PASSENGER">
+      PASSENGER
+    </option>
+
+    <option value="FREIGHTER">
+      FREIGHTER
+    </option>
+  </select>
+</div>
     </div>
 
     {/* WEIGHTS */}
@@ -13342,6 +13499,7 @@ setSelectedAircraftTechnicalRevisions(
               model: '',
               variant: '',
               aircraftType: '',
+              operationType: 'PASSENGER',
               dow: '',
               mzfw: '',
               mtow: '',
