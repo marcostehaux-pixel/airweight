@@ -116,6 +116,7 @@ import {
   updateFreighterFlight,
   closeFreighterFlightInSupabase,
   adaptFreighterFlightToSupabase,
+  adaptPassengerFlightToSupabase,
   adaptSupabaseFlightToOperdat,
   saveFreighterCargoLoads
 } from './services/flightService'
@@ -1033,6 +1034,75 @@ useState(
 ''
 
 )
+async function closePassengerFlight(id) {
+
+  const flight = cargoFlightRecords.find(
+    item => item.id === id
+  )
+
+  if (!flight) {
+    console.log(
+      'Passenger flight not found:',
+      id
+    )
+    return
+  }
+
+  const canModifyFlight =
+    userRole === 'admin' ||
+    flight.createdBy === currentUser?.id
+
+  if (!canModifyFlight) {
+
+    alert(
+      'You can only close flights created by your user.'
+    )
+
+    return
+  }
+
+  try {
+
+    const closedFlight =
+      await closeFreighterFlightInSupabase(id)
+
+    const adaptedClosedFlight =
+      adaptSupabaseFlightToOperdat(
+        closedFlight
+      )
+
+    setCargoFlightRecords(
+      previous =>
+        previous.map(flight =>
+          flight.id === id
+            ? adaptedClosedFlight
+            : flight
+        )
+    )
+
+    if (id === activePassengerFlightId) {
+      setActivePassengerFlightId(null)
+    }
+
+    console.log(
+      'OPERDAT PASSENGER FLIGHT CLOSED:',
+      adaptedClosedFlight
+    )
+
+    alert('Flight closed')
+
+  } catch (error) {
+
+    console.error(
+      'PASSENGER FLIGHT CLOSE FAILED:',
+      error
+    )
+
+    alert(
+      'The flight could not be closed in the database.'
+    )
+  }
+}
 async function closeFreighterFlight(id) {
 
   const flight = cargoFlightRecords.find(
@@ -1104,6 +1174,155 @@ async function closeFreighterFlight(id) {
       'The flight could not be closed in the database.'
     )
   }
+}
+function openPassengerFlight(id) {
+
+  const flight =
+    cargoFlightRecords.find(
+      item => item.id === id
+    )
+
+  if (!flight) {
+    console.log(
+      'Passenger flight not found:',
+      id
+    )
+    return
+  }
+
+  const canModifyFlight =
+    userRole === 'admin' ||
+    flight.createdBy === currentUser?.id
+
+  if (!canModifyFlight) {
+
+    alert(
+      'You can only modify flights created by your user.'
+    )
+
+    return
+  }
+
+  if (flight.status !== 'OPEN') {
+    return
+  }
+
+  const passengerAircraft =
+    aircraftDatabase.find(
+      aircraft =>
+        aircraft.registration ===
+        flight.registration
+    )
+
+  if (!passengerAircraft) {
+
+    alert(
+      'The aircraft used by this flight is not available.'
+    )
+
+    return
+  }
+
+  // Active passenger flight
+  setActivePassengerFlightId(
+    flight.id
+  )
+
+  // Aircraft
+  setSelectedAircraft(
+    passengerAircraft
+  )
+
+  // Flight data
+  setFlightNumber(
+    flight.flightNumber || ''
+  )
+
+  setFlightFrom(
+    flight.from || ''
+  )
+
+  setFlightTo(
+    flight.to || ''
+  )
+
+  // Seat map
+  setSelectedSeats(
+    [...(flight.selectedSeats || [])]
+  )
+
+  // Passenger distribution
+  setFwdAdults(
+    Number(flight.fwdAdults) || 0
+  )
+
+  setFwdChildren(
+    Number(flight.fwdChildren) || 0
+  )
+
+  setFwdInfants(
+    Number(flight.fwdInfants) || 0
+  )
+
+  setMidAdults(
+    Number(flight.midAdults) || 0
+  )
+
+  setMidChildren(
+    Number(flight.midChildren) || 0
+  )
+
+  setMidInfants(
+    Number(flight.midInfants) || 0
+  )
+
+  setAftAdults(
+    Number(flight.aftAdults) || 0
+  )
+
+  setAftChildren(
+    Number(flight.aftChildren) || 0
+  )
+
+  setAftInfants(
+    Number(flight.aftInfants) || 0
+  )
+
+  // Cargo
+  setForwardCargo(
+    Number(flight.forwardCargo) || 0
+  )
+
+  setAftCargo(
+    Number(flight.aftCargo) || 0
+  )
+
+  // Crew / catering
+  setExtraCrew(
+    Number(flight.extraCrew) || 0
+  )
+
+  setCatering(
+    Boolean(flight.catering)
+  )
+
+  // Fuel
+  setFuel(
+    Number(flight.rampFuel) || 0
+  )
+
+  setTaxiFuel(
+    Number(flight.taxiFuel) || 0
+  )
+
+  setTripFuel(
+    Number(flight.tripFuel) || 0
+  )
+
+  // Go to Passenger Loadsheet
+  setActiveMenu(
+    'Loadsheet'
+  )
 }
 function openFreighterFlight(id) {
 
@@ -1192,6 +1411,167 @@ setPerformanceMaxTow(
   setActiveMenu(
     'FreighterLoadsheet'
   )
+}
+function printClosedPassengerFlight(flight) {
+
+  if (flight.status !== 'CLOSED') {
+    return
+  }
+
+  const passengerAircraft =
+    aircraftDatabase.find(
+      aircraft =>
+        aircraft.registration ===
+        flight.registration
+    )
+
+  if (!passengerAircraft) {
+    alert(
+      'The aircraft used by this flight is not available.'
+    )
+    return
+  }
+
+  const savedSeats =
+    flight.selectedSeats || []
+
+  const savedForwardSeats =
+    savedSeats.filter(
+      seat => seat <= 59
+    ).length
+
+  const savedMidSeats =
+    savedSeats.filter(
+      seat =>
+        seat > 59 &&
+        seat <= 129
+    ).length
+
+  const savedAftSeats =
+    savedSeats.filter(
+      seat =>
+        seat > 129 &&
+        seat <= 180
+    ).length
+
+  generateLoadsheet({
+
+    selectedAircraft:
+      passengerAircraft,
+
+    selectedSeats:
+      savedSeats,
+
+    forwardCargo:
+      flight.forwardCargo || 0,
+
+    aftCargo:
+      flight.aftCargo || 0,
+
+    fuel:
+      flight.rampFuel || 0,
+
+    tripFuel:
+      flight.tripFuel || 0,
+
+    ldw:
+      flight.lw || 0,
+
+    zfw:
+      flight.zfw || 0,
+
+    rw:
+      flight.rampWeight || 0,
+
+    tow:
+      flight.tow || 0,
+
+    payload:
+      flight.payload || 0,
+
+    cg:
+      flight.towCg || 0,
+
+    zfCg:
+      flight.zfwCg || 0,
+
+    trim:
+      flight.trim || 0,
+
+    toCg:
+      flight.towCg || 0,
+
+    taxiFuel:
+      flight.taxiFuel || 0,
+
+    extraCrew:
+      flight.extraCrew || 0,
+
+    catering:
+      Boolean(flight.catering),
+
+    metarFrom:
+      flight.metarFrom || '',
+
+    metarTo:
+      flight.metarTo || '',
+
+    effectiveBasicWeight:
+      flight.effectiveBasicWeight ??
+      passengerAircraft.basicWeight,
+
+    effectiveBasicIndex:
+      flight.effectiveBasicIndex ??
+      passengerAircraft.basicIndex,
+
+    forwardSeats:
+      savedForwardSeats,
+
+    midSeats:
+      savedMidSeats,
+
+    aftSeats:
+      savedAftSeats,
+
+    fwdAdults:
+      flight.fwdAdults || 0,
+
+    fwdChildren:
+      flight.fwdChildren || 0,
+
+    fwdInfants:
+      flight.fwdInfants || 0,
+
+    midAdults:
+      flight.midAdults || 0,
+
+    midChildren:
+      flight.midChildren || 0,
+
+    midInfants:
+      flight.midInfants || 0,
+
+    aftAdults:
+      flight.aftAdults || 0,
+
+    aftChildren:
+      flight.aftChildren || 0,
+
+    aftInfants:
+      flight.aftInfants || 0,
+
+    flightFrom:
+      flight.from || '',
+
+    flightTo:
+      flight.to || '',
+
+    flightNumber:
+      flight.flightNumber || '',
+
+    crewConfiguration:
+      flight.crewConfiguration || ''
+  })
 }
 function printClosedFreighterFlight(flight) {
 
@@ -1741,6 +2121,8 @@ const [cargoFlightRecords, setCargoFlightRecords] =
 
 const [activeFreighterFlightId, setActiveFreighterFlightId] =
   useState(null)
+  const [activePassengerFlightId, setActivePassengerFlightId] =
+  useState(null)
   const [historySearch, setHistorySearch] =
   useState('')
 
@@ -2021,6 +2403,176 @@ if (
 )
 
 }
+async function saveCurrentPassengerFlight() {
+
+  const now =
+    new Date().toISOString()
+
+  const flightData = {
+
+    status: 'OPEN',
+
+    operationType: 'PASSENGER',
+
+    updatedAt: now,
+
+    flightNumber:
+      flightNumber || '----',
+
+    from:
+      flightFrom || '----',
+
+    to:
+      flightTo || '----',
+
+    registration:
+      selectedAircraft.registration,
+
+    selectedSeats: [
+      ...selectedSeats
+    ],
+
+    forwardCargo,
+    aftCargo,
+
+    fwdAdults,
+    fwdChildren,
+    fwdInfants,
+
+    midAdults,
+    midChildren,
+    midInfants,
+
+    aftAdults,
+    aftChildren,
+    aftInfants,
+
+    extraCrew,
+    catering,
+
+    crewConfiguration,
+
+    payload,
+
+    zfw,
+    tow,
+    lw,
+
+    zfwIndex: zfi,
+    towIndex: toi,
+    lwIndex: li,
+
+    zfwCg: zfCg,
+    towCg: toCg,
+    lwCg,
+
+    trim,
+
+    rampFuel: fuel,
+    taxiFuel,
+    tripFuel,
+
+    metarFrom: metar || '',
+    metarTo: metarTo || '',
+
+    basicWeight:
+      selectedAircraft.basicWeight,
+
+    basicIndex:
+      selectedAircraft.basicIndex,
+
+    effectiveBasicWeight,
+    effectiveBasicIndex,
+
+    maxZFW:
+      selectedAircraft.maxZFW,
+
+    maxTOW:
+      selectedAircraft.maxTOW,
+
+    maxLW:
+      selectedAircraft.maxLW
+  }
+  const supabaseFlight =
+    adaptPassengerFlightToSupabase({
+      flightData,
+      currentUser,
+      aircraftId: selectedAircraft?.id
+    })
+
+  try {
+
+    let savedFlight
+
+    if (activePassengerFlightId) {
+
+      savedFlight =
+        await updateFreighterFlight(
+          activePassengerFlightId,
+          supabaseFlight
+        )
+
+    } else {
+
+      savedFlight =
+        await createFreighterFlight(
+          supabaseFlight
+        )
+    }
+
+    const adaptedFlight =
+      adaptSupabaseFlightToOperdat(
+        savedFlight
+      )
+
+    setCargoFlightRecords(
+      previous => {
+
+        const exists =
+          previous.some(
+            flight =>
+              flight.id === adaptedFlight.id
+          )
+
+        if (exists) {
+          return previous.map(
+            flight =>
+              flight.id === adaptedFlight.id
+                ? adaptedFlight
+                : flight
+          )
+        }
+
+        return [
+          adaptedFlight,
+          ...previous
+        ]
+      }
+    )
+
+    setActivePassengerFlightId(
+      adaptedFlight.id
+    )
+
+    console.log(
+      'PASSENGER FLIGHT SAVED:',
+      adaptedFlight
+    )
+
+    alert('Passenger flight saved')
+
+  } catch (error) {
+
+    console.error(
+      'PASSENGER FLIGHT SAVE FAILED:',
+      error
+    )
+
+    alert(
+      'The passenger flight could not be saved in the database.'
+    )
+  }
+}
 async function saveCurrentFreighterFlight() {
 
   const now =
@@ -2281,6 +2833,38 @@ console.log(
   'FLIGHT HISTORY RECORDS:',
   cargoFlightRecords.length
 )
+console.log(
+  'FLIGHT RECORDS DEBUG:',
+  {
+    userRole,
+    currentUserId: currentUser?.id,
+    historySearch,
+    historyStatus,
+    historyDate,
+    historyUser,
+    totalRecords: cargoFlightRecords.length
+  }
+)
+const flightRecords =
+  cargoFlightRecords.filter(flight => {
+
+    const ownerMatch =
+      userRole === 'admin' ||
+      userRole === 'super_admin' ||
+      flight.createdBy === currentUser?.id
+
+    const operationMatch =
+      userRole === 'passenger'
+        ? flight.operationType === 'PASSENGER'
+        : userRole === 'freighter'
+          ? flight.operationType === 'FREIGHTER'
+          : true
+
+    return (
+      ownerMatch &&
+      operationMatch
+    )
+  })
 const filteredHistoryFlights =
   cargoFlightRecords.filter(flight => {
 
@@ -7620,7 +8204,24 @@ value,
     }}
 
   />
-
+<button
+  onClick={saveCurrentPassengerFlight}
+  style={{
+    padding: '16px 32px',
+    background: '#0066cc',
+    color: 'white',
+    border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: '12px',
+    fontSize: '16px',
+    cursor: 'pointer',
+    marginRight: '12px',
+    boxShadow: '0 0 25px rgba(0,102,204,0.20)'
+  }}
+>
+  {activePassengerFlightId
+    ? 'Update Flight'
+    : 'Save Flight'}
+</button>
 </div>
     <button
  onMouseEnter={(e) => {
@@ -13256,7 +13857,9 @@ await refreshCargoFleet()
 )}
 
 {(
+  userRole === 'passenger' ||
   userRole === 'freighter' ||
+  userRole === 'student' ||
   userRole === 'admin' ||
   userRole === 'super_admin'
 ) &&
@@ -13354,7 +13957,7 @@ await refreshCargoFleet()
 
     {/* FLIGHT RECORDS */}
 
-    {filteredHistoryFlights.map(flight => (
+    {flightRecords.map(flight => (
 
         <div
           key={flight.id}
@@ -13376,7 +13979,6 @@ await refreshCargoFleet()
               '0 8px 24px rgba(0,0,0,0.18)'
           }}
         >
-
           {/* FLIGHT HEADER */}
 
           <div
@@ -13715,11 +14317,13 @@ await refreshCargoFleet()
             >
 
               <button
-                onClick={() =>
-                  openFreighterFlight(
-                    flight.id
-                  )
-                }
+                onClick={() => {
+  if (flight.operationType === 'PASSENGER') {
+    openPassengerFlight(flight.id)
+  } else {
+    openFreighterFlight(flight.id)
+  }
+}}
 
                 style={{
                   padding: '9px 16px',
@@ -13748,11 +14352,13 @@ await refreshCargoFleet()
 
 
               <button
-                onClick={() =>
-                  closeFreighterFlight(
-                    flight.id
-                  )
-                }
+                onClick={() => {
+  if (flight.operationType === 'PASSENGER') {
+    closePassengerFlight(flight.id)
+  } else {
+    closeFreighterFlight(flight.id)
+  }
+}}
 
                 style={{
                   padding: '9px 16px',
@@ -13797,11 +14403,13 @@ await refreshCargoFleet()
   >
 
     <button
-      onClick={() =>
-        printClosedFreighterFlight(
-          flight
-        )
-      }
+      onClick={() => {
+  if (flight.operationType === 'PASSENGER') {
+    printClosedPassengerFlight(flight)
+  } else {
+    printClosedFreighterFlight(flight)
+  }
+}}
 
       style={{
         padding: '8px 14px',
@@ -13823,7 +14431,7 @@ await refreshCargoFleet()
       LOADSHEET PDF
     </button>
 
-
+{flight.operationType !== 'PASSENGER' && (
     <button
       onClick={() =>
         printClosedLoadOrder(
@@ -13850,7 +14458,7 @@ await refreshCargoFleet()
     >
       LOAD ORDER PDF
     </button>
-
+)}
   </div>
 
 )}

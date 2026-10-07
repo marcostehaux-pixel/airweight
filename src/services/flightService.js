@@ -89,7 +89,84 @@ lw_cg:
 
     flight_data: flightData
   }
+}export function adaptPassengerFlightToSupabase({
+  flightData,
+  currentUser,
+  aircraftId
+}) {
+  return {
+    organization_id: currentUser?.organizationId,
+    aircraft_id: aircraftId,
+    created_by: currentUser?.id,
+    created_by_name:
+      currentUser?.fullName ||
+      currentUser?.email ||
+      null,
+
+    flight_number:
+      flightData.flightNumber || '----',
+
+    flight_date:
+      new Date().toISOString().slice(0, 10),
+
+    origin:
+      flightData.from || '----',
+
+    destination:
+      flightData.to || '----',
+
+    status:
+      flightData.status || 'OPEN',
+
+    zfw:
+      flightData.zfw ?? null,
+
+    tow:
+      flightData.tow ?? null,
+
+    lw:
+      flightData.lw ?? null,
+
+    zf_index:
+      flightData.zfwIndex ?? null,
+
+    tow_index:
+      flightData.towIndex ?? null,
+
+    lw_index:
+      flightData.lwIndex ?? null,
+
+    zf_cg:
+      flightData.zfwCg ?? null,
+
+    tow_cg:
+      flightData.towCg ?? null,
+
+    lw_cg:
+      flightData.lwCg ?? null,
+
+    ramp_fuel:
+      flightData.rampFuel ?? null,
+
+    taxi_fuel:
+      flightData.taxiFuel ?? null,
+
+    trip_fuel:
+      flightData.tripFuel ?? null,
+
+    payload:
+      flightData.payload ?? null,
+
+    metar_from:
+      flightData.metarFrom || null,
+
+    metar_to:
+      flightData.metarTo || null,
+
+    flight_data: flightData
+  }
 }
+
 export function adaptSupabaseFlightToOperdat(row) {
   const savedData = row.flight_data || {}
 
@@ -126,6 +203,7 @@ export function adaptSupabaseFlightToOperdat(row) {
 operationType:
   savedData.operationType ||
   'FREIGHTER',
+  
     // Operational values
     zfw:
       row.zfw ?? savedData.zfw ?? 0,
