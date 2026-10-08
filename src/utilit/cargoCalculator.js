@@ -306,10 +306,24 @@ export function getTotalCargoIndex(mainDeckIndex, lowerDeckIndex) {
 export function calculateCargoBalance(
   selectedCargoAircraft,
   cargoWeights,
-  takeoffFuel
-)
+  takeoffFuel,
+  cargoExtraCrew = 0
+) {
+  const extraCrewWeight = cargoExtraCrew * 90
 
- {
+const extraCrewArm =
+  selectedCargoAircraft.extraCrewArm
+
+const extraCrewArmValid =
+  Number.isFinite(extraCrewArm) &&
+  extraCrewArm > 0
+
+const extraCrewMoment =
+  extraCrewWeight > 0 && extraCrewArmValid
+    ? extraCrewWeight * extraCrewArm
+    : 0
+const extraCrewConfigurationError =
+  extraCrewWeight > 0 && !extraCrewArmValid
 
   const mainCargo = getMainCargo( selectedCargoAircraft, cargoWeights)
 
@@ -317,7 +331,12 @@ export function calculateCargoBalance(
 
   const totalCargo = getTotalCargo(mainCargo, lowerCargo)
 
-  const cargoZfw = getCargoZfw(selectedCargoAircraft,totalCargo)
+  const cargoZfw =
+  getCargoZfw(
+    selectedCargoAircraft,
+    totalCargo
+  ) +
+  (extraCrewConfigurationError ? 0 : extraCrewWeight)
 
   const availablePayload = getAvailablePayload(selectedCargoAircraft,cargoZfw)
 
@@ -335,7 +354,10 @@ export function calculateCargoBalance(
 
   const basicMoment = getBasicMoment(selectedCargoAircraft)
 
-  const zfwMoment = basicMoment + totalCargoMoment
+  const zfwMoment =
+  basicMoment +
+  totalCargoMoment +
+  (extraCrewConfigurationError ? 0 : extraCrewMoment)
 
   const zfwArm = getZfwArm(zfwMoment,cargoZfw)
 
@@ -346,6 +368,7 @@ export function calculateCargoBalance(
   const towArm = getTowArm(towMoment,cargoZfw + takeoffFuel)
 
   return {
+    extraCrewConfigurationError,
 
     mainCargo,
 

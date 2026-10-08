@@ -90,8 +90,14 @@ const cargoConfig = {
     seatArmAft: Number(configuration.seat_arm_aft),
 
     fuelArm: Number(configuration.fuel_arm),
-    forwardCargoArm: Number(configuration.forward_cargo_arm),
-    aftCargoArm: Number(configuration.aft_cargo_arm),
+forwardCargoArm: Number(configuration.forward_cargo_arm),
+aftCargoArm: Number(configuration.aft_cargo_arm),
+
+extraCrewArm:
+  configuration.extra_crew_arm === null ||
+  configuration.extra_crew_arm === undefined
+    ? null
+    : Number(configuration.extra_crew_arm),
 
     envelope,
     cargoConfig
@@ -235,7 +241,8 @@ export async function createAircraftConfiguration({
   seatArmAft,
   fuelArm,
   forwardCargoArm,
-  aftCargoArm
+  aftCargoArm,
+  extraCrewArm
 }) {
   
   const { data, error } = await supabase
@@ -281,7 +288,14 @@ export async function createAircraftConfiguration({
         Number(forwardCargoArm),
 
       aft_cargo_arm:
-        Number(aftCargoArm)
+  Number(aftCargoArm),
+
+extra_crew_arm:
+  extraCrewArm === '' ||
+  extraCrewArm === null ||
+  extraCrewArm === undefined
+    ? null
+    : Number(extraCrewArm)
     })
     .select()
     .single()
@@ -673,10 +687,10 @@ export async function createWeightBalanceRevision({
   seatArmFwd,
   seatArmMid,
   seatArmAft,
-
   fuelArm,
   forwardCargoArm,
   aftCargoArm,
+  extraCrewArm,
 
   changeReason,
   sourceDocument,
@@ -725,8 +739,15 @@ export async function createWeightBalanceRevision({
       p_forward_cargo_arm:
         Number(forwardCargoArm),
 
-      p_aft_cargo_arm:
+            p_aft_cargo_arm:
         Number(aftCargoArm),
+
+      p_extra_crew_arm:
+        extraCrewArm === '' ||
+        extraCrewArm === null ||
+        extraCrewArm === undefined
+          ? null
+          : Number(extraCrewArm),
 
       p_change_reason:
         changeReason?.trim() || null,

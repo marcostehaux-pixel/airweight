@@ -861,7 +861,8 @@ const [
   seatArmAft: '',
   fuelArm: '',
   forwardCargoArm: '',
-  aftCargoArm: ''
+aftCargoArm: '',
+extraCrewArm: ''
 })
 
 const [
@@ -1870,11 +1871,18 @@ const paxMoment =
     selectedAircraft.seatArmMid
 
   )
+  const [extraCrew,setExtraCrew] = useState(0)
+  const [cargoExtraCrew, setCargoExtraCrew] = useState(0)
+const [ catering,setCatering] = useState( 0 )
   const calculatedFwdCabinPax = fwdAdults + fwdChildren
 const calculatedMidCabinPax = midAdults + midChildren
 const calculatedAftCabinPax = aftAdults + aftChildren
   const payload = passengerWeight + forwardCargo + aftCargo
-const zfw = selectedAircraft.basicWeight + passengerWeight + forwardCargo + aftCargo 
+const zfw =
+  selectedAircraft.basicWeight +
+  (extraCrew * 85) +
+  (catering ? 250 : 0) +
+  payload
 
 const rw = zfw + fuel
 const fuelData = calculateFuel(fuel,taxiFuel,tripFuel)
@@ -1883,6 +1891,7 @@ const [
   setPerformanceMaxTow
 ] = useState('')
 const {
+  extraCrewConfigurationError,
   mainCargo,
   lowerCargo,
   totalCargo,
@@ -1899,7 +1908,8 @@ towArm
 } = calculateCargoBalance(
   selectedCargoAircraft,
   cargoWeights,
-  fuelData.takeoffFuel
+  fuelData.takeoffFuel,
+  cargoExtraCrew
 )
 const effectiveMaxTow =
   performanceMaxTow &&
@@ -1992,11 +2002,10 @@ const ldw = tow - tripFuel
 const lw = ldw
 const arm = tow > 0? (totalMoment / tow) : 0
 const cg = arm > 0 ? (( arm - selectedAircraft.lemac) / selectedAircraft.mac) * 100 : 0
-const [extraCrew,setExtraCrew] = useState(0)
-const [ catering,setCatering] = useState( 0 )
+
 const dow = selectedAircraft.basicWeight
 const cateringWeight = catering ? 250 :0
-const effectiveBasicWeight = dow + (extraCrew *85) + cateringWeight
+const effectiveBasicWeight = dow + (extraCrew * 85) + cateringWeight
 const crewConfiguration = extraCrew > 0 ? `2/${4 + extraCrew}` : selectedAircraft.basicConfig
 const basicWeightDelta = effectiveBasicWeight - selectedAircraft.basicWeight
 const effectiveBasicMoment = (extraCrew * 85 * 360) + (catering ? 250 * 420 : 0)
@@ -2176,12 +2185,11 @@ const cargoLwInsideEnvelope =
 })
 
 const freighterPrintValid =
+  !extraCrewConfigurationError &&
   !cargoPositionOverLimit &&
   cargoZfw <= selectedCargoAircraft.maxZFW &&
-  weightData.takeoffWeight <=
-    effectiveMaxTow &&
-  weightData.landingWeight <=
-    selectedCargoAircraft.maxLW &&
+  weightData.takeoffWeight <= effectiveMaxTow &&
+  weightData.landingWeight <= selectedCargoAircraft.maxLW &&
   cargoZfwInsideEnvelope &&
   cargoTowInsideEnvelope &&
   cargoLwInsideEnvelope
@@ -2529,11 +2537,11 @@ async function saveCurrentPassengerFlight() {
 
     crewConfiguration,
 
-    payload,
+   payload,
 
-    zfw,
-    tow,
-    lw,
+zfw,
+tow,
+lw,
 
     zfwIndex: zfi,
     towIndex: toi,
@@ -2570,6 +2578,15 @@ async function saveCurrentPassengerFlight() {
     maxLW:
       selectedAircraft.maxLW
   }
+  console.log('PASSENGER SAVE WEIGHTS:', {
+  zfw,
+  tow,
+  lw,
+  effectiveBasicWeight,
+  payload,
+  extraCrew,
+  catering
+})
   const supabaseFlight =
     adaptPassengerFlightToSupabase({
       flightData,
@@ -4872,6 +4889,43 @@ kg
 </strong>
 
 </div>
+<div
+  style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px'
+  }}
+>
+  <span style={{width: '100px'}}>
+    EXTRA CREW
+  </span>
+
+  <select
+    value={cargoExtraCrew}
+    onChange={(e) =>
+      setCargoExtraCrew(Number(e.target.value))
+    }
+    style={{
+      width: '90px',
+      padding: '6px 8px',
+      borderRadius: '6px',
+      border: '1px solid rgba(255,255,255,0.15)',
+      background: '#182536',
+      color: '#ffffff',
+      textAlign: 'center'
+    }}
+  >
+    {[0, 1, 2, 3, 4].map((quantity) => (
+      <option key={quantity} value={quantity}>
+        {quantity}
+      </option>
+    ))}
+  </select>
+
+  <span style={{fontSize: '13px', color: '#b8c0cc'}}>
+    {cargoExtraCrew * 85} kg
+  </span>
+</div>
 
 <div style={{display:'flex'}}>
 
@@ -5758,7 +5812,11 @@ if (!freighterPrintValid) {
 
   let message =
     'LOADSHEET CANNOT BE GENERATED\n\n'
-
+    
+if (extraCrewConfigurationError) {
+  message +=
+    'EXTRA CREW ARM NOT CONFIGURED\n'
+}
   if (cargoPositionOverLimit) {
 
     message +=
@@ -7106,21 +7164,13 @@ unit="UI"
 status={true}
 
 />
- <StatusCard
-        title="ZFW"
-        value={
-
-zfw +
-
-(extraCrew *85)+
-
-(catering ? 250 : 0)
-
-}
-        unit="kg"
-        status={zfwStatus}
-        limit={selectedAircraft.maxZFW}
-      />
+<StatusCard
+  title="ZFW"
+  value={zfw}
+  unit="kg"
+  status={zfwStatus}
+  limit={selectedAircraft.maxZFW}
+/>
 <StatusCard
 
 title="ZFI"
@@ -7194,45 +7244,11 @@ selectedAircraft.maxRW
 
 />
   <StatusCard
-
-title="TOW"
-
-value={
-
-tow +
-
-(extraCrew *85)+
-
-(catering ? 250 : 0)
-
-}
-
-unit="kg"
-
-status={
-
-(
-
-tow +
-
-(extraCrew *85)+
-
-(catering ? 250 : 0)
-
-)
-
-<=
-
-selectedAircraft.maxTOW
-
-}
-
-limit={
-
-selectedAircraft.maxTOW
-
-}
-
+  title="TOW"
+  value={tow}
+  unit="kg"
+  status={tow <= selectedAircraft.maxTOW}
+  limit={selectedAircraft.maxTOW}
 />
       <StatusCard
 
@@ -9957,7 +9973,10 @@ onEditWeightBalance={() => {
       config.forward_cargo_arm ?? '',
 
     aftCargoArm:
-      config.aft_cargo_arm ?? ''
+  config.aft_cargo_arm ?? '',
+
+extraCrewArm:
+  config.extra_crew_arm ?? ''
   })
 
   setWeightBalanceRevisionMeta({
@@ -11696,14 +11715,15 @@ onShowRevisionHistory={() => {
       gap: '14px'
     }}
   >
-    {[
-      ['Seat Arm FWD', 'seatArmFwd'],
-      ['Seat Arm MID', 'seatArmMid'],
-      ['Seat Arm AFT', 'seatArmAft'],
-      ['Fuel Arm', 'fuelArm'],
-      ['Forward Cargo Arm', 'forwardCargoArm'],
-      ['Aft Cargo Arm', 'aftCargoArm']
-    ].map(([label, field]) => (
+   {[
+  ['Seat Arm FWD', 'seatArmFwd'],
+  ['Seat Arm MID', 'seatArmMid'],
+  ['Seat Arm AFT', 'seatArmAft'],
+  ['Fuel Arm', 'fuelArm'],
+  ['Forward Cargo Arm', 'forwardCargoArm'],
+  ['Aft Cargo Arm', 'aftCargoArm'],
+  ['Extra Crew Arm', 'extraCrewArm']
+].map(([label, field]) => (
       <RevisionInput
         key={field}
         label={label}
@@ -13176,13 +13196,14 @@ setSelectedAircraftTechnicalRevisions(
       }}
     >
       {[
-        ['seatArmFwd', 'SEAT ARM FWD'],
-        ['seatArmMid', 'SEAT ARM MID'],
-        ['seatArmAft', 'SEAT ARM AFT'],
-        ['fuelArm', 'FUEL ARM'],
-        ['forwardCargoArm', 'FORWARD CARGO ARM'],
-        ['aftCargoArm', 'AFT CARGO ARM']
-      ].map(([field, label]) => (
+  ['seatArmFwd', 'SEAT ARM FWD'],
+  ['seatArmMid', 'SEAT ARM MID'],
+  ['seatArmAft', 'SEAT ARM AFT'],
+  ['fuelArm', 'FUEL ARM'],
+  ['forwardCargoArm', 'FORWARD CARGO ARM'],
+  ['aftCargoArm', 'AFT CARGO ARM'],
+  ['extraCrewArm', 'EXTRA CREW ARM']
+].map(([field, label]) => (
         <div key={field}>
           <div
             style={{
@@ -15444,9 +15465,10 @@ maxWidth: '100%',
   ['Seat Arm MID', selectedAdminAircraftFullData.configuration.seat_arm_mid],
   ['Seat Arm AFT', selectedAdminAircraftFullData.configuration.seat_arm_aft],
 
-  ['Fuel Arm', selectedAdminAircraftFullData.configuration.fuel_arm],
-  ['Forward Cargo Arm', selectedAdminAircraftFullData.configuration.foward_cargo_arm],
-  ['Aft Cargo Arm', selectedAdminAircraftFullData.configuration.aft_cargo_arm]
+ ['Fuel Arm', selectedAdminAircraftFullData.configuration.fuel_arm],
+['Forward Cargo Arm', selectedAdminAircraftFullData.configuration.forward_cargo_arm],
+['Aft Cargo Arm', selectedAdminAircraftFullData.configuration.aft_cargo_arm],
+['Extra Crew Arm', selectedAdminAircraftFullData.configuration.extra_crew_arm]
 ].map(([label, value]) => (
 
         <div
