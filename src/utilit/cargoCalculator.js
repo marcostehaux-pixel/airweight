@@ -311,19 +311,31 @@ export function calculateCargoBalance(
 ) {
   const extraCrewWeight = cargoExtraCrew * 90
 
-const extraCrewArm =
-  selectedCargoAircraft.extraCrewArm
+// FREIGHTER - Correcciones respecto de tripulación 2/0/0
+const extraCrewIndexCorrections = [
+  0,
+  -1.25067,
+  -2.50133,
+  -3.75200
+]
 
-const extraCrewArmValid =
-  Number.isFinite(extraCrewArm) &&
-  extraCrewArm > 0
+const extraCrewIndexCorrection =
+  extraCrewIndexCorrections[cargoExtraCrew]
+
+const extraCrewConfigurationError =
+  !Number.isInteger(cargoExtraCrew) ||
+  extraCrewIndexCorrection === undefined
 
 const extraCrewMoment =
-  extraCrewWeight > 0 && extraCrewArmValid
-    ? extraCrewWeight * extraCrewArm
-    : 0
-const extraCrewConfigurationError =
-  extraCrewWeight > 0 && !extraCrewArmValid
+  extraCrewConfigurationError
+    ? 0
+    : (
+        extraCrewWeight *
+        selectedCargoAircraft.indexReferenceArm
+      ) + (
+        extraCrewIndexCorrection *
+        selectedCargoAircraft.indexConstant
+      )
 
   const mainCargo = getMainCargo( selectedCargoAircraft, cargoWeights)
 
@@ -335,8 +347,7 @@ const extraCrewConfigurationError =
   getCargoZfw(
     selectedCargoAircraft,
     totalCargo
-  ) +
-  (extraCrewConfigurationError ? 0 : extraCrewWeight)
+  ) + extraCrewWeight
 
   const availablePayload = getAvailablePayload(selectedCargoAircraft,cargoZfw)
 
@@ -354,10 +365,10 @@ const extraCrewConfigurationError =
 
   const basicMoment = getBasicMoment(selectedCargoAircraft)
 
-  const zfwMoment =
+ const zfwMoment =
   basicMoment +
   totalCargoMoment +
-  (extraCrewConfigurationError ? 0 : extraCrewMoment)
+  extraCrewMoment
 
   const zfwArm = getZfwArm(zfwMoment,cargoZfw)
 

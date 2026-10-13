@@ -490,13 +490,14 @@ setCurrentUser({
     if (profile.role === 'freighter') {
       setActiveMenu('FreighterLoadsheet')
     }
-    if (
+ if (
   profile.role === 'passenger' ||
   profile.role === 'student' ||
   profile.role === 'admin'
 ) {
-  setActiveMenu('Loadsheet')
+  setActiveMenu('Dashboard')
 }
+
 if (profile.role === 'super_admin') {
   setActiveMenu('Flight History')
 }
@@ -637,7 +638,8 @@ const [
 const [tripFuel, setTripFuel] = useState(0)
 const [taxiFuel,setTaxiFuel ]= useState(0)
 const [fuel, setFuel] = useState(0)
-const [selectedAircraft,setSelectedAircraft] = useState(aircraftDatabase[0])
+const [selectedAircraft, setSelectedAircraft] = useState(aircraftDatabase[0])
+const [aircraftSummaryRegistration, setAircraftSummaryRegistration] = useState('')
 const [selectedCargoAircraft,setSelectedCargoAircraft] = useState(aircraftCargoDatabase[0]
 )
 function clearCargo(){setCargoWeights(
@@ -659,7 +661,7 @@ async function refreshPassengerFleet() {
       fleet || []
     )
 if (
-  userRole === 'passenger' &&
+  (userRole === 'passenger' || userRole === 'student') &&
   fleet &&
   fleet.length > 0
 ) {
@@ -688,6 +690,21 @@ if (
   }
 }
 async function refreshCargoFleet() {
+  if (userRole === 'student') {
+  setCargoAircraftFleet(aircraftCargoDatabase)
+
+  setSelectedCargoAircraft((current) => {
+    const availableAircraft =
+      aircraftCargoDatabase.find(
+        aircraft =>
+          aircraft.registration === current?.registration
+      )
+
+    return availableAircraft || aircraftCargoDatabase[0]
+  })
+
+  return
+}
   try {
     const fleet = await getCargoAircraftFleet()
 
@@ -2013,14 +2030,24 @@ const doi = selectedAircraft.basicIndex + (extraCrew * 0.1)
 
 const cargoDow = selectedCargoAircraft.basicWeight
 
-const cargoDoi =
-  selectedCargoAircraft.basicIndex + (extraCrew * 0.1)
+// FREIGHTER - Extra Crew (supernumerarios)
+// Referencia: tripulación estándar 2/0/0 incluida en EOW/EOI.
+// Correcciones de índice respecto de esa configuración.
+
+const cargoExtraCrewIndexCorrections = [
+  0,        // 2/0/0
+  -1.25067, // 2/0/1
+  -2.50133, // 2/0/2
+  -3.75200  // 2/0/3
+]
+
+const cargoExtraCrewIndexCorrection =
+  cargoExtraCrewIndexCorrections[cargoExtraCrew] ?? 0
+
+const cargoDoi = selectedCargoAircraft.basicIndex
 
 const cargoEffectiveBasicIndex =
-  cargoDoi +
-  (extraCrew * 0.1) +
-  (catering ? 0.2 : 0)
-
+  cargoDoi + cargoExtraCrewIndexCorrection
 const cargoZfwIndex = getZeroFuelIndex(
   cargoEffectiveBasicIndex,
   totalCargoIndex
@@ -2301,12 +2328,16 @@ const maxCg=34
 return (18+(index-35)*0.235)
 }
  function getCgFromEnvelope(index,weight){return Number(getNearestCg(index).toFixed(1))}
- const aircraftSummary =
-  selectedCargoAircraft &&
-  selectedCargoAircraft.registration ===
-    selectedAircraft.registration
-    ? selectedCargoAircraft
-    : selectedAircraft;
+ const aircraftSummaryFleet =
+  userRole === 'student'
+    ? [...passengerAircraftFleet, ...aircraftCargoDatabase]
+    : [...passengerAircraftFleet, ...cargoAircraftFleet];
+const aircraftSummary =
+  aircraftSummaryFleet.find(
+    aircraft =>
+      aircraft.registration === aircraftSummaryRegistration
+  ) ||
+    aircraftSummaryFleet[0];
 const paxZfwArm = indexToArm(
   zfi,
   zfw,
@@ -2478,7 +2509,7 @@ if (
   role === 'student' ||
   role === 'admin'
 ) {
-  setActiveMenu('Loadsheet')
+  setActiveMenu('Dashboard')
 }
 
     setLogged(true)
@@ -2587,6 +2618,12 @@ lw,
   extraCrew,
   catering
 })
+if (currentUser?.role === 'super_admin') {
+  alert(
+    'Super Admin Test Mode — Flights are not saved to Flight Records.'
+  )
+  return
+}
   const supabaseFlight =
     adaptPassengerFlightToSupabase({
       flightData,
@@ -2771,7 +2808,12 @@ effectiveMaxTow:
 rampWeight:
   weightData.rampWeight,
   }
-
+if (currentUser?.role === 'super_admin') {
+  alert(
+    'Super Admin Test Mode — Flights are not saved to Flight Records.'
+  )
+  return
+}
 const supabaseFlight =
   adaptFreighterFlightToSupabase({
     flightData,
@@ -3312,34 +3354,35 @@ return (
   )}
 
 
-  {/* PASSENGER LOADSHEET */}
+ {/* PASSENGER LOADSHEET */}
 
-  {(
-  userRole === 'passenger' ||
-  userRole === 'admin' ||
-  userRole === 'student' ||
-  userRole === 'super_admin'
-) && (
+{false && (
+  (
+    userRole === 'passenger' ||
+    userRole === 'admin' ||
+    userRole === 'student' ||
+    userRole === 'super_admin'
+  ) && (
     <div
-      onClick={() => setActiveMenu('Loadsheet')}
+      onClick={() => setActiveMenu('Dashboard')}
       style={{
         marginBottom: '10px',
         padding: '12px 15px',
         borderRadius: '9px',
         background:
-          activeMenu === 'Loadsheet'
+          activeMenu === 'Dashboard'
             ? 'rgba(21,101,255,0.16)'
             : 'transparent',
         border:
-          activeMenu === 'Loadsheet'
+          activeMenu === 'Dashboard'
             ? '1px solid rgba(21,101,255,0.40)'
             : '1px solid transparent',
         color:
-          activeMenu === 'Loadsheet'
+          activeMenu === 'Dashboard'
             ? '#ffffff'
             : '#b9c4d3',
         fontWeight:
-          activeMenu === 'Loadsheet'
+          activeMenu === 'Dashboard'
             ? '700'
             : '500',
         cursor: 'pointer',
@@ -3347,8 +3390,8 @@ return (
       }}
     >
       Passenger Loadsheet
-    </div>
-  )}
+       </div>
+  ))}
 
 
   {/* FUEL */}
@@ -3385,7 +3428,10 @@ return (
 
   {/* AIRCRAFT */}
 
-  {userRole !== 'freighter' && (
+  {(
+  userRole === 'student' ||
+  userRole === 'super_admin'
+) && (
     <div
       onClick={() => setActiveMenu('Aircraft')}
       style={{
@@ -4915,15 +4961,13 @@ kg
       textAlign: 'center'
     }}
   >
-    {[0, 1, 2, 3, 4].map((quantity) => (
-      <option key={quantity} value={quantity}>
-        {quantity}
-      </option>
-    ))}
+    {[0,1,2,3].map(quantity => (
+  <option key={quantity} value={quantity}>{quantity}</option>
+))}
   </select>
 
   <span style={{fontSize: '13px', color: '#b8c0cc'}}>
-    {cargoExtraCrew * 85} kg
+    {cargoExtraCrew * 90} kg
   </span>
 </div>
 
@@ -5886,9 +5930,15 @@ cargoMetarFrom,
 basicWeight:
   selectedCargoAircraft.basicWeight,
 
-
 basicIndex:
   selectedCargoAircraft.basicIndex,
+
+extraCrewCount: cargoExtraCrew,
+
+extraCrewWeight: cargoExtraCrew * 90,
+
+extraCrewIndexCorrection:
+  cargoExtraCrewIndexCorrection,
 
 maxZFW:
   selectedCargoAircraft.maxZFW,
@@ -6561,39 +6611,10 @@ AIRCRAFT SUMMARY
 
 <select
 
-value={selectedAircraft.registration}
+value={aircraftSummary.registration}
 
-onChange={(e)=>{
-
-const paxFleet =
-  userRole === 'student'
-    ? aircraftDatabase
-    : passengerAircraftFleet
-
-const paxAircraft =
-  paxFleet.find(
-    a =>
-      a.registration ===
-      e.target.value
-  )
-
-const cargoAircraft =
-  cargoAircraftFleet.find(
-    a => a.registration === e.target.value
-  )
-const [
-  performanceMaxTow,
-  setPerformanceMaxTow
-] = useState('')
-console.log('PAX', paxAircraft)
-console.log('CARGO', cargoAircraft)
-
-if(paxAircraft)
-setSelectedAircraft(paxAircraft)
-
-if(cargoAircraft)
-setSelectedCargoAircraft(cargoAircraft)
-
+onChange={(e) => {
+  setAircraftSummaryRegistration(e.target.value)
 }}
 
 style={{
@@ -6616,15 +6637,7 @@ outline:'none'
 
 >
 
-{
-(
-  userRole === 'student'
-    ? [
-        ...aircraftDatabase,
-        ...cargoAircraftFleet
-      ]
-    : passengerAircraftFleet
-).map(a => (
+{aircraftSummaryFleet.map(a => (
 
 <option
 
@@ -6737,7 +6750,7 @@ BASIC WT<br/>
 
 <strong>
 
-{effectiveBasicWeight}
+{aircraftSummary.basicWeight}
 
 kg
 
@@ -6752,7 +6765,7 @@ BASIC INDEX<br/>
 
 <strong>
 
-{effectiveBasicIndex?.toFixed(1)}
+{Number(aircraftSummary.basicIndex ?? 0).toFixed(1)}
 
 </strong>
 
@@ -7122,13 +7135,10 @@ boxShadow:
 
       style={{
 
-        display: 'flex',
-
-        gap: '20px',
-
-        marginTop: '40px',
-
-        flexWrap: 'wrap'
+       display: 'flex',
+gap: '10px',
+marginTop: '20px',
+flexWrap: 'wrap'
 
       }}
 
@@ -7136,10 +7146,9 @@ boxShadow:
      
 
 <StatusCard
-
-title="Basic WT"
-
-value={effectiveBasicWeight}
+  compact={true}
+  title="Basic WT"
+  value={effectiveBasicWeight}
 
 unit="kg"
 
@@ -7154,7 +7163,7 @@ subtitle={
 />
 
 <StatusCard
-
+compact={true}
 title="BWI"
 
 value={effectiveBasicIndex?.toFixed(2)}
@@ -7165,6 +7174,7 @@ status={true}
 
 />
 <StatusCard
+  compact={true}
   title="ZFW"
   value={zfw}
   unit="kg"
@@ -7172,8 +7182,8 @@ status={true}
   limit={selectedAircraft.maxZFW}
 />
 <StatusCard
-
-title="ZFI"
+  compact={true}
+  title="ZFI"
 
 value={zfi.toFixed(1)}
 
@@ -7181,6 +7191,7 @@ unit="IU"status={true}
 
 />
  <StatusCard
+ compact={true}
 title="ZF CG"
 
 value={
@@ -7192,7 +7203,7 @@ unit="%"
 status={true}
 />
 <StatusCard
-
+compact={true}
 title="BLOCK FUEL"
 
 value={fuel}
@@ -7203,7 +7214,7 @@ status={true}
 
 />
 <StatusCard
-
+compact={true}
 title="RW"
 
 value={
@@ -7244,6 +7255,7 @@ selectedAircraft.maxRW
 
 />
   <StatusCard
+  compact={true}
   title="TOW"
   value={tow}
   unit="kg"
@@ -7251,7 +7263,7 @@ selectedAircraft.maxRW
   limit={selectedAircraft.maxTOW}
 />
       <StatusCard
-
+compact={true}
 title="TOI"
 
 value={toi.toFixed(1)}
@@ -7330,6 +7342,7 @@ status={true}
 
 
 <StatusCard
+compact={true}
 title="TO CG"
 
 value={
@@ -7342,7 +7355,7 @@ status={true}
 />
 
 <StatusCard
-
+compact={true}
   title={`TRIM · ${trimLabel}`}
 
   value={trim.toFixed(1)}
@@ -7392,7 +7405,93 @@ status={true}
 </div>
 
     </div>
+    <div
+  style={{
+    marginTop: '20px',
+    marginBottom: '15px',
+    padding: '16px 20px',
+    borderRadius: '14px',
+    background: 'rgba(255,255,255,0.04)',
+    border: '1px solid rgba(255,255,255,0.08)'
+  }}
+>
+  <div
+    style={{
+      color: '#8fa0b7',
+      fontSize: '12px',
+      fontWeight: '700',
+      letterSpacing: '1.5px'
+    }}
+  >
+    CARGO COMPARTMENTS
+    <div
+  style={{
+    display: 'flex',
+    gap: '20px',
+    flexWrap: 'wrap',
+    alignItems: 'flex-start'
+  }}
+>
+    <div style={{ marginTop: '15px', maxWidth: '250px' }}>
+  <label>Forward Cargo (kg)</label>
 
+  <input
+    type="number"
+    min="0"
+    max="3000"
+    value={forwardCargo === 0 ? '' : forwardCargo}
+    onChange={(e) => {
+      const value = parseInt(e.target.value, 10) || 0
+      setForwardCargo(Math.max(0, Math.min(value, 3000)))
+    }}
+    style={{
+      width: '100%',
+      boxSizing: 'border-box',
+      padding: '12px',
+      marginTop: '8px',
+      borderRadius: '10px',
+      border: '1px solid rgba(255,255,255,0.08)',
+      background: 'rgba(255,255,255,0.05)',
+      color: 'white'
+    }}
+  />
+</div>
+<div style={{ marginTop: '15px', maxWidth: '250px' }}>
+  <label>Aft Cargo (kg)</label>
+
+  <input
+    type="number"
+    min="0"
+    max="5000"
+    value={aftCargo === 0 ? '' : aftCargo}
+    onChange={(e) => {
+      const value = parseInt(e.target.value, 10) || 0
+      setAftCargo(Math.max(0, Math.min(value, 5000)))
+    }}
+    style={{
+      width: '100%',
+      boxSizing: 'border-box',
+      padding: '12px',
+      marginTop: '8px',
+      borderRadius: '10px',
+      border: '1px solid rgba(255,255,255,0.08)',
+      background: 'rgba(255,255,255,0.05)',
+      color: 'white'
+    }}
+  />
+</div>
+</div>
+  </div>
+</div>
+<div
+  style={{
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '20px',
+   flexWrap: 'nowrap'
+  }}
+>
+  
    <EnvelopeChart
 
 cg={cg}
@@ -7431,14 +7530,229 @@ selectedAircraft.maxZFW
 }
 
 />
+<div
+  style={{
+    width: '220px',
+    display: 'flex',
+flexDirection: 'column',
+    minHeight: '300px',
+    padding: '15px',
+    marginTop: '30px',
+    borderRadius: '14px',
+    background: 'rgba(255,255,255,0.04)',
+    border: '1px solid rgba(255,255,255,0.08)'
+  }}
+>
+  <div style={{ color: '#8fa0b7', fontSize: '13px', marginBottom: '15px' }}>
+  OPERATIONS
+</div>
 
+<button
+  onClick={saveCurrentPassengerFlight}
+  style={{
+    padding: '16px 20px',
+    background: '#0066cc',
+    color: 'white',
+    border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: '12px',
+    fontSize: '14px',
+    fontWeight: '700',
+    cursor: 'pointer',
+    width: '100%',
+    marginBottom: '12px'
+  }}
+>
+  {activePassengerFlightId ? 'Update Flight' : 'Save Flight'}
+</button>
+<button
+  onClick={newPassengerFlight}
+  style={{
+    padding: '16px 20px',
+    background: 'rgba(255,255,255,0.04)',
+    color: '#aeb9c8',
+    border: '1px solid rgba(255,255,255,0.12)',
+    borderRadius: '12px',
+    fontSize: '14px',
+    fontWeight: '700',
+    cursor: 'pointer',
+    width: '100%',
+    marginBottom: '12px'
+  }}
+>
+  NEW FLIGHT
+</button>
+ <button
+ onMouseEnter={(e) => {
 
-    <CargoPanel
-      forwardCargo={forwardCargo}
-      aftCargo={aftCargo}
+    e.target.style.transform =
+      'translateY(-3px)'
+
+    e.target.style.boxShadow =
+      '0 0 35px rgba(0,255,140,0.35)'
+
+  }}
+
+  onMouseLeave={(e) => {
+
+    e.target.style.transform =
+      'translateY(0px)'
+
+    e.target.style.boxShadow =
+      '0 0 25px rgba(0,255,140,0.20)'
+      
+
+  }}
+      onClick={() =>
+        
+
+        generateLoadsheet({
+
+          selectedAircraft,
+metarFrom: metar,
+metarTo,
+          selectedSeats,
+
+          forwardCargo,
+
+          aftCargo,
+
+          fuel,
+          taxiFuel,
+          tripFuel,
+          ldw,
+payload,
+
+          zfw,
+rw,
+          tow,
+          cg,
+crewConfiguration,
+
+catering,
+          cgStatus,
+          zfCg,
+
+toCg,
+          flightFrom,
+
+flightTo,
+
+flightNumber,
+trim,
+effectiveBasicWeight,
+
+effectiveBasicIndex,
+forwardSeats,
+midSeats,
+
+aftSeats,
+fwdAdults,
+fwdChildren,
+fwdInfants,
+
+midAdults,
+midChildren,
+midInfants,
+
+aftAdults,
+aftChildren,
+aftInfants
+        })
+
+      }
+
+      style={{
+
+        padding: '16px 32px',
+
+        background:
+          '#00aa66',
+
+        color: 'white',
+
+        border:
+          '1px solid rgba(255,255,255,0.08)',
+
+        borderRadius: '12px',
+
+        fontSize: '16px',
+
+        cursor: 'pointer',
+
+        boxShadow:
+        
+          '0 0 25px rgba(0,255,140,0.20)'
+          
+
+      }}
+
+    >
+
+      Generate Loadsheet PDF
+
+        </button>
+        <div style={{ marginTop: '25px' }}>
+  <h3 style={{ fontSize: '13px', color: '#8fa0b7' }}>
+    EXTRA CREW
+  </h3>
+
+  <div
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      marginTop: '10px'
+    }}
+  >
+    <button
+      onClick={() => setExtraCrew(Math.max(0, extraCrew - 1))}
+    >
+      −
+    </button>
+
+    <span>{extraCrew}</span>
+
+    <button
+      onClick={() => setExtraCrew(Math.min(4, extraCrew + 1))}
+    >
+      +
+    </button>
+  </div>
+  <div style={{ marginTop: '20px' }}>
+  <label
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+      color: '#8fa0b7',
+      fontSize: '13px',
+      fontWeight: '600',
+      cursor: 'pointer'
+    }}
+  >
+    <input
+      type="checkbox"
+      checked={Boolean(catering)}
+      onChange={(e) =>
+        setCatering(e.target.checked ? 1 : 0)
+      }
     />
+
+    CATERING
+  </label>
+</div>
+</div>
+</div>
+
+   {/*
+<CargoPanel
+  forwardCargo={forwardCargo}
+  aftCargo={aftCargo}
+/>
+*/}
   </div>
 
+</div>
 )}
 {
 
@@ -7482,22 +7796,19 @@ activeMenu !== 'Freighter'
 >
 {activeMenu === 'Dashboard' && (
 
-<div>
-  <h3>
+<div> 
+  
+<h3 style={{ display: 'none' }}>
+  FUEL PREDICTION
+</h3>
 
-    FUEL PREDICTION
+ <div style={{ display: 'none' }}>
+  TOW:
+  {tow.toFixed(0)}
+  KG
+</div>
 
-  </h3>
-
-  <div>
-
-    TOW:
-    {tow.toFixed(0)}
-    KG
-
-  </div>
-
-  <div>
+  <div style={{ display: 'none' }}>
 
     TRIP:
     -
@@ -7509,7 +7820,7 @@ activeMenu !== 'Freighter'
   <div
 
     style={{
-
+display: 'none',
       marginTop:
         '10px',
 
@@ -7528,7 +7839,7 @@ activeMenu !== 'Freighter'
 <div
 
   style={{
-
+display: 'none',
     marginTop: '20px',
 
     padding: '18px',
@@ -7849,7 +8160,7 @@ searchTaf ||
 </div>
 
 )}
-{activeMenu === 'Loadsheet' && (
+{false && activeMenu === 'Loadsheet' && (
 
   <div
 
@@ -7974,139 +8285,7 @@ searchTaf ||
       </strong>
 
     </div>
-<div
 
-style={{
-
-marginBottom:'20px'
-
-}}
-
->
-
-<h3>
-
-EXTRA CREW
-
-</h3>
-
-<div
-
-style={{
-
-display:'flex',
-
-alignItems:'center',
-
-gap:'12px'
-
-}}
-
->
-
-<button
-
-onClick={()=>
-
-setExtraCrew(
-
-Math.max(
-
-0,
-
-extraCrew-1
-
-)
-
-)
-
-}
-
->
-
-−
-
-</button>
-
-<span>
-
-{
-
-extraCrew
-
-}
-
-</span>
-
-<button
-
-onClick={()=>
-
-setExtraCrew(
-
-Math.min(
-
-4,
-
-extraCrew+1
-
-)
-
-)
-
-}
-
->
-
-+
-
-</button>
-
-</div>
-<div
-
-style={{
-
-marginTop:'15px'
-
-}}
-
->
-
-<label>
-
-<input
-
-type="checkbox"
-
-checked={catering}
-
-onChange={(e)=>
-
-setCatering(
-
-e.target.checked
-
-?
-
-1
-
-:
-
-0
-
-)
-
-}
-
-/>
-
-CATERING
-
-</label>
-
-</div>
-</div>
     <div
 
       style={{
@@ -8155,9 +8334,7 @@ CATERING
 
     >
 
-   {
-    
-activeMenu !== 'Loadsheet' && (
+   {false && activeMenu === 'Loadsheet' && (
 
 <div>
 
@@ -8200,274 +8377,20 @@ loadStatus
 }
 
     </div>
-<div style={{ marginBottom: '20px' }}>
 
 
-
-</div>
-<div style={{ marginBottom: '25px' }}>
-
-  <label>Forward Cargo (kg)</label>
-
-  <input
-
-    type="number"
-
-    value={forwardCargo === 0 ? '' : forwardCargo}
-
-    onChange={(e)=>{
-
-const value=
-
-parseInt(
-
-e.target.value
-
-)||0
-
-setForwardCargo(
-
-Math.min(
-
-value,
-
-3000
-
-)
-
-)
-
-}}
-
-    style={{
-
-      width: '100%',
-
-      padding: '12px',
-
-      marginTop: '8px',
-
-      borderRadius: '10px',
-
-      border:
-        '1px solid rgba(255,255,255,0.08)',
-
-      background:
-        'rgba(255,255,255,0.05)',
-
-      color: 'white'
-
-    }}
-
-  />
-
-</div>
-
-<div style={{ marginBottom: '30px' }}>
-
-  <label>Aft Cargo (kg)</label>
-
-  <input
-
-    type="number"
-
-    value={aftCargo === 0 ? '' : aftCargo}
-
-    onChange={(e)=>{
-
-const value=
-
-parseInt(
-
-e.target.value
-
-)||0
-
-setAftCargo(
-
-Math.min(
-
-value,
-
-5000
-
-)
-
-)
-
-}}
-
-    style={{
-
-      width: '100%',
-
-      padding: '12px',
-
-      marginTop: '8px',
-
-      borderRadius: '10px',
-
-      border:
-        '1px solid rgba(255,255,255,0.08)',
-
-      background:
-        'rgba(255,255,255,0.05)',
-
-      color: 'white'
-
-    }}
-
-  />
-<button
-  onClick={saveCurrentPassengerFlight}
+  <div
   style={{
-    padding: '16px 32px',
-    background: '#0066cc',
-    color: 'white',
-    border: '1px solid rgba(255,255,255,0.08)',
-    borderRadius: '12px',
-    fontSize: '16px',
-    cursor: 'pointer',
-    marginRight: '12px',
-    boxShadow: '0 0 25px rgba(0,102,204,0.20)'
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '12px',
+    marginTop: '20px'
   }}
 >
-  {activePassengerFlightId
-    ? 'Update Flight'
-    : 'Save Flight'}
-</button>
-</div>
-<button
-  onClick={newPassengerFlight}
-  style={{
-    padding: '16px 32px',
-    background: 'rgba(255,255,255,0.04)',
-    color: '#aeb9c8',
-    border: '1px solid rgba(255,255,255,0.12)',
-    borderRadius: '12px',
-    fontSize: '16px',
-    fontWeight: '700',
-    cursor: 'pointer',
-    marginRight: '12px',
-    letterSpacing: '0.7px'
-  }}
->
-  NEW FLIGHT
-</button>
-    <button
- onMouseEnter={(e) => {
-
-    e.target.style.transform =
-      'translateY(-3px)'
-
-    e.target.style.boxShadow =
-      '0 0 35px rgba(0,255,140,0.35)'
-
-  }}
-
-  onMouseLeave={(e) => {
-
-    e.target.style.transform =
-      'translateY(0px)'
-
-    e.target.style.boxShadow =
-      '0 0 25px rgba(0,255,140,0.20)'
-      
-
-  }}
-      onClick={() =>
-        
-
-        generateLoadsheet({
-
-          selectedAircraft,
-metarFrom: metar,
-metarTo,
-          selectedSeats,
-
-          forwardCargo,
-
-          aftCargo,
-
-          fuel,
-          taxiFuel,
-          tripFuel,
-          ldw,
-payload,
-
-          zfw,
-rw,
-          tow,
-          cg,
-crewConfiguration,
-
-catering,
-          cgStatus,
-          zfCg,
-
-toCg,
-          flightFrom,
-
-flightTo,
-
-flightNumber,
-trim,
-effectiveBasicWeight,
-
-effectiveBasicIndex,
-forwardSeats,
-midSeats,
-
-aftSeats,
-fwdAdults,
-fwdChildren,
-fwdInfants,
-
-midAdults,
-midChildren,
-midInfants,
-
-aftAdults,
-aftChildren,
-aftInfants
-        })
-
-      }
-
-      style={{
-
-        padding: '16px 32px',
-
-        background:
-          '#00aa66',
-
-        color: 'white',
-
-        border:
-          '1px solid rgba(255,255,255,0.08)',
-
-        borderRadius: '12px',
-
-        fontSize: '16px',
-
-        cursor: 'pointer',
-
-        boxShadow:
-        
-          '0 0 25px rgba(0,255,140,0.20)'
-          
-
-      }}
-
-    >
-
-      Generate Loadsheet PDF
-
-    </button>
+   
 
   </div>
-
-
+  </div>
 
 )}
 {activeMenu === 'Platform Management' && (

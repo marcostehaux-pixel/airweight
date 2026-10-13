@@ -7,7 +7,7 @@ function StatusCard(props) {
 
   const isNormal =
     props.status !== false
-
+const compact = props.compact === true
   return (
 
     <div
@@ -22,9 +22,11 @@ function StatusCard(props) {
 
       style={{
 
-        minWidth: '165px',
+        width: compact ? '145px' : '185px',
+minWidth: compact ? '145px' : '165px',
+boxSizing: 'border-box',    
 
-        padding: '20px',
+padding: compact ? '12px' : '20px',
 
         borderRadius: '16px',
 
@@ -100,7 +102,7 @@ function StatusCard(props) {
 
         style={{
 
-          fontSize: '12px',
+          fontSize: compact ? '10px' : '12px',
 
           fontWeight: '600',
 
@@ -143,7 +145,7 @@ function StatusCard(props) {
 
           style={{
 
-            fontSize: '31px',
+            fontSize: compact ? '23px' : '31px',
 
             lineHeight: '1',
 

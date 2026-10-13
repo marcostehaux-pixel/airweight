@@ -14,7 +14,9 @@ preparedBy,
 cargoMetarFrom,
 cargoMetarTo,
 basicWeight,
-
+  extraCrewCount,
+  extraCrewWeight,
+  extraCrewIndexCorrection,
     mainCargo,
 
     lowerCargo,
@@ -607,7 +609,21 @@ const balanceData = [
   }
 
 })
+// FREIGHTER - EXTRA CREW
+doc.setFont('helvetica', 'normal')
+doc.setFontSize(7)
 
+doc.text(
+  `EXTRA CREW: ${extraCrewCount ?? 0} / ${formatWeight(extraCrewWeight ?? 0)}`,
+  130,
+  211
+)
+
+doc.text(
+  `INDEX CORR: ${Number(extraCrewIndexCorrection ?? 0).toFixed(5)}`,
+  130,
+  216
+)
 
   /* ==========================================================
      LOAD CONDITION
