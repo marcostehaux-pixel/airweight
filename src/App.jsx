@@ -1,4 +1,5 @@
 import Login from './Login'
+import Landing from './Landing'
 import { getCargoFuelIndex } from './utilit/cargoFuelIndex'
 import aircraftCargoDatabase from './data/aircraftCargoDatabase'
 import {getLowerDeckIndex} from './utilit/cargoCalculator'
@@ -215,7 +216,7 @@ const cargoEditorInputStyle = {
   outline: 'none'
 }
 function App() {
-  
+  const [showLandingLogin, setShowLandingLogin] = useState(false)
 const [logged,setLogged]=useState(false)
 const [userRole, setUserRole] = useState(null)
 const [passwordRecoveryMode, setPasswordRecoveryMode] = useState(false)
@@ -2486,15 +2487,15 @@ console.log({
   aftPax,
   paxIndex
 })
-if(
+if (!logged) {
+  if (!showLandingLogin && !passwordRecoveryMode) {
+    return (
+      <Landing onSignIn={() => setShowLandingLogin(true)} />
+    )
+  }
 
-!logged
-
-){
-
-return(
-
-<Login
+  return (
+    <Login
   passwordRecoveryMode={passwordRecoveryMode}
   onLogin={(role, userData) => {
     setUserRole(role)
