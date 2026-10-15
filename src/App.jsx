@@ -1,5 +1,6 @@
 import Login from './Login'
 import Landing from './Landing'
+import FlightPlanning from './FlightPlanning.jsx';
 import { getCargoFuelIndex } from './utilit/cargoFuelIndex'
 import aircraftCargoDatabase from './data/aircraftCargoDatabase'
 import {getLowerDeckIndex} from './utilit/cargoCalculator'
@@ -3172,6 +3173,44 @@ return (
       Passenger
     </div>
   )}
+
+
+
+{/* FLIGHT PLANNING — TRAINING */}
+
+{(
+  userRole === 'student' ||
+  userRole === 'super_admin'
+) && (
+  <div
+    onClick={() => setActiveMenu('Flight Planning')}
+    style={{
+      marginBottom: '10px',
+      padding: '12px 15px',
+      borderRadius: '9px',
+      background:
+        activeMenu === 'Flight Planning'
+          ? 'rgba(21,101,255,0.16)'
+          : 'transparent',
+      border:
+        activeMenu === 'Flight Planning'
+          ? '1px solid rgba(21,101,255,0.40)'
+          : '1px solid transparent',
+      color:
+        activeMenu === 'Flight Planning'
+          ? '#ffffff'
+          : '#b9c4d3',
+      fontWeight:
+        activeMenu === 'Flight Planning'
+          ? '700'
+          : '500',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease'
+    }}
+  >
+    Flight Planning
+  </div>
+)}
 
 
  {/* FLIGHT RECORDS */}
@@ -13959,6 +13998,19 @@ await refreshCargoFleet()
   
 )}
 
+{/* FLIGHT PLANNING — TRAINING ONLY */}
+
+{(
+  userRole === 'student' ||
+  userRole === 'super_admin'
+) &&
+  activeMenu === 'Flight Planning' && (
+    <FlightPlanning
+  passengerAircraft={passengerAircraftFleet}
+  cargoAircraft={cargoAircraftFleet}
+/>
+)}
+
 {(
   userRole === 'passenger' ||
   userRole === 'freighter' ||
@@ -14057,6 +14109,7 @@ await refreshCargoFleet()
       </div>
 
     )}
+
 
     {/* FLIGHT RECORDS */}
 
@@ -14418,6 +14471,7 @@ await refreshCargoFleet()
                   '1px solid rgba(255,255,255,0.06)'
               }}
             >
+
 
               <button
                 onClick={() => {
