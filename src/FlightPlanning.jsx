@@ -1,6 +1,18 @@
-
 import React from 'react';
-import { calculateAirDistance } from './flightPlanningengine.js';
+
+import {
+  calculateAirDistance,
+  calculateTripFuel,
+  calculateLRCTrip,
+  calculateAlternateFuel,
+  calculateContingencyFuel,
+  calculateIterativeHoldingFuel,
+  calculateFuelDistribution
+} from './flightPlanningEngine.js';
+import FuelPlanningSummary from './FuelPlanningSummary.jsx';
+import TrainingOFP from './TrainingOFP.jsx';
+import { findTrainingRoute } from "./trainingroutes.js";
+
 export default function FlightPlanning({
   passengerAircraft = [],
   cargoAircraft = []
@@ -15,11 +27,135 @@ const [zfw, setZfw] = React.useState('');
 const [cruiseLevel, setCruiseLevel] = React.useState('');
 const [averageWind, setAverageWind] = React.useState('');
 const [routeDistance, setRouteDistance] = React.useState('');
+const [alternateDistance, setAlternateDistance] = React.useState('');
+const [alternateGroundSpeed, setAlternateGroundSpeed] =
+  React.useState('');
+
+const [alternateFuelFlow, setAlternateFuelFlow] =
+  React.useState('');
+  // OPERDAT TRAINING
+// Alternate Holding Configuration
+
+const [alternateHoldingTime, setAlternateHoldingTime] =
+  React.useState('30');
+// OPERDAT TRAINING
+// Taxi / APU Fuel (kg)
+
+const [taxiFuel, setTaxiFuel] = React.useState('');
+// OPERDAT TRAINING
+// Extra / Tankering Fuel (kg)
+
+const [extraFuel, setExtraFuel] = React.useState('');
+// OPERDAT TRAINING
+// Tankering Fuel (kg)
+
+const [tankeringFuel, setTankeringFuel] = React.useState('');
+const [alternateHoldingAltitude, setAlternateHoldingAltitude] =
+  React.useState('1500');
+  
+
+const selectedTrainingRoute = findTrainingRoute(
+  departure,
+  destination,
+  "B738"
+);
+
+
+
 const airDistanceResult =
-  routeDistance !== '' && averageWind !== ''
+  selectedTrainingRoute?.distanceNM != null &&
+  averageWind !== ''
     ? calculateAirDistance({
-        groundDistance: routeDistance,
-        averageWind
+        groundDistance: selectedTrainingRoute.distanceNM,
+        averageWind: Number(averageWind)
+      })
+    : null;
+
+    const tripFuelResult = airDistanceResult
+  ? calculateTripFuel({
+      estimatedTimeHours:
+        airDistanceResult.estimatedTimeHours
+    })
+  : null;
+  const lrcTripResult =
+  airDistanceResult && cruiseLevel !== ''
+    ? calculateLRCTrip({
+        airDistance: airDistanceResult.airDistance,
+        cruiseLevel
+      })
+    : null;
+    // OPERDAT TRAINING
+// Preliminary alternate fuel estimate
+// NOT FOR OPERATIONAL USE
+
+
+
+const selectedAlternateRoute = findTrainingRoute(
+  destination,
+  alternate,
+  "B738"
+);
+
+
+
+const alternateFuelResult =
+  selectedAlternateRoute?.distanceNM != null &&
+  alternateGroundSpeed !== ''
+    ? calculateAlternateFuel({
+        alternateDistance: selectedAlternateRoute.distanceNM,
+        averageGroundSpeed: Number(alternateGroundSpeed),
+        alternateFuelFlow: 2500
+      })
+    : null;
+
+
+    // Preliminary contingency fuel
+// Percentage only — holding comparison pending
+
+const preliminaryContingencyResult =
+  lrcTripResult
+    ? calculateContingencyFuel({
+        tripFuel: lrcTripResult.referenceTripFuel,
+        contingencyPercent: 5
+      })
+    : null;
+    const preliminaryHoldingResult =
+  zfw !== '' &&
+  preliminaryContingencyResult?.contingencyFuel != null
+    ? calculateIterativeHoldingFuel({
+        zeroFuelWeight: Number(zfw),
+        remainingReserveFuel:
+  preliminaryContingencyResult.contingencyFuel +
+  (extraFuel !== '' && Number(extraFuel) >= 0
+    ? Number(extraFuel)
+    : 0) +
+  (tankeringFuel !== '' && Number(tankeringFuel) >= 0
+    ? Number(tankeringFuel)
+    : 0),
+        holdingMinutes: Number(alternateHoldingTime),
+        pressureAltitude: 1500
+      })
+    : null;
+    // OPERDAT TRAINING
+// Preliminary Fuel Distribution
+
+const preliminaryFuelDistribution =
+  lrcTripResult?.referenceTripFuel != null &&
+  preliminaryContingencyResult?.contingencyFuel != null &&
+  alternateFuelResult?.alternateFuel != null &&
+  preliminaryHoldingResult?.holdingFuel != null &&
+  taxiFuel !== '' &&
+  extraFuel !== '' &&
+  tankeringFuel !== ''
+    ? calculateFuelDistribution({
+        tripFuel: lrcTripResult.referenceTripFuel,
+        contingencyFuel:
+          preliminaryContingencyResult.contingencyFuel,
+        alternateFuel: alternateFuelResult.alternateFuel,
+        holdingFuel: preliminaryHoldingResult.holdingFuel,
+        taxiFuel: Number(taxiFuel),
+        extraFuel:
+          Number(extraFuel) + Number(tankeringFuel)
       })
     : null;
   const aircraftOptions = [
@@ -281,9 +417,9 @@ const airDistanceResult =
     type="number"
     min="1"
     step="1"
-    value={routeDistance}
-    onChange={e => setRouteDistance(e.target.value)}
-    placeholder="Enter planned distance"
+value={selectedTrainingRoute?.distanceNM ?? ''}
+readOnly
+    placeholder="Select departure and destination"
     style={{
       width: '100%',
       maxWidth: '260px',
@@ -296,7 +432,260 @@ const airDistanceResult =
     }}
   />
 </div>
+{/* ALTERNATE ROUTE DISTANCE */}
 
+<div style={{ marginBottom: '24px' }}>
+  <label
+    htmlFor="training-alternate-distance"
+    style={{
+      display: 'block',
+      marginBottom: '8px',
+      color: '#b9c4d3'
+    }}
+  >
+    Alternate Route Distance (NM)
+  </label>
+
+  <input
+    id="training-alternate-distance"
+    type="number"
+    min="1"
+    step="1"
+    
+value={selectedAlternateRoute?.distanceNM ?? ''}
+readOnly
+
+    placeholder="Select destination and alternate"
+    style={{
+      width: '100%',
+      maxWidth: '260px',
+      boxSizing: 'border-box',
+      padding: '12px',
+      borderRadius: '8px',
+      background: '#17243a',
+      color: '#ffffff',
+      border: '1px solid #43536b'
+    }}
+  />
+</div>
+{/* ALTERNATE FLIGHT PARAMETERS */}
+
+<div
+  style={{
+    display: 'grid',
+    gridTemplateColumns:
+      'repeat(auto-fit, minmax(190px, 1fr))',
+    gap: '16px',
+    marginBottom: '24px'
+  }}
+>
+  {[
+    {
+      label: 'Alternate Average Ground Speed (kt)',
+      value: alternateGroundSpeed,
+      setter: setAlternateGroundSpeed
+    },
+    
+  ].map(field => (
+    <div key={field.label}>
+      <label
+        style={{
+          display: 'block',
+          marginBottom: '8px',
+          color: '#b9c4d3'
+        }}
+      >
+        {field.label}
+      </label>
+
+      
+{field.label === 'Alternate Average Ground Speed (kt)' ? (
+  <select
+    value={field.value}
+    onChange={e => field.setter(e.target.value)}
+    style={{
+      width: '100%',
+      boxSizing: 'border-box',
+      padding: '12px',
+      borderRadius: '8px',
+      background: '#17243a',
+      color: '#ffffff',
+      border: '1px solid #43536b'
+    }}
+  >
+    <option value="">Select Ground Speed</option>
+    <option value="350">350 KT</option>
+    <option value="400">400 KT</option>
+  </select>
+) : (
+  <input
+    type="number"
+    min="1"
+    step="1"
+    value={field.value}
+    onChange={e => field.setter(e.target.value)}
+    placeholder="Training estimate"
+    style={{
+      width: '100%',
+      boxSizing: 'border-box',
+      padding: '12px',
+      borderRadius: '8px',
+      background: '#17243a',
+      color: '#ffffff',
+      border: '1px solid #43536b'
+    }}
+  />
+)}
+
+    </div>
+  ))}
+</div>
+
+{/* ALTERNATE HOLDING CONFIGURATION */}
+
+<div
+  style={{
+    display: 'grid',
+    gridTemplateColumns:
+      'repeat(auto-fit, minmax(190px, 1fr))',
+    gap: '16px',
+    marginBottom: '24px'
+  }}
+>
+  <div>
+    <label
+      htmlFor="alternate-holding-time"
+      style={{
+        display: 'block',
+        marginBottom: '8px',
+        color: '#b9c4d3'
+      }}
+    >
+      Alternate Holding Time (min)
+    </label>
+
+    <select
+      id="alternate-holding-time"
+      value={alternateHoldingTime}
+      onChange={e =>
+        setAlternateHoldingTime(e.target.value)
+      }
+      style={{
+        width: '100%',
+        boxSizing: 'border-box',
+        padding: '12px',
+        borderRadius: '8px',
+        background: '#17243a',
+        color: '#ffffff',
+        border: '1px solid #43536b'
+      }}
+    >
+      <option value="">Select Holding Time</option>
+      <option value="15">15 minutes</option>
+      <option value="30">30 minutes</option>
+    </select>
+  </div>
+</div>
+
+  {/* OPERDAT TRAINING — TAXI / APU FUEL */}
+
+<div>
+  <label
+    htmlFor="taxi-fuel"
+    style={{
+      display: 'block',
+      marginBottom: '8px',
+      color: '#b9c4d3'
+    }}
+  >
+    Taxi / APU Fuel (kg)
+  </label>
+
+  <input
+    id="taxi-fuel"
+    type="number"
+    min="0"
+    step="1"
+    value={taxiFuel}
+    onChange={e => setTaxiFuel(e.target.value)}
+    placeholder="Enter Taxi / APU Fuel"
+    style={{
+      width: '100%',
+      boxSizing: 'border-box',
+      padding: '12px',
+      borderRadius: '8px',
+      background: '#17243a',
+      color: '#ffffff',
+      border: '1px solid #43536b'
+    }}
+  />
+</div>
+{/* OPERDAT TRAINING — EXTRA FUEL */}
+
+<div>
+  <label
+    htmlFor="extra-fuel"
+    style={{
+      display: 'block',
+      marginBottom: '8px',
+      color: '#b9c4d3'
+    }}
+  >
+    Extra Fuel (kg)
+  </label>
+
+  <input
+    id="extra-fuel"
+    type="number"
+    min="0"
+    step="1"
+    value={extraFuel}
+    onChange={e => setExtraFuel(e.target.value)}
+    placeholder="Enter Extra Fuel"
+    style={{
+      width: '100%',
+      boxSizing: 'border-box',
+      padding: '12px',
+      borderRadius: '8px',
+      background: '#17243a',
+      color: '#ffffff',
+      border: '1px solid #43536b'
+    }}
+  />
+</div>
+{/* OPERDAT TRAINING — TANKERING FUEL */}
+
+<div>
+  <label
+    htmlFor="tankering-fuel"
+    style={{
+      display: 'block',
+      marginBottom: '8px',
+      color: '#b9c4d3'
+    }}
+  >
+    Tankering Fuel (kg)
+  </label>
+
+  <input
+    id="tankering-fuel"
+    type="number"
+    min="0"
+    step="1"
+    value={tankeringFuel}
+    onChange={e => setTankeringFuel(e.target.value)}
+    placeholder="Enter Tankering Fuel"
+    style={{
+      width: '100%',
+      boxSizing: 'border-box',
+      padding: '12px',
+      borderRadius: '8px',
+      background: '#17243a',
+      color: '#ffffff',
+      border: '1px solid #43536b'
+    }}
+  />
+</div>
 <h3 style={{ marginTop: '26px', marginBottom: '16px' }}>
   Flight Performance
 </h3>
@@ -416,9 +805,21 @@ const airDistanceResult =
     >
       Positive = Tailwind / Negative = Headwind
     </div>
-    
+  </div>
+</div>
 {/* SIMULATED AIR DISTANCE */}
 
+{/* FIRST ROW — FLIGHT AND ALTERNATE ESTIMATES */}
+<div
+  style={{
+    display: 'grid',
+    gridTemplateColumns:
+      'repeat(2, minmax(0, 1fr))',
+    gap: '20px',
+    alignItems: 'start',
+    marginTop: '20px'
+  }}
+>
 {airDistanceResult && (
   <div
     style={{
@@ -468,6 +869,65 @@ const airDistanceResult =
           {airDistanceResult.airDistance.toLocaleString()} NM
         </strong>
       </div>
+      <div>
+  <div style={{ color: '#b9c4d3' }}>
+    Estimated Ground Speed
+  </div>
+  <strong>
+    {airDistanceResult.estimatedGroundSpeed.toFixed(0)} kt
+  </strong>
+</div>
+
+<div>
+  <div style={{ color: '#b9c4d3' }}>
+    Estimated Trip Time
+  </div>
+  <strong>
+    {Math.floor(airDistanceResult.estimatedTimeHours)} h{' '}
+    {String(
+      Math.round(
+        (airDistanceResult.estimatedTimeHours % 1) * 60
+      )
+    ).padStart(2, '0')} min
+  </strong>
+</div> 
+{tripFuelResult && (
+  <div>
+    <div style={{ color: '#b9c4d3' }}>
+      Estimated Trip Fuel
+    </div>
+    <strong>
+      {tripFuelResult.tripFuel.toLocaleString()} kg
+    </strong>
+  </div>
+  
+)}
+{lrcTripResult && (
+  <>
+    <div>
+      <div style={{ color: '#b9c4d3' }}>
+        LRC Reference Trip Fuel
+      </div>
+      <strong>
+        {lrcTripResult.referenceTripFuel.toLocaleString()} kg
+      </strong>
+    </div>
+
+    <div>
+      <div style={{ color: '#b9c4d3' }}>
+        LRC Reference Trip Time
+      </div>
+      <strong>
+        {Math.floor(lrcTripResult.referenceTripTimeMinutes / 60)} h{' '}
+        {String(
+          lrcTripResult.referenceTripTimeMinutes % 60
+        ).padStart(2, '0')} min
+      </strong>
+    </div>
+    
+  </>
+  
+)}
     </div>
 
     <p
@@ -483,21 +943,153 @@ const airDistanceResult =
     </p>
   </div>
 )}
+{/* ALTERNATE FUEL ESTIMATES */}
 
-  </div>
+{alternateFuelResult && (
+  <div
+    style={{
+      marginTop: '12px',
+      marginBottom: '24px',
+      padding: '20px',
+      borderRadius: '10px',
+      background: 'rgba(21,101,255,0.10)',
+      border: '1px solid rgba(21,101,255,0.35)'
+    }}
+  >
+    <h3 style={{ marginTop: 0 }}>
+      Alternate Fuel Estimates
+    </h3>
+
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns:
+          'repeat(auto-fit, minmax(160px, 1fr))',
+        gap: '16px'
+      }}
+    >
+      <div>
+        <div style={{ color: '#b9c4d3' }}>
+          Alternate Distance
+        </div>
+        <strong>
+          {alternateFuelResult.alternateDistance.toLocaleString()} NM
+        </strong>
+      </div>
+
+      <div>
+        <div style={{ color: '#b9c4d3' }}>
+          Average Ground Speed
+        </div>
+        <strong>
+          {Number(alternateGroundSpeed).toLocaleString()} kt
+        </strong>
+      </div>
+
+      <div>
+        <div style={{ color: '#b9c4d3' }}>
+          Alternate Flight Time
+        </div>
+        <strong>
+          {alternateFuelResult.alternateTimeMinutes} min
+        </strong>
+      </div>
+
+      <div>
+        <div style={{ color: '#b9c4d3' }}>
+          ALTN FUEL
+        </div>
+        <strong>
+          {alternateFuelResult.alternateFuel.toLocaleString()} kg
+        </strong>
+      </div>
+      
+    </div>
+
+    <p
+      style={{
+        marginBottom: 0,
+        marginTop: '16px',
+        fontSize: '12px',
+        color: '#8ca9d8'
+      }}
+    >
+      Preliminary alternate fuel estimate.
+      Simplified training model — not for operational use.
+    </p>
+   </div>
+
+)}
+
+{/* END FIRST ROW */}
 </div>
 
+{/* OPERDAT TRAINING — DISPATCH FUEL SUMMARY */}
 
-        <p style={{ color: '#b9c4d3' }}>
-          Status: Simulator under development
-        </p>
+<FuelPlanningSummary
+  tripFuel={lrcTripResult?.referenceTripFuel ?? null}
+  tripTimeMinutes={lrcTripResult?.referenceTripTimeMinutes ?? null}
+  contingencyFuel={
+    preliminaryContingencyResult?.contingencyFuel ?? null
+  }
+  alternateFuel={alternateFuelResult?.alternateFuel ?? null}
+  alternateTimeMinutes={
+    alternateFuelResult?.alternateTimeMinutes ?? null
+  }
+  holdingFuel={preliminaryHoldingResult?.holdingFuel ?? null}
+  holdingTimeMinutes={
+  preliminaryHoldingResult
+    ? Number(alternateHoldingTime)
+    : null
+}
+taxiFuel={
+  taxiFuel !== '' && Number.isFinite(Number(taxiFuel))
+    && Number(taxiFuel) >= 0
+    ? Number(taxiFuel)
+    : null
+}
+extraFuel={
+  extraFuel !== '' &&
+  Number.isFinite(Number(extraFuel)) &&
+  Number(extraFuel) >= 0
+    ? Number(extraFuel)
+    : null
+}
 
-        <p style={{ color: '#8ca9d8' }}>
-          Route selection, weather conditions,
-          fuel planning and simulated flight plan
-          generation will be added progressively.
-        </p>
-      </div>
-    </div>
-  );
+tankeringFuel={
+  tankeringFuel !== '' &&
+  Number.isFinite(Number(tankeringFuel)) &&
+  Number(tankeringFuel) >= 0
+    ? Number(tankeringFuel)
+    : null
+}
+requiredFuel={
+  preliminaryFuelDistribution?.requiredFuel ?? null
+}
+
+totalFuel={
+  preliminaryFuelDistribution?.totalFuel ?? null
+}
+takeoffFuel={
+  preliminaryFuelDistribution?.takeoffFuel ?? null
+}
+/>
+{/* OPERDAT TRAINING — OFP PREVIEW */}
+<div style={{ marginTop: '30px' }}>
+  <TrainingOFP />
+</div>
+
+<p style={{ color: '#b9c4d3' }}>
+  Status: Simulator under development
+</p>
+
+<p style={{ color: '#8ca9d8' }}>
+  Route selection, weather conditions,
+  fuel planning and simulated flight plan
+  generation will be added progressively.
+</p>
+</div>
+
+</div>
+);
 }
