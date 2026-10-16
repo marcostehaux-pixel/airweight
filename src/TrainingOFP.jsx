@@ -1,11 +1,52 @@
-
 import React from "react";
 
-export default function TrainingOFP() {
+export default function TrainingOFP({
+  flightNumber = "—",
+  registration = "—",
+  origin = "—",
+  destination = "—",
+  alternate = "—",
+  ezfw = null,
+  cruiseLevel = "—",
+  averageWind = null,
+  groundDistance = null,
+  alternateDistance = null,
+
+  tripFuel = null,
+  contingencyFuel = null,
+  alternateFuel = null,
+  holdingFuel = null,
+  taxiFuel = null,
+  extraFuel = null,
+  tankeringFuel = null,
+
+  requiredFuel = null,
+  totalFuel = null,
+  takeoffFuel = null,
+  airDistance = null,
+estimatedTimeHours = null
+}) {
+  const nowUTC = new Date();
+
+  const dateUTC = nowUTC.toLocaleDateString("en-GB", {
+    timeZone: "UTC",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+
+  const timeUTC = nowUTC.toLocaleTimeString("en-GB", {
+    timeZone: "UTC",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
   return (
-    <section
-      style={{
-        background: "#ffffff",
+  <section
+    id="operdat-training-ofp"
+    style={{
+      background: "#ffffff",
         color: "#17212b",
         padding: "24px",
         border: "1px solid #d5dbe3",
@@ -28,8 +69,8 @@ export default function TrainingOFP() {
         </div>
 
         <div style={{ textAlign: "right", fontSize: "12px" }}>
-          <div>DATE UTC: --/--/----</div>
-          <div>TIME UTC: --:--</div>
+          <div>DATE UTC: {dateUTC}</div>
+<div>TIME UTC: {timeUTC}</div>
         </div>
       </header>
 
@@ -54,17 +95,28 @@ export default function TrainingOFP() {
             fontSize: "12px",
           }}
         >
-          <div><strong>FLIGHT:</strong> —</div>
-          <div><strong>AIRCRAFT:</strong> B737-800</div>
-          <div><strong>REGISTRATION:</strong> —</div>
+          <div><strong>FROM:</strong> {origin}</div>
+<div><strong>TO:</strong> {destination}</div>
+<div><strong>ALTERNATE:</strong> {alternate}</div>
+<div>
+  <strong>FLIGHT:</strong> {flightNumber || "—"}
+</div>
+<div>
+  <strong>REGISTRATION:</strong> {registration || "—"}
+</div>
+<div>
+  <strong>EZFW:</strong>{" "}
+  {ezfw != null ? `${Number(ezfw).toLocaleString()} KG` : "—"}
+</div>
 
-          <div><strong>FROM:</strong> SAAR</div>
-          <div><strong>TO:</strong> SBGL</div>
-          <div><strong>ALTERNATE:</strong> SBKP</div>
+<div>
+  <strong>CRUISE LEVEL:</strong> {cruiseLevel}
+</div>
 
-          <div><strong>EZFW:</strong> 56000 KG</div>
-          <div><strong>CRUISE LEVEL:</strong> FL370</div>
-          <div><strong>AVG WIND:</strong> 0 KT</div>
+<div>
+  <strong>AVG WIND:</strong>{" "}
+  {averageWind != null ? `${averageWind} KT` : "—"}
+</div>
         </div>
       </div>
 
@@ -83,23 +135,30 @@ export default function TrainingOFP() {
         </h3>
 
         <div style={{ fontSize: "12px", lineHeight: "1.9" }}>
-          <div>
-            <strong>MAIN ROUTE:</strong> SAAR → SBGL
-          </div>
+  <div>
+    <strong>MAIN ROUTE:</strong> {origin} → {destination}
+  </div>
 
-          <div>
-            <strong>PLANNED DISTANCE:</strong> 1195 NM
-          </div>
+  <div>
+    <strong>PLANNED DISTANCE:</strong>{" "}
+    {groundDistance != null
+      ? `${Number(groundDistance).toLocaleString()} NM`
+      : "—"}
+  </div>
 
-          <div>
-            <strong>ALTERNATE ROUTE:</strong> SBGL → SBKP
-          </div>
+  <div>
+    <strong>ALTERNATE ROUTE:</strong> {destination} → {alternate}
+  </div>
 
-          <div>
-            <strong>ALTERNATE DISTANCE:</strong> 319 NM
-          </div>
-        </div>
-        
+  <div>
+    <strong>ALTERNATE DISTANCE:</strong>{" "}
+    {alternateDistance != null
+      ? `${Number(alternateDistance).toLocaleString()} NM`
+      : "—"}
+  </div>
+</div>
+      </div>
+
       {/* FUEL PLANNING */}
       <div style={{ marginTop: "16px", marginBottom: "16px" }}>
         <h3
@@ -115,15 +174,15 @@ export default function TrainingOFP() {
         </h3>
 
         <div style={{ fontSize: "12px", lineHeight: "1.9" }}>
-          {[
-            ["TRIP FUEL", "—"],
-            ["CONTINGENCY FUEL", "—"],
-            ["ALTERNATE FUEL", "—"],
-            ["HOLDING FUEL", "—"],
-            ["TAXI / APU FUEL", "—"],
-            ["EXTRA FUEL", "—"],
-            ["TANKERING FUEL", "—"],
-          ].map(([label, value]) => (
+         {[
+  ["TRIP FUEL", tripFuel],
+  ["CONTINGENCY FUEL", contingencyFuel],
+  ["ALTERNATE FUEL", alternateFuel],
+  ["HOLDING FUEL", holdingFuel],
+  ["TAXI / APU FUEL", taxiFuel],
+  ["EXTRA FUEL", extraFuel],
+  ["TANKERING FUEL", tankeringFuel],
+].map(([label, value]) => (
             <div
               key={label}
               style={{
@@ -134,11 +193,18 @@ export default function TrainingOFP() {
               }}
             >
               <span>{label}</span>
-              <strong>{value}</strong>
+              <strong>
+  {value != null && Number.isFinite(Number(value))
+    ? `${Number(value).toLocaleString("en-US", {
+        maximumFractionDigits: 0,
+      })} KG`
+    : "—"}
+</strong>
             </div>
-          ))}
+                   ))}
         </div>
-        
+      </div>
+
       {/* FUEL SUMMARY */}
       <div style={{ marginTop: "16px", marginBottom: "16px" }}>
         <h3
@@ -154,10 +220,10 @@ export default function TrainingOFP() {
         </h3>
 
         {[
-          ["REQUIRED FUEL", "—"],
-          ["TOTAL FUEL", "—"],
-          ["TAKEOFF FUEL", "—"],
-        ].map(([label, value]) => (
+  ["REQUIRED FUEL", requiredFuel],
+  ["TOTAL FUEL", totalFuel],
+  ["TAKEOFF FUEL", takeoffFuel],
+].map(([label, value]) => (
           <div
             key={label}
             style={{
@@ -174,7 +240,13 @@ export default function TrainingOFP() {
             }}
           >
             <span>{label}</span>
-            <span>{value}</span>
+            <span>
+  {value != null && Number.isFinite(Number(value))
+    ? `${Number(value).toLocaleString("en-US", {
+        maximumFractionDigits: 0,
+      })} KG`
+    : "—"}
+</span>
           </div>
         ))}
       </div>
@@ -201,13 +273,42 @@ export default function TrainingOFP() {
             fontSize: "12px",
           }}
         >
-          <div><strong>EZFW:</strong> — KG</div>
-          <div><strong>CRUISE LEVEL:</strong> —</div>
-          <div><strong>AVG WIND:</strong> — KT</div>
+         <div>
+  <strong>EZFW:</strong>{" "}
+  {ezfw != null ? `${Number(ezfw).toLocaleString("en-US")} KG` : "—"}
+</div>
 
-          <div><strong>AIR DISTANCE:</strong> — NM</div>
-          <div><strong>GROUND DISTANCE:</strong> — NM</div>
-          <div><strong>EST. FLIGHT TIME:</strong> —</div>
+<div>
+  <strong>CRUISE LEVEL:</strong> {cruiseLevel || "—"}
+</div>
+
+<div>
+  <strong>AVG WIND:</strong>{" "}
+  {averageWind != null ? `${averageWind} KT` : "—"}
+</div>
+
+<div>
+  <strong>AIR DISTANCE:</strong>{" "}
+  {airDistance != null
+    ? `${Number(airDistance).toLocaleString("en-US")} NM`
+    : "—"}
+</div>
+
+<div>
+  <strong>GROUND DISTANCE:</strong>{" "}
+  {groundDistance != null
+    ? `${Number(groundDistance).toLocaleString("en-US")} NM`
+    : "—"}
+</div>
+
+<div>
+  <strong>EST. FLIGHT TIME:</strong>{" "}
+  {estimatedTimeHours != null
+    ? `${Math.floor(estimatedTimeHours)} h ${String(
+        Math.round((estimatedTimeHours % 1) * 60)
+      ).padStart(2, "0")} min`
+    : "—"}
+</div>
         </div>
       </div>
 
@@ -257,11 +358,7 @@ export default function TrainingOFP() {
           OPERDAT TRAINING — SIMULATED DOCUMENT
         </div>
         <div>NOT VALID FOR FLIGHT OPERATIONS</div>
-      </footer>
-
-      </div>
-
-      </div>
+           </footer>
 
       <p
         style={{

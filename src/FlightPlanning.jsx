@@ -12,7 +12,8 @@ import {
 import FuelPlanningSummary from './FuelPlanningSummary.jsx';
 import TrainingOFP from './TrainingOFP.jsx';
 import { findTrainingRoute } from "./trainingroutes.js";
-
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
 export default function FlightPlanning({
   passengerAircraft = [],
   cargoAircraft = []
@@ -181,7 +182,71 @@ const preliminaryFuelDistribution =
     aircraft =>
       aircraft.registration === selectedRegistration
   );
+const generateOFPPDF = async () => {
+  const element = document.getElementById("operdat-training-ofp");
 
+  if (!element) {
+    alert("OPERDAT OFP document not found.");
+    return;
+  }
+
+  try {
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      backgroundColor: "#ffffff",
+      useCORS: true,
+      logging: false,
+    });
+
+    const imageData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
+
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    const margin = 10;
+    const usableWidth = pageWidth - margin * 2;
+    const usableHeight = pageHeight - margin * 2;
+
+    const imageHeight =
+      (canvas.height * usableWidth) / canvas.width;
+
+    let remainingHeight = imageHeight;
+    let offset = 0;
+
+    while (remainingHeight > 0) {
+      if (offset > 0) {
+        pdf.addPage();
+      }
+
+      pdf.addImage(
+        imageData,
+        "PNG",
+        margin,
+        margin - offset,
+        usableWidth,
+        imageHeight
+      );
+
+      remainingHeight -= usableHeight;
+      offset += usableHeight;
+    }
+
+    const safeFlightNumber =
+      flightNumber.trim().replace(/[^a-zA-Z0-9_-]/g, "") ||
+      "TRAINING";
+
+    pdf.save(`OPERDAT_OFP_${safeFlightNumber}.pdf`);
+  } catch (error) {
+    console.error("OFP PDF generation error:", error);
+    alert("Unable to generate OPERDAT OFP PDF.");
+  }
+};
   return (
     <div
       style={{
@@ -1076,7 +1141,80 @@ takeoffFuel={
 />
 {/* OPERDAT TRAINING — OFP PREVIEW */}
 <div style={{ marginTop: '30px' }}>
-  <TrainingOFP />
+  <TrainingOFP
+    origin={departure}
+    destination={destination}
+    alternate={alternate}
+    flightNumber={flightNumber}
+    registration={selectedRegistration}
+    ezfw={zfw === '' ? null : Number(zfw)}
+    cruiseLevel={cruiseLevel}
+    averageWind={averageWind === '' ? null : Number(averageWind)}
+    groundDistance={airDistanceResult?.groundDistance ?? null}
+    alternateDistance={alternateFuelResult?.alternateDistance ?? null}
+
+    tripFuel={lrcTripResult?.referenceTripFuel ?? null}
+    contingencyFuel={
+      preliminaryContingencyResult?.contingencyFuel ?? null
+    }
+    alternateFuel={alternateFuelResult?.alternateFuel ?? null}
+    holdingFuel={preliminaryHoldingResult?.holdingFuel ?? null}
+
+    taxiFuel={
+      taxiFuel !== '' &&
+      Number.isFinite(Number(taxiFuel)) &&
+      Number(taxiFuel) >= 0
+        ? Number(taxiFuel)
+        : null
+    }
+
+    extraFuel={
+      extraFuel !== '' &&
+      Number.isFinite(Number(extraFuel)) &&
+      Number(extraFuel) >= 0
+        ? Number(extraFuel)
+        : null
+    }
+
+    tankeringFuel={
+      tankeringFuel !== '' &&
+      Number.isFinite(Number(tankeringFuel)) &&
+      Number(tankeringFuel) >= 0
+        ? Number(tankeringFuel)
+        : null
+    }
+    requiredFuel={
+  preliminaryFuelDistribution?.requiredFuel ?? null
+}
+totalFuel={
+  preliminaryFuelDistribution?.totalFuel ?? null
+}
+takeoffFuel={
+  preliminaryFuelDistribution?.takeoffFuel ?? null
+}
+airDistance={airDistanceResult?.airDistance ?? null}
+estimatedTimeHours={airDistanceResult?.estimatedTimeHours ?? null}
+   />
+</div>
+
+{/* OPERDAT TRAINING — PDF EXPORT */}
+<div style={{ marginTop: '20px', marginBottom: '24px' }}>
+  <button
+    type="button"
+    onClick={generateOFPPDF}
+    style={{
+      padding: '14px 24px',
+      background: '#1565ff',
+      color: '#ffffff',
+      border: 'none',
+      borderRadius: '8px',
+      fontSize: '14px',
+      fontWeight: 'bold',
+      cursor: 'pointer'
+    }}
+  >
+    Generate OFP PDF
+  </button>
 </div>
 
 <p style={{ color: '#b9c4d3' }}>
