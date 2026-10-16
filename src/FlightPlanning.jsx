@@ -20,6 +20,8 @@ export default function FlightPlanning({
 }) {
   const [selectedRegistration, setSelectedRegistration] =
     React.useState('');
+    // OPERDAT TRAINING — GENERATED OFP
+const [generatedOFP, setGeneratedOFP] = React.useState(null);
 const [flightNumber, setFlightNumber] = React.useState('');
 const [departure, setDeparture] = React.useState('');
 const [destination, setDestination] = React.useState('');
@@ -182,6 +184,121 @@ const preliminaryFuelDistribution =
     aircraft =>
       aircraft.registration === selectedRegistration
   );
+  // OPERDAT TRAINING — OFP DISPLAY DATA
+const ofpDisplayData = generatedOFP ?? {
+  flightNumber,
+  registration: selectedRegistration,
+  origin: departure,
+  destination,
+  alternate,
+  ezfw: zfw === '' ? null : Number(zfw),
+  cruiseLevel,
+  averageWind: averageWind === '' ? null : Number(averageWind),
+
+  groundDistance: airDistanceResult?.groundDistance ?? null,
+  alternateDistance: alternateFuelResult?.alternateDistance ?? null,
+  airDistance: airDistanceResult?.airDistance ?? null,
+  estimatedTimeHours: airDistanceResult?.estimatedTimeHours ?? null,
+
+  tripFuel: lrcTripResult?.referenceTripFuel ?? null,
+  contingencyFuel: preliminaryContingencyResult?.contingencyFuel ?? null,
+  alternateFuel: alternateFuelResult?.alternateFuel ?? null,
+  holdingFuel: preliminaryHoldingResult?.holdingFuel ?? null,
+
+  taxiFuel: taxiFuel === '' ? null : Number(taxiFuel),
+  extraFuel: extraFuel === '' ? null : Number(extraFuel),
+  tankeringFuel: tankeringFuel === '' ? null : Number(tankeringFuel),
+
+  requiredFuel: preliminaryFuelDistribution?.requiredFuel ?? null,
+  totalFuel: preliminaryFuelDistribution?.totalFuel ?? null,
+  takeoffFuel: preliminaryFuelDistribution?.takeoffFuel ?? null,
+};
+// OPERDAT TRAINING — NEW FLIGHT
+const startNewFlight = () => {
+  // Clear generated OFP
+  setGeneratedOFP(null);
+
+  // Flight identification
+  setFlightNumber('');
+  setSelectedRegistration('');
+
+  // Route
+  setDeparture('');
+  setDestination('');
+  setAlternate('');
+
+  // Flight planning
+  setZfw('');
+  setCruiseLevel('');
+  setAverageWind('');
+  setRouteDistance('');
+
+  // Alternate planning
+  setAlternateDistance('');
+  setAlternateGroundSpeed('');
+  setAlternateFuelFlow('');
+
+  // Holding configuration
+  setAlternateHoldingTime('30');
+  setAlternateHoldingAltitude('1500');
+
+  // Fuel configuration
+  setTaxiFuel('');
+  setExtraFuel('');
+  setTankeringFuel('');
+};
+  // OPERDAT TRAINING — GENERATE OFP
+const generateOFP = () => {
+  const generatedAtUTC = new Date().toISOString();
+
+  const ofpData = {
+    generatedAtUTC,
+
+    flightNumber,
+    registration: selectedRegistration,
+    origin: departure,
+    destination,
+    alternate,
+    ezfw: zfw === '' ? null : Number(zfw),
+    cruiseLevel,
+    averageWind:
+      averageWind === '' ? null : Number(averageWind),
+
+    groundDistance:
+      airDistanceResult?.groundDistance ?? null,
+    alternateDistance:
+      alternateFuelResult?.alternateDistance ?? null,
+    airDistance:
+      airDistanceResult?.airDistance ?? null,
+    estimatedTimeHours:
+      airDistanceResult?.estimatedTimeHours ?? null,
+
+    tripFuel:
+      lrcTripResult?.referenceTripFuel ?? null,
+    contingencyFuel:
+      preliminaryContingencyResult?.contingencyFuel ?? null,
+    alternateFuel:
+      alternateFuelResult?.alternateFuel ?? null,
+    holdingFuel:
+      preliminaryHoldingResult?.holdingFuel ?? null,
+
+    taxiFuel:
+      taxiFuel === '' ? null : Number(taxiFuel),
+    extraFuel:
+      extraFuel === '' ? null : Number(extraFuel),
+    tankeringFuel:
+      tankeringFuel === '' ? null : Number(tankeringFuel),
+
+    requiredFuel:
+      preliminaryFuelDistribution?.requiredFuel ?? null,
+    totalFuel:
+      preliminaryFuelDistribution?.totalFuel ?? null,
+    takeoffFuel:
+      preliminaryFuelDistribution?.takeoffFuel ?? null,
+  };
+
+  setGeneratedOFP(ofpData);
+};
 const generateOFPPDF = async () => {
   const element = document.getElementById("operdat-training-ofp");
 
@@ -1139,69 +1256,54 @@ takeoffFuel={
   preliminaryFuelDistribution?.takeoffFuel ?? null
 }
 />
+
 {/* OPERDAT TRAINING — OFP PREVIEW */}
+
 <div style={{ marginTop: '30px' }}>
-  <TrainingOFP
-    origin={departure}
-    destination={destination}
-    alternate={alternate}
-    flightNumber={flightNumber}
-    registration={selectedRegistration}
-    ezfw={zfw === '' ? null : Number(zfw)}
-    cruiseLevel={cruiseLevel}
-    averageWind={averageWind === '' ? null : Number(averageWind)}
-    groundDistance={airDistanceResult?.groundDistance ?? null}
-    alternateDistance={alternateFuelResult?.alternateDistance ?? null}
-
-    tripFuel={lrcTripResult?.referenceTripFuel ?? null}
-    contingencyFuel={
-      preliminaryContingencyResult?.contingencyFuel ?? null
-    }
-    alternateFuel={alternateFuelResult?.alternateFuel ?? null}
-    holdingFuel={preliminaryHoldingResult?.holdingFuel ?? null}
-
-    taxiFuel={
-      taxiFuel !== '' &&
-      Number.isFinite(Number(taxiFuel)) &&
-      Number(taxiFuel) >= 0
-        ? Number(taxiFuel)
-        : null
-    }
-
-    extraFuel={
-      extraFuel !== '' &&
-      Number.isFinite(Number(extraFuel)) &&
-      Number(extraFuel) >= 0
-        ? Number(extraFuel)
-        : null
-    }
-
-    tankeringFuel={
-      tankeringFuel !== '' &&
-      Number.isFinite(Number(tankeringFuel)) &&
-      Number(tankeringFuel) >= 0
-        ? Number(tankeringFuel)
-        : null
-    }
-    requiredFuel={
-  preliminaryFuelDistribution?.requiredFuel ?? null
-}
-totalFuel={
-  preliminaryFuelDistribution?.totalFuel ?? null
-}
-takeoffFuel={
-  preliminaryFuelDistribution?.takeoffFuel ?? null
-}
-airDistance={airDistanceResult?.airDistance ?? null}
-estimatedTimeHours={airDistanceResult?.estimatedTimeHours ?? null}
-   />
+  
+ <TrainingOFP
+  {...ofpDisplayData}
+/>
+{/* OPERDAT TRAINING — OFP STATUS */}
+<div
+  style={{
+    marginTop: '24px',
+    marginBottom: '10px',
+    fontSize: '13px',
+    fontWeight: 'bold',
+    color: generatedOFP ? '#167347' : '#a66a00',
+  }}
+>
+  {generatedOFP
+    ? 'OFP GENERATED — SNAPSHOT SAVED'
+    : 'OFP PREVIEW — NOT YET GENERATED'}
 </div>
-
+</div>
+{/* OPERDAT TRAINING — GENERATE OFP */}
+<div style={{ marginTop: '20px' }}>
+  <button
+    type="button"
+    onClick={generateOFP}
+    style={{
+      padding: '12px 24px',
+      backgroundColor: '#1769aa',
+      color: '#ffffff',
+      border: 'none',
+      borderRadius: '6px',
+      fontWeight: 'bold',
+      cursor: 'pointer',
+    }}
+  >
+    Generate OFP
+  </button>
+</div>
 {/* OPERDAT TRAINING — PDF EXPORT */}
 <div style={{ marginTop: '20px', marginBottom: '24px' }}>
+  
   <button
     type="button"
     onClick={generateOFPPDF}
+    disabled={!generatedOFP}
     style={{
       padding: '14px 24px',
       background: '#1565ff',
@@ -1210,6 +1312,8 @@ estimatedTimeHours={airDistanceResult?.estimatedTimeHours ?? null}
       borderRadius: '8px',
       fontSize: '14px',
       fontWeight: 'bold',
+      opacity: generatedOFP ? 1 : 0.5,
+cursor: generatedOFP ? 'pointer' : 'not-allowed',
       cursor: 'pointer'
     }}
   >
@@ -1227,7 +1331,26 @@ estimatedTimeHours={airDistanceResult?.estimatedTimeHours ?? null}
   generation will be added progressively.
 </p>
 </div>
-
+{/* OPERDAT TRAINING — NEW FLIGHT */}
+{generatedOFP && (
+  <div style={{ marginTop: '10px' }}>
+    <button
+      type="button"
+      onClick={startNewFlight}
+      style={{
+        padding: '10px 20px',
+        backgroundColor: '#64748b',
+        color: '#ffffff',
+        border: 'none',
+        borderRadius: '6px',
+        fontWeight: 'bold',
+        cursor: 'pointer',
+      }}
+    >
+      New Flight
+    </button>
+  </div>
+)}
 </div>
 );
 }

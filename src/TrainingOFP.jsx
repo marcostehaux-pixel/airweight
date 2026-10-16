@@ -1,6 +1,7 @@
 import React from "react";
 
 export default function TrainingOFP({
+  generatedAtUTC = null,
   flightNumber = "—",
   registration = "—",
   origin = "—",
@@ -26,7 +27,9 @@ export default function TrainingOFP({
   airDistance = null,
 estimatedTimeHours = null
 }) {
-  const nowUTC = new Date();
+  const nowUTC = generatedAtUTC
+  ? new Date(generatedAtUTC)
+  : new Date();
 
   const dateUTC = nowUTC.toLocaleDateString("en-GB", {
     timeZone: "UTC",
