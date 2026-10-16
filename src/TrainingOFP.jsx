@@ -2,6 +2,7 @@ import React from "react";
 
 export default function TrainingOFP({
   generatedAtUTC = null,
+  routeText = "ROUTE NOT ASSIGNED",
   flightNumber = "—",
   registration = "—",
   origin = "—",
@@ -138,7 +139,28 @@ estimatedTimeHours = null
         </h3>
 
         <div style={{ fontSize: "12px", lineHeight: "1.9" }}>
-  <div>
+  <div> 
+    <div
+  style={{
+    marginTop: "12px",
+    padding: "10px",
+    backgroundColor: "#f1f5f9",
+    borderRadius: "4px",
+    fontSize: "11px",
+    color: "#1e293b",
+    overflowWrap: "anywhere",
+  }}
+>
+  <strong>PLANNED ROUTE:</strong>
+  <div
+    style={{
+      marginTop: "5px",
+      fontFamily: "monospace",
+    }}
+  >
+    {routeText}
+  </div>
+</div>
     <strong>MAIN ROUTE:</strong> {origin} → {destination}
   </div>
 

@@ -11,9 +11,14 @@ import {
 } from './flightPlanningEngine.js';
 import FuelPlanningSummary from './FuelPlanningSummary.jsx';
 import TrainingOFP from './TrainingOFP.jsx';
-import { findTrainingRoute } from "./trainingroutes.js";
+import {
+  findTrainingRoute,
+  getAvailableDestinations,
+  getAvailableOrigins,
+} from './trainingRoutes';
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
+import TrainingRouteDetails from './TrainingRouteDetails';
 export default function FlightPlanning({
   passengerAircraft = [],
   cargoAircraft = []
@@ -191,6 +196,8 @@ const ofpDisplayData = generatedOFP ?? {
   origin: departure,
   destination,
   alternate,
+    routeText:
+    selectedTrainingRoute?.routeText ?? "ROUTE NOT ASSIGNED",
   ezfw: zfw === '' ? null : Number(zfw),
   cruiseLevel,
   averageWind: averageWind === '' ? null : Number(averageWind),
@@ -259,6 +266,8 @@ const generateOFP = () => {
     origin: departure,
     destination,
     alternate,
+        routeText:
+      selectedTrainingRoute?.routeText ?? "ROUTE NOT ASSIGNED",
     ezfw: zfw === '' ? null : Number(zfw),
     cruiseLevel,
     averageWind:
@@ -548,7 +557,88 @@ const generateOFPPDF = async () => {
       >
         {field.label}
       </label>
+      {field.label === 'Departure ICAO' ? (
+        <select
+          value={departure}
+          onChange={(e) => {
+            setDeparture(e.target.value);
+            setDestination('');
+            setAlternate('');
+            setGeneratedOFP(null);
+          }}
+          style={{
+            width: '100%',
+            boxSizing: 'border-box',
+            padding: '12px',
+            borderRadius: '8px',
+            background: '#17243a',
+            color: '#ffffff',
+            border: '1px solid #43536b'
+          }}
+        >
+          <option value="">Select departure airport</option>
+          {getAvailableOrigins('B738').map((icao) => (
+            <option key={icao} value={icao}>
+              {icao}
+            </option>
+          ))}
+        </select>
+            ) : field.label === 'Destination ICAO' ? (
+        <select
+          value={destination}
+          onChange={(e) => {
+            setDestination(e.target.value);
+            setAlternate('');
+            setGeneratedOFP(null);
+          }}
+          disabled={!departure}
+          style={{
+            width: '100%',
+            boxSizing: 'border-box',
+            padding: '12px',
+            borderRadius: '8px',
+            background: '#17243a',
+            color: '#ffffff',
+            border: '1px solid #43536b',
+            cursor: departure ? 'pointer' : 'not-allowed'
+          }}
+        >
+          <option value="">Select destination airport</option>
 
+          {getAvailableDestinations(departure, 'B738').map((icao) => (
+            <option key={icao} value={icao}>
+              {icao}
+            </option>
+          ))}
+        </select>
+            ) : field.label === 'Alternate ICAO' ? (
+        <select
+          value={alternate}
+          onChange={(e) => {
+            setAlternate(e.target.value);
+            setGeneratedOFP(null);
+          }}
+          disabled={!destination}
+          style={{
+            width: '100%',
+            boxSizing: 'border-box',
+            padding: '12px',
+            borderRadius: '8px',
+            background: '#17243a',
+            color: '#ffffff',
+            border: '1px solid #43536b',
+            cursor: destination ? 'pointer' : 'not-allowed'
+          }}
+        >
+          <option value="">Select alternate airport</option>
+
+          {getAvailableDestinations(destination, 'B738').map((icao) => (
+            <option key={icao} value={icao}>
+              {icao}
+            </option>
+          ))}
+        </select>
+      ) : (
       <input
         type="text"
         value={field.value}
@@ -573,7 +663,7 @@ const generateOFPPDF = async () => {
           border: '1px solid #43536b'
         }}
       />
-      
+            )}
     </div>
   ))}
 </div>
@@ -1256,7 +1346,17 @@ takeoffFuel={
   preliminaryFuelDistribution?.takeoffFuel ?? null
 }
 />
-
+{/* OPERDAT TRAINING — ROUTE DETAILS */}
+{selectedTrainingRoute && (
+  <div style={{ marginTop: '24px' }}>
+    <TrainingRouteDetails
+      origin={departure}
+      destination={destination}
+      cruiseLevel={cruiseLevel}
+      route={selectedTrainingRoute.routeText}
+    />
+  </div>
+)}
 {/* OPERDAT TRAINING — OFP PREVIEW */}
 
 <div style={{ marginTop: '30px' }}>

@@ -85,3 +85,27 @@ export function getAvailableDestinations(from, aircraft) {
     )
   ];
 }
+// OPERDAT TRAINING
+// Available departure airports
+
+export function getAvailableOrigins(aircraft = "B738") {
+  return [
+    ...new Set(
+      trainingRoutes
+        .filter(
+          (route) =>
+            route.aircraft === aircraft &&
+            (
+              (route.complete === true &&
+                route.navigationVerified === true) ||
+              route.testEnabled === true
+            ) &&
+            Number.isFinite(route.distanceNM) &&
+            route.distanceNM > 0 &&
+            Array.isArray(route.waypoints) &&
+            route.waypoints.length > 0
+        )
+        .map((route) => route.from)
+    )
+  ].sort();
+}
