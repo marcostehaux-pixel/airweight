@@ -58,6 +58,10 @@ const [extraFuel, setExtraFuel] = React.useState('');
 // Tankering Fuel (kg)
 
 const [tankeringFuel, setTankeringFuel] = React.useState('');
+// OPERDAT TRAINING — OPTIONAL FUEL
+const [etopsFuel, setEtopsFuel] = React.useState('');
+const [ballastFuel, setBallastFuel] = React.useState('');
+const [policyFuel, setPolicyFuel] = React.useState('');
 const [alternateHoldingAltitude, setAlternateHoldingAltitude] =
   React.useState('1500');
   
@@ -160,7 +164,12 @@ const preliminaryFuelDistribution =
         contingencyFuel:
           preliminaryContingencyResult.contingencyFuel,
         alternateFuel: alternateFuelResult.alternateFuel,
-        holdingFuel: preliminaryHoldingResult.holdingFuel,
+                holdingFuel: preliminaryHoldingResult.holdingFuel,
+
+        etopsFuel: etopsFuel === '' ? 0 : Number(etopsFuel),
+        ballastFuel: ballastFuel === '' ? 0 : Number(ballastFuel),
+        policyFuel: policyFuel === '' ? 0 : Number(policyFuel),
+
         taxiFuel: Number(taxiFuel),
         extraFuel:
           Number(extraFuel) + Number(tankeringFuel)
@@ -211,14 +220,26 @@ const ofpDisplayData = generatedOFP ?? {
   contingencyFuel: preliminaryContingencyResult?.contingencyFuel ?? null,
   alternateFuel: alternateFuelResult?.alternateFuel ?? null,
   holdingFuel: preliminaryHoldingResult?.holdingFuel ?? null,
-
+  holdingTimeMinutes: preliminaryHoldingResult
+  ? Number(alternateHoldingTime)
+  : null,
   taxiFuel: taxiFuel === '' ? null : Number(taxiFuel),
   extraFuel: extraFuel === '' ? null : Number(extraFuel),
   tankeringFuel: tankeringFuel === '' ? null : Number(tankeringFuel),
-
+etopsFuel: etopsFuel === '' ? 0 : Number(etopsFuel),
+ballastFuel: ballastFuel === '' ? 0 : Number(ballastFuel),
+policyFuel: policyFuel === '' ? 0 : Number(policyFuel),
   requiredFuel: preliminaryFuelDistribution?.requiredFuel ?? null,
   totalFuel: preliminaryFuelDistribution?.totalFuel ?? null,
   takeoffFuel: preliminaryFuelDistribution?.takeoffFuel ?? null,
+  destinationRemainingFuel:
+  preliminaryFuelDistribution?.destinationRemainingFuel ?? null,
+
+alternateRemainingFuel:
+  preliminaryFuelDistribution?.alternateRemainingFuel ?? null,
+
+afterHoldingFuel:
+  preliminaryFuelDistribution?.afterHoldingFuel ?? null,
 };
 // OPERDAT TRAINING — NEW FLIGHT
 const startNewFlight = () => {
@@ -290,20 +311,31 @@ const generateOFP = () => {
       alternateFuelResult?.alternateFuel ?? null,
     holdingFuel:
       preliminaryHoldingResult?.holdingFuel ?? null,
-
+      holdingTimeMinutes: preliminaryHoldingResult
+  ? Number(alternateHoldingTime)
+  : null,
     taxiFuel:
       taxiFuel === '' ? null : Number(taxiFuel),
     extraFuel:
       extraFuel === '' ? null : Number(extraFuel),
     tankeringFuel:
       tankeringFuel === '' ? null : Number(tankeringFuel),
-
-    requiredFuel:
+etopsFuel: etopsFuel === '' ? 0 : Number(etopsFuel),
+ballastFuel: ballastFuel === '' ? 0 : Number(ballastFuel),
+policyFuel: policyFuel === '' ? 0 : Number(policyFuel),
+        requiredFuel:
       preliminaryFuelDistribution?.requiredFuel ?? null,
     totalFuel:
       preliminaryFuelDistribution?.totalFuel ?? null,
     takeoffFuel:
       preliminaryFuelDistribution?.takeoffFuel ?? null,
+
+    destinationRemainingFuel:
+      preliminaryFuelDistribution?.destinationRemainingFuel ?? null,
+    alternateRemainingFuel:
+      preliminaryFuelDistribution?.alternateRemainingFuel ?? null,
+    afterHoldingFuel:
+      preliminaryFuelDistribution?.afterHoldingFuel ?? null,
   };
 
   setGeneratedOFP(ofpData);
@@ -958,6 +990,62 @@ readOnly
     }}
   />
 </div>
+
+{/* OPERDAT TRAINING — OPTIONAL FUEL */}
+
+{[
+  {
+    id: 'etops-fuel',
+    label: 'ETOPS Fuel (kg)',
+    value: etopsFuel,
+    setter: setEtopsFuel
+  },
+  {
+    id: 'ballast-fuel',
+    label: 'Ballast Fuel (kg)',
+    value: ballastFuel,
+    setter: setBallastFuel
+  },
+  {
+    id: 'policy-fuel',
+    label: 'Policy Fuel (kg)',
+    value: policyFuel,
+    setter: setPolicyFuel
+  }
+].map(field => (
+  <div key={field.id}>
+    <label
+      htmlFor={field.id}
+      style={{
+        display: 'block',
+        marginBottom: '8px',
+        color: '#b9c4d3'
+      }}
+    >
+      {field.label}
+    </label>
+
+    <input
+      id={field.id}
+      type="number"
+      min="0"
+      step="1"
+      value={field.value}
+      onChange={e => field.setter(e.target.value)}
+      placeholder="Optional — default 0 kg"
+      style={{
+        width: '100%',
+        boxSizing: 'border-box',
+        padding: '12px',
+        borderRadius: '8px',
+        background: '#17243a',
+        color: '#ffffff',
+        border: '1px solid #43536b'
+      }}
+    />
+  </div>
+))}
+
 <h3 style={{ marginTop: '26px', marginBottom: '16px' }}>
   Flight Performance
 </h3>
@@ -1327,7 +1415,9 @@ extraFuel={
     ? Number(extraFuel)
     : null
 }
-
+etopsFuel={Number(etopsFuel || 0)}
+ballastFuel={Number(ballastFuel || 0)}
+policyFuel={Number(policyFuel || 0)}
 tankeringFuel={
   tankeringFuel !== '' &&
   Number.isFinite(Number(tankeringFuel)) &&
@@ -1346,6 +1436,7 @@ takeoffFuel={
   preliminaryFuelDistribution?.takeoffFuel ?? null
 }
 />
+
 {/* OPERDAT TRAINING — ROUTE DETAILS */}
 {selectedTrainingRoute && (
   <div style={{ marginTop: '24px' }}>

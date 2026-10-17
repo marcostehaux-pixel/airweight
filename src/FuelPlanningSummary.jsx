@@ -7,6 +7,7 @@ import React from 'react';
  * NOT FOR OPERATIONAL USE
  */
 
+
 export default function FuelPlanningSummary({
   tripFuel = null,
   tripTimeMinutes = null,
@@ -18,10 +19,14 @@ export default function FuelPlanningSummary({
   taxiFuel = null,
   extraFuel = null,
   tankeringFuel = null,
-requiredFuel = null,
-totalFuel = null,
-takeoffFuel = null
+  etopsFuel = 0,
+  ballastFuel = 0,
+  policyFuel = 0,
+  requiredFuel = null,
+  totalFuel = null,
+  takeoffFuel = null
 }) {
+
   const items = [
     'TRIP',
     'ENRTE RSV',
@@ -72,10 +77,19 @@ takeoffFuel = null
     fuel = contingencyFuel;
   } else if (item === 'ALTN') {
     fuel = alternateFuel;
-  } else if (item === 'HOLD ALTN') {
-    fuel = holdingFuel;
-  } else if (item === 'TAXI / APU') {
+ 
+} else if (item === 'HOLD ALTN') {
+  fuel = holdingFuel;
+} else if (item === 'ETOPS') {
+  fuel = etopsFuel;
+} else if (item === 'BALLAST') {
+  fuel = ballastFuel;
+} else if (item === 'POLICY') {
+  fuel = policyFuel;
+} else if (item === 'TAXI / APU') {
   fuel = taxiFuel;
+
+
 } else if (item === 'EXTRA / TANKERING') {
   fuel =
     extraFuel === null && tankeringFuel === null

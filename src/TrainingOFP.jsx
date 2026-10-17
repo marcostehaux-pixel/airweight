@@ -18,6 +18,7 @@ export default function TrainingOFP({
   contingencyFuel = null,
   alternateFuel = null,
   holdingFuel = null,
+  holdingTimeMinutes = null,
   taxiFuel = null,
   extraFuel = null,
   tankeringFuel = null,
@@ -25,7 +26,13 @@ export default function TrainingOFP({
   requiredFuel = null,
   totalFuel = null,
   takeoffFuel = null,
+    destinationRemainingFuel = null,
+  alternateRemainingFuel = null,
+  afterHoldingFuel = null,
   airDistance = null,
+  etopsFuel = 0,
+ballastFuel = 0,
+policyFuel = 0,
 estimatedTimeHours = null
 }) {
   const nowUTC = generatedAtUTC
@@ -245,10 +252,30 @@ estimatedTimeHours = null
           FUEL SUMMARY
         </h3>
 
-        {[
+       {[
+  ["TRIP", tripFuel],
+  ["ENRTE RSV", contingencyFuel],
+  ["ALTN", alternateFuel],
+  [
+  `HOLD ALTN (${holdingTimeMinutes != null
+    ? `${holdingTimeMinutes} MIN`
+    : "—"})`,
+  holdingFuel
+],
+  ["ETOPS", etopsFuel],
+["BALLAST", ballastFuel],
+["POLICY", policyFuel],
+  ["STORED", 0],
   ["REQUIRED FUEL", requiredFuel],
+  ["TAXI / APU", taxiFuel],
+  ["EXTRA / TANKERING",
+    extraFuel != null && tankeringFuel != null
+      ? Number(extraFuel) + Number(tankeringFuel)
+      : null
+  ],
   ["TOTAL FUEL", totalFuel],
   ["TAKEOFF FUEL", takeoffFuel],
+  
 ].map(([label, value]) => (
           <div
             key={label}
@@ -276,7 +303,50 @@ estimatedTimeHours = null
           </div>
         ))}
       </div>
+{/* FUEL REMAINING ESTIMATES */}
+<div style={{ marginTop: "12px", marginBottom: "16px" }}>
+  <h3
+    style={{
+      background: "#233b58",
+      color: "#ffffff",
+      padding: "7px 10px",
+      fontSize: "13px",
+      margin: "0 0 10px 0",
+    }}
+  >
+    FUEL REMAINING ESTIMATES — TRAINING
+  </h3>
 
+  {[
+    ["AT DESTINATION", destinationRemainingFuel],
+    ["AT ALTERNATE", alternateRemainingFuel],
+    ["AFTER ALTERNATE HOLDING", afterHoldingFuel],
+  ].map(([label, value]) => (
+    <div
+      key={label}
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        padding: "6px 12px",
+        borderBottom: "1px solid #d5dbe3",
+        fontSize: "12px",
+      }}
+    >
+      <span>{label}</span>
+      <strong>
+        {value != null && Number.isFinite(Number(value))
+          ? `${Number(value).toLocaleString("en-US", {
+              maximumFractionDigits: 0,
+            })} KG`
+          : "—"}
+      </strong>
+    </div>
+  ))}
+
+  <div style={{ fontSize: "10px", marginTop: "6px", color: "#666" }}>
+    SIMULATED VALUES — NOT FOR OPERATIONAL USE
+  </div>
+</div>
       {/* FLIGHT PERFORMANCE */}
       <div style={{ marginTop: "16px", marginBottom: "16px" }}>
         <h3
