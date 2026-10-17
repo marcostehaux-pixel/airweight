@@ -3,6 +3,7 @@ import Landing from './Landing'
 import FlightPlanning from './FlightPlanning.jsx';
 import { getCargoFuelIndex } from './utilit/cargoFuelIndex'
 import aircraftCargoDatabase from './data/aircraftCargoDatabase'
+import { validatePassengerEnvelope } from './envelopeValidation'
 import {getLowerDeckIndex} from './utilit/cargoCalculator'
 import {getMainDeckIndex} from './utilit/cargoCalculator'
 import {getMainCargo} from './utilit/cargoCalculator'
@@ -2427,9 +2428,32 @@ return inside
 }
 
 const zfWithinEnvelope = zfw <= selectedAircraft.maxZFW && zfCg >= 18 && zfCg <= 34
+const passengerEnvelopeCheck = validatePassengerEnvelope({
+  zfi,
+  toi,
+  zfw,
+  tow
+})
+console.log('PASSENGER ENVELOPE VALIDATION', {
+  zfi,
+  toi,
+  zfw,
+  tow,
+  zfwInside: passengerEnvelopeCheck.zfwInside,
+  towInside: passengerEnvelopeCheck.towInside
+})
+const passengerZfwInside = passengerEnvelopeCheck.zfwInside
+const passengerTowInside = passengerEnvelopeCheck.towInside
 const trimLabel = trim < 4 ? 'NOSE UP' : trim > 7 ? 'NOSE DOWN' : 'SET'
-const loadStatus = 'READY FOR DISPATCH'
-const cgStatus = true
+const cgStatus =
+  zfWithinEnvelope &&
+  toWithinEnvelope &&
+  passengerZfwInside &&
+  passengerTowInside;
+
+const loadStatus = cgStatus
+  ? 'READY FOR DISPATCH'
+  : 'CG OUT OF LIMITS';
 const cgLabel = cg < 18 ? 'FORWARD' : cg > 32 ? 'AFT' : 'NORMAL'
 const zfwStatus = zfw <= selectedAircraft.maxZFW
 const towStatus = tow <= selectedAircraft.maxTOW
@@ -7240,8 +7264,7 @@ zfCg?.toFixed?.(1)
 }
 
 unit="%"
-
-status={true}
+status={zfWithinEnvelope && passengerZfwInside}
 />
 <StatusCard
 compact={true}
@@ -7258,15 +7281,7 @@ status={true}
 compact={true}
 title="RW"
 
-value={
-
-rw +
-
-(extraCrew * 85) +
-
-(catering ? 250 : 0)
-
-}
+value={rw}
 
 unit="kg"
 
@@ -7392,7 +7407,22 @@ toCg?.toFixed?.(1)
 
 unit="%"
 
-status={true}
+status={toWithinEnvelope && passengerTowInside}
+/> 
+<StatusCard
+  compact={true}
+  title="TRIP FUEL"
+  value={tripFuel}
+  unit="kg"
+  status={true}
+/>
+<StatusCard
+  compact={true}
+  title="LW"
+  value={ldw}
+  unit="kg"
+  status={ldw <= selectedAircraft.maxLW}
+  limit={selectedAircraft.maxLW}
 />
 
 <StatusCard
@@ -7609,10 +7639,43 @@ flexDirection: 'column',
       
 
   }}
-      onClick={() =>
-        
+      onClick={() => {
+  if (
+  !cgStatus ||
+  zfw > selectedAircraft.maxZFW ||
+  tow > selectedAircraft.maxTOW ||
+  ldw > selectedAircraft.maxLW ||
+  rw > selectedAircraft.maxRW
+) {
+    let message = 'LOADSHEET CANNOT BE GENERATED\n\n'
 
-        generateLoadsheet({
+    if (!zfWithinEnvelope || !passengerZfwInside) {
+      message += 'ZFW CG OUT OF ENVELOPE\n'
+    }
+
+    if (!toWithinEnvelope || !passengerTowInside) {
+      message += 'TOW CG OUT OF ENVELOPE\n'
+    }
+if (zfw > selectedAircraft.maxZFW) {
+  message += 'MAXIMUM ZFW EXCEEDED\n'
+}
+
+if (tow > selectedAircraft.maxTOW) {
+  message += 'MAXIMUM TOW EXCEEDED\n'
+}
+
+if (ldw > selectedAircraft.maxLW) {
+  message += 'MAXIMUM LANDING WEIGHT EXCEEDED\n'
+}
+
+if (rw > selectedAircraft.maxRW) {
+  message += 'MAXIMUM RAMP WEIGHT EXCEEDED\n'
+}
+    alert(message)
+    return
+  }
+
+  generateLoadsheet({
 
           selectedAircraft,
 metarFrom: metar,
@@ -7664,9 +7727,8 @@ midInfants,
 aftAdults,
 aftChildren,
 aftInfants
-        })
-
-      }
+})
+}}
 
       style={{
 

@@ -1,3 +1,4 @@
+import { isInsidePolygon } from '../envelopeValidation'
 function EnvelopeChart(props) {
 
 const mapIndex = (index) => {
@@ -120,119 +121,17 @@ const zfwEnvelope = [
 [530,170]
 
 ]
-const isInsidePolygon = (x, y, polygon) => {
-  let inside = false
 
-  for (
-    let i = 0, j = polygon.length - 1;
-    i < polygon.length;
-    j = i++
-  ) {
-    const xi = polygon[i][0]
-    const yi = polygon[i][1]
-
-    const xj = polygon[j][0]
-    const yj = polygon[j][1]
-
-    const intersect =
-      (yi > y) !== (yj > y) &&
-      x <
-        ((xj - xi) * (y - yi)) /
-          (yj - yi) +
-          xi
-
-    if (intersect)
-      inside = !inside
-  }
-
-  return inside
-}
-const zfwX=
-
-mapIndex(
-
-props.zfi||
-
-50
-
-)
-
-
-const towX=
-
-mapIndex(
-
-props.toi||
-
-50
-
-)
-
-
-const ldwX = towX
-
-const weightToY=(weight)=>{
-
-const min=42675
-
-const max=85000
-
-const y40000 = mapWeight(42675)
-
-const y85000 = mapWeight(85000)
-
-
-return (
-
-y40000-
-
-(
-
-(
-
-Number(
-
-weight
-
-)-
-
-min
-
-)
-
-/
-
-(
-
-max-
-
-min
-
-)
-
-)
-
-*
-
-(
-
-y40000-y85000
-
-)
-
-)
-
-}
 const zfwY =
 mapWeight(
 props.zfw || 42675
 )
 
-const towY = weightToY(
-
-props.tow || 42675
-
+const towY = mapWeight(
+  props.tow || 42675
 )
+const zfwX = mapIndex(props.zfi ?? 50)
+const towX = mapIndex(props.toi ?? 50)
 const zfwInside =
   isInsidePolygon(
     zfwX - 15,
