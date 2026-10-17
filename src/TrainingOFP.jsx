@@ -91,14 +91,15 @@ estimatedTimeHours = null
           FLIGHT INFORMATION
         </h3>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "12px",
-            fontSize: "12px",
-          }}
-        >
+       <div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: "12px",
+    fontSize: "15px",
+    lineHeight: "1.5",
+  }}
+>
           <div><strong>FROM:</strong> {origin}</div>
 <div><strong>TO:</strong> {destination}</div>
 <div><strong>ALTERNATE:</strong> {alternate}</div>
@@ -138,7 +139,7 @@ estimatedTimeHours = null
           ROUTE INFORMATION
         </h3>
 
-        <div style={{ fontSize: "12px", lineHeight: "1.9" }}>
+        <div style={{ fontSize: "15px", lineHeight: "1.6" }}>
   <div> 
     <div
   style={{
@@ -146,7 +147,7 @@ estimatedTimeHours = null
     padding: "10px",
     backgroundColor: "#f1f5f9",
     borderRadius: "4px",
-    fontSize: "11px",
+    fontSize: "14px",
     color: "#1e293b",
     overflowWrap: "anywhere",
   }}
@@ -198,7 +199,7 @@ estimatedTimeHours = null
           FUEL PLANNING
         </h3>
 
-        <div style={{ fontSize: "12px", lineHeight: "1.9" }}>
+        <div style={{ fontSize: "15px", lineHeight: "1.5" }}>
          {[
   ["TRIP FUEL", tripFuel],
   ["CONTINGENCY FUEL", contingencyFuel],
@@ -260,7 +261,7 @@ estimatedTimeHours = null
               background:
                 label === "TOTAL FUEL" ? "#e9eef5" : "#ffffff",
               borderBottom: "1px solid #d5dbe3",
-              fontSize: "13px",
+              fontSize: "16px",
               fontWeight: "bold",
             }}
           >
@@ -294,8 +295,9 @@ estimatedTimeHours = null
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "12px",
-            fontSize: "12px",
+gap: "12px",
+fontSize: "15px",
+lineHeight: "1.5",
           }}
         >
          <div>
@@ -353,9 +355,9 @@ estimatedTimeHours = null
 
         <div
           style={{
-            fontSize: "11px",
-            lineHeight: "1.7",
-            color: "#344054",
+            fontSize: "13px",
+lineHeight: "1.5",
+color: "#344054",
           }}
         >
           <div>Aircraft: B737-800 — Training configuration</div>
@@ -387,11 +389,11 @@ estimatedTimeHours = null
 
       <p
         style={{
-          fontSize: "11px",
-          fontWeight: "bold",
-          textAlign: "center",
-          padding: "10px",
-          background: "#edf1f5",
+          fontSize: "13px",
+fontWeight: "bold",
+textAlign: "center",
+padding: "10px",
+background: "#edf1f5",
         }}
       >
         SIMULATED FLIGHT PLAN — FOR TRAINING PURPOSES ONLY —

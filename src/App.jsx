@@ -3062,7 +3062,7 @@ const filteredHistoryFlights =
 return (
 
   <div
-
+translate="no"
     style={{
   minHeight: '100vh',
   display: 'flex',
@@ -7120,7 +7120,8 @@ const aircraft =
   )
 
 if (aircraft) {
-  setSelectedAircraft(aircraft)
+  setSelectedAircraft(aircraft);
+  setAircraftSummaryRegistration(aircraft.registration);
 }
 
         }}
@@ -7405,45 +7406,6 @@ compact={true}
   status={true}
 
 />
-
-<div
-
-  style={{
-
-    marginTop: '25px',
-
-    padding: '18px',
-
-    borderRadius: '14px',
-
-    textAlign: 'center',
-
-    background:
-
-      loadStatus ===
-      'READY FOR DISPATCH'
-
-        ? 'rgba(0,255,120,0.10)'
-
-        : loadStatus ===
-          'REVIEW LOAD'
-
-          ? 'rgba(255,180,0,0.10)'
-
-          : 'rgba(255,60,60,0.10)',
-
-    border:
-
-      '1px solid rgba(255,255,255,0.08)'
-
-  }}
-
->
-
- 
-
-</div>
-
     </div>
     <div
   style={{
@@ -7539,6 +7501,11 @@ cg={cg}
 zfCg={zfCg}
 
 toCg={toCg}
+indexReferenceArm={selectedAircraft.indexReferenceArm}
+indexConstant={selectedAircraft.indexConstant}
+indexOffset={selectedAircraft.indexOffset}
+lemac={selectedAircraft.lemac}
+mac={selectedAircraft.mac}
 zfStatus={zfWithinEnvelope}
 toStatus={toWithinEnvelope}
 lwCg={lwCg}

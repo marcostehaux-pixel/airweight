@@ -18,12 +18,16 @@ export default function Landing({ onSignIn }) {
   }
 
   return (
-    <main style={{
-      minHeight: '100vh',
-      background: '#071629',
-      color: '#fff',
-      fontFamily: 'Inter, Arial, sans-serif'
-    }}>
+    <main
+  lang="es"
+  translate="yes"
+  style={{
+    minHeight: '100vh',
+    background: '#071629',
+    color: '#fff',
+    fontFamily: 'Inter, Arial, sans-serif'
+  }}
+>
         
 <nav style={{
   position: 'sticky',
@@ -806,14 +810,17 @@ margin: '0 auto 45px'
       y desarrollo tecnológico.
     </p>
 
-    <p style={{
-      color: '#75b4ff',
-      fontSize: 19,
-      fontWeight: 700,
-      marginTop: 35
-    }}>
-      OPERDAT — Flight Operations Platform
-    </p>
+   <p style={{
+  color: '#75b4ff',
+  fontSize: 19,
+  fontWeight: 700,
+  marginTop: 35
+}}>
+  <span translate="no" className="notranslate">
+    OPERDAT
+  </span>
+  {' — Flight Operations Platform'}
+</p>
   </div>
 </section>
 

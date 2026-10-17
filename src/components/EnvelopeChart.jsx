@@ -1,55 +1,18 @@
 function EnvelopeChart(props) {
 
-const mapIndex=(index)=>{
+const mapIndex = (index) => {
+  const min = 35;
+  const max = 90;
 
-const min=35
+  const left = 90;
+  const right = 750;
 
-const max=90
-
-const left=140
-
-const right=620
-
-
-return (
-
-left+
-
-(
-
-(
-
-index-
-
-min
-
-)
-
-/
-
-(
-
-max-
-
-min
-
-)
-
-)
-
-*
-
-(
-
-right-
-
-left
-
-)
-
-)
-
-}
+  return (
+    left +
+    ((Number(index) - min) / (max - min)) *
+    (right - left)
+  );
+};
 
 const mapWeight=(weight)=>{
 
@@ -105,7 +68,34 @@ top
 )
 
 }
+const cgToIndex = (cgPercent, weight) => {
+  const {
+    indexReferenceArm,
+    indexConstant,
+    indexOffset,
+    lemac,
+    mac
+  } = props;
 
+  if (
+    !Number.isFinite(Number(indexConstant)) ||
+    Number(indexConstant) === 0 ||
+    !Number.isFinite(Number(indexReferenceArm)) ||
+    !Number.isFinite(Number(indexOffset)) ||
+    !Number.isFinite(Number(lemac)) ||
+    !Number.isFinite(Number(mac))
+  ) {
+    return null;
+  }
+
+  const arm = Number(lemac) + (cgPercent / 100) * Number(mac);
+
+  return (
+    Number(indexOffset) +
+    ((arm - Number(indexReferenceArm)) * weight) /
+      Number(indexConstant)
+  );
+};
 const envelope = [
   [60, 50],
   [130, 160],
@@ -542,49 +532,45 @@ stroke="#666"
   
 {/* %MAC LINES */}
 
-{[18,19,20,21,22,23,24,25,26,27,28,29,30,31,32].map((value, index) => (
+{[18,19,20,21,22,23,24,25,26,27,28,29,30,31,32].map((value) => {
+  const indexTop = cgToIndex(value, 85000);
+  const indexBottom = cgToIndex(value, 40000);
 
-  <line
+  if (indexTop === null || indexBottom === null) return null;
 
-    key={index}
-
-    x1={60 + index * 50}
-
-    y1={40}
-
-    x2={170 + index * 30}
-    y2={310}
-
-    stroke="rgba(255,255,255,0.25)"
-
-    strokeWidth="1"
-
-  />
-
-))}
+  return (
+    <line
+      key={value}
+      x1={mapIndex(indexTop)}
+      y1={mapWeight(85000)}
+      x2={mapIndex(indexBottom)}
+      y2={mapWeight(40000)}
+      stroke="rgba(255,255,255,0.25)"
+      strokeWidth="1"
+    />
+  );
+})}
 {/* %MAC LABELS */}
 
-{[18,19,20,21,22,23,24,25,26,27,28,29,30,31,32].map((value, index) => (
+{[18,19,20,21,22,23,24,25,26,27,28,29,30,31,32].map((value) => {
 
-  <text
+  const indexTop = cgToIndex(value, 85000);
 
-    key={`label-${index}`}
+  if (indexTop === null) return null;
 
-    x={50 + index * 50}
-
-    y={25}
-
-    fill="rgba(255,255,255,0.75)"
-
-    fontSize="13"
-
-  >
-
-    {value}%
-
-  </text>
-
-))}
+  return (
+    <text
+      key={`label-${value}`}
+      x={mapIndex(indexTop)}
+      y={mapWeight(85000) - 12}
+      fill="rgba(255,255,255,0.75)"
+      fontSize="13"
+      textAnchor="middle"
+    >
+      {value}%
+    </text>
+  );
+})}
 
 {/* MTOW */}
 {false && (
