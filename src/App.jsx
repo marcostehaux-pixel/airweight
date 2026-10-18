@@ -3162,44 +3162,36 @@ translate="no"
     </div>
   </div>
 
-
-
-{/* PASSENGER */}
-
-{userRole !== 'freighter' && (
-    <div
-      onClick={() => setActiveMenu('Dashboard')}
-      style={{
-        marginBottom: '10px',
-        padding: '12px 15px',
-        borderRadius: '9px',
-        background:
-          activeMenu === 'Dashboard'
-            ? 'rgba(21,101,255,0.16)'
-            : 'transparent',
-        border:
-          activeMenu === 'Dashboard'
-            ? '1px solid rgba(21,101,255,0.40)'
-            : '1px solid transparent',
-        color:
-          activeMenu === 'Dashboard'
-            ? '#ffffff'
-            : '#b9c4d3',
-        fontWeight: activeMenu === 'Dashboard' ? '700' : '500',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-        boxShadow:
-          activeMenu === 'Dashboard'
-            ? '0 0 20px rgba(21,101,255,0.12)'
-            : 'none'
-      }}
-    >
-      Passenger
-    </div>
-  )}
-
-
-
+{userRole === 'super_admin' && (
+  <div
+    onClick={() => setActiveMenu('Platform Management')}
+    style={{
+      marginBottom: '10px',
+      padding: '12px 15px',
+      borderRadius: '9px',
+      background:
+        activeMenu === 'Platform Management'
+          ? 'rgba(21,101,255,0.16)'
+          : 'transparent',
+      border:
+        activeMenu === 'Platform Management'
+          ? '1px solid rgba(21,101,255,0.40)'
+          : '1px solid transparent',
+      color:
+        activeMenu === 'Platform Management'
+          ? '#ffffff'
+          : '#b9c4d3',
+      fontWeight:
+        activeMenu === 'Platform Management'
+          ? '700'
+          : '500',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease'
+    }}
+  >
+    Platform Management
+  </div>
+)}
 {/* FLIGHT PLANNING — TRAINING */}
 
 {(
@@ -3235,7 +3227,176 @@ translate="no"
     Flight Planning
   </div>
 )}
+{/* PASSENGER */}
 
+{userRole !== 'freighter' && (
+    <div
+      onClick={() => setActiveMenu('Dashboard')}
+      style={{
+        marginBottom: '10px',
+        padding: '12px 15px',
+        borderRadius: '9px',
+        background:
+          activeMenu === 'Dashboard'
+            ? 'rgba(21,101,255,0.16)'
+            : 'transparent',
+        border:
+          activeMenu === 'Dashboard'
+            ? '1px solid rgba(21,101,255,0.40)'
+            : '1px solid transparent',
+        color:
+          activeMenu === 'Dashboard'
+            ? '#ffffff'
+            : '#b9c4d3',
+        fontWeight: activeMenu === 'Dashboard' ? '700' : '500',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        boxShadow:
+          activeMenu === 'Dashboard'
+            ? '0 0 20px rgba(21,101,255,0.12)'
+            : 'none'
+      }}
+    >
+      Passenger Loadsheet
+    </div>
+  )}
+{/* SEAT MAP */}
+
+  {userRole !== 'freighter' && (
+    <div
+      onClick={() => setActiveMenu('Seat Map')}
+      style={{
+        marginBottom: '10px',
+        padding: '12px 15px',
+        borderRadius: '9px',
+        background:
+          activeMenu === 'Seat Map'
+            ? 'rgba(21,101,255,0.16)'
+            : 'transparent',
+        border:
+          activeMenu === 'Seat Map'
+            ? '1px solid rgba(21,101,255,0.40)'
+            : '1px solid transparent',
+        color:
+          activeMenu === 'Seat Map'
+            ? '#ffffff'
+            : '#b9c4d3',
+        fontWeight:
+          activeMenu === 'Seat Map'
+            ? '700'
+            : '500',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease'
+      }}
+    >
+      Seat Map
+    </div>
+  )}
+{/* FREIGHTER LOADSHEET */}
+
+  {(
+  userRole === 'freighter' ||
+  userRole === 'admin' ||
+  userRole === 'student' ||
+  userRole === 'super_admin'
+) && (
+    <div
+      onClick={() =>
+        setActiveMenu('FreighterLoadsheet')
+      }
+      style={{
+        marginBottom: '10px',
+        padding: '12px 15px',
+        borderRadius: '9px',
+        background:
+          activeMenu === 'FreighterLoadsheet'
+            ? 'rgba(21,101,255,0.16)'
+            : 'transparent',
+        border:
+          activeMenu === 'FreighterLoadsheet'
+            ? '1px solid rgba(21,101,255,0.40)'
+            : '1px solid transparent',
+        color:
+          activeMenu === 'FreighterLoadsheet'
+            ? '#ffffff'
+            : '#b9c4d3',
+        fontWeight:
+          activeMenu === 'FreighterLoadsheet'
+            ? '700'
+            : '500',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease'
+      }}
+    >
+      Freighter Loadsheet
+    </div>
+  )}
+  
+  {/* FUEL */}
+
+  <div
+    onClick={() => setActiveMenu('Fuel')}
+    style={{
+      marginBottom: '10px',
+      padding: '12px 15px',
+      borderRadius: '9px',
+      background:
+        activeMenu === 'Fuel'
+          ? 'rgba(21,101,255,0.16)'
+          : 'transparent',
+      border:
+        activeMenu === 'Fuel'
+          ? '1px solid rgba(21,101,255,0.40)'
+          : '1px solid transparent',
+      color:
+        activeMenu === 'Fuel'
+          ? '#ffffff'
+          : '#b9c4d3',
+      fontWeight:
+        activeMenu === 'Fuel'
+          ? '700'
+          : '500',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease'
+    }}
+  >
+    Fuel Load
+  </div>
+{/* AIRCRAFT */}
+
+  {(
+  userRole === 'student' ||
+  userRole === 'super_admin'
+) && (
+    <div
+      onClick={() => setActiveMenu('Aircraft')}
+      style={{
+        marginBottom: '10px',
+        padding: '12px 15px',
+        borderRadius: '9px',
+        background:
+          activeMenu === 'Aircraft'
+            ? 'rgba(21,101,255,0.16)'
+            : 'transparent',
+        border:
+          activeMenu === 'Aircraft'
+            ? '1px solid rgba(21,101,255,0.40)'
+            : '1px solid transparent',
+        color:
+          activeMenu === 'Aircraft'
+            ? '#ffffff'
+            : '#b9c4d3',
+        fontWeight:
+          activeMenu === 'Aircraft'
+            ? '700'
+            : '500',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease'
+      }}
+    >
+      Aircraft Data
+    </div>
+  )}
 
  {/* FLIGHT RECORDS */}
 
@@ -3312,36 +3473,7 @@ translate="no"
     Flight History
   </div>
 )}
- {userRole === 'super_admin' && (
-  <div
-    onClick={() => setActiveMenu('Platform Management')}
-    style={{
-      marginBottom: '10px',
-      padding: '12px 15px',
-      borderRadius: '9px',
-      background:
-        activeMenu === 'Platform Management'
-          ? 'rgba(21,101,255,0.16)'
-          : 'transparent',
-      border:
-        activeMenu === 'Platform Management'
-          ? '1px solid rgba(21,101,255,0.40)'
-          : '1px solid transparent',
-      color:
-        activeMenu === 'Platform Management'
-          ? '#ffffff'
-          : '#b9c4d3',
-      fontWeight:
-        activeMenu === 'Platform Management'
-          ? '700'
-          : '500',
-      cursor: 'pointer',
-      transition: 'all 0.2s ease'
-    }}
-  >
-    Platform Management
-  </div>
-)}
+ 
 {/* AIRCRAFT MANAGEMENT */}
 
 {userRole === 'admin' && (
@@ -3376,47 +3508,6 @@ translate="no"
     Aircraft Management
   </div>
 )}
-
-  {/* FREIGHTER LOADSHEET */}
-
-  {(
-  userRole === 'freighter' ||
-  userRole === 'admin' ||
-  userRole === 'student' ||
-  userRole === 'super_admin'
-) && (
-    <div
-      onClick={() =>
-        setActiveMenu('FreighterLoadsheet')
-      }
-      style={{
-        marginBottom: '10px',
-        padding: '12px 15px',
-        borderRadius: '9px',
-        background:
-          activeMenu === 'FreighterLoadsheet'
-            ? 'rgba(21,101,255,0.16)'
-            : 'transparent',
-        border:
-          activeMenu === 'FreighterLoadsheet'
-            ? '1px solid rgba(21,101,255,0.40)'
-            : '1px solid transparent',
-        color:
-          activeMenu === 'FreighterLoadsheet'
-            ? '#ffffff'
-            : '#b9c4d3',
-        fontWeight:
-          activeMenu === 'FreighterLoadsheet'
-            ? '700'
-            : '500',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease'
-      }}
-    >
-      Freighter Loadsheet
-    </div>
-  )}
-
 
  {/* PASSENGER LOADSHEET */}
 
@@ -3456,110 +3547,6 @@ translate="no"
       Passenger Loadsheet
        </div>
   ))}
-
-
-  {/* FUEL */}
-
-  <div
-    onClick={() => setActiveMenu('Fuel')}
-    style={{
-      marginBottom: '10px',
-      padding: '12px 15px',
-      borderRadius: '9px',
-      background:
-        activeMenu === 'Fuel'
-          ? 'rgba(21,101,255,0.16)'
-          : 'transparent',
-      border:
-        activeMenu === 'Fuel'
-          ? '1px solid rgba(21,101,255,0.40)'
-          : '1px solid transparent',
-      color:
-        activeMenu === 'Fuel'
-          ? '#ffffff'
-          : '#b9c4d3',
-      fontWeight:
-        activeMenu === 'Fuel'
-          ? '700'
-          : '500',
-      cursor: 'pointer',
-      transition: 'all 0.2s ease'
-    }}
-  >
-    Fuel Load
-  </div>
-
-
-  {/* AIRCRAFT */}
-
-  {(
-  userRole === 'student' ||
-  userRole === 'super_admin'
-) && (
-    <div
-      onClick={() => setActiveMenu('Aircraft')}
-      style={{
-        marginBottom: '10px',
-        padding: '12px 15px',
-        borderRadius: '9px',
-        background:
-          activeMenu === 'Aircraft'
-            ? 'rgba(21,101,255,0.16)'
-            : 'transparent',
-        border:
-          activeMenu === 'Aircraft'
-            ? '1px solid rgba(21,101,255,0.40)'
-            : '1px solid transparent',
-        color:
-          activeMenu === 'Aircraft'
-            ? '#ffffff'
-            : '#b9c4d3',
-        fontWeight:
-          activeMenu === 'Aircraft'
-            ? '700'
-            : '500',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease'
-      }}
-    >
-      Aircraft Data
-    </div>
-  )}
-
-
-  {/* SEAT MAP */}
-
-  {userRole !== 'freighter' && (
-    <div
-      onClick={() => setActiveMenu('Seat Map')}
-      style={{
-        marginBottom: '10px',
-        padding: '12px 15px',
-        borderRadius: '9px',
-        background:
-          activeMenu === 'Seat Map'
-            ? 'rgba(21,101,255,0.16)'
-            : 'transparent',
-        border:
-          activeMenu === 'Seat Map'
-            ? '1px solid rgba(21,101,255,0.40)'
-            : '1px solid transparent',
-        color:
-          activeMenu === 'Seat Map'
-            ? '#ffffff'
-            : '#b9c4d3',
-        fontWeight:
-          activeMenu === 'Seat Map'
-            ? '700'
-            : '500',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease'
-      }}
-    >
-      Seat Map
-    </div>
-  )}
-
 
   {/* WEATHER */}
 
