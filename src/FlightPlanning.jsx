@@ -19,11 +19,14 @@ import {
 } from './trainingRoutes';
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
+import { supabase } from './lib/supabase';
 import TrainingRouteDetails from './TrainingRouteDetails';
 export default function FlightPlanning({
+  
   passengerAircraft = [],
   cargoAircraft = []
 }) {
+  
   const [selectedRegistration, setSelectedRegistration] =
     React.useState('');
     // OPERDAT TRAINING — GENERATED OFP
@@ -65,8 +68,71 @@ const [ballastFuel, setBallastFuel] = React.useState('');
 const [policyFuel, setPolicyFuel] = React.useState('');
 const [alternateHoldingAltitude, setAlternateHoldingAltitude] =
   React.useState('1500');
-  
+  const [savedTrainingOFPs, setSavedTrainingOFPs] =
+  React.useState([]);
 
+const [loadingTrainingOFPs, setLoadingTrainingOFPs] =
+  React.useState(false);
+const loadTrainingOFPs = async () => {
+  setLoadingTrainingOFPs(true);
+
+  try {
+    const { data: userData, error: userError } =
+      await supabase.auth.getUser();
+
+    if (userError || !userData.user) {
+      setSavedTrainingOFPs([]);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("training_ofps")
+      .select(
+        "id, flight_number, departure, destination, file_name, file_path, created_at"
+      )
+      .eq("user_id", userData.user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Training OFP history load error:", error);
+      return;
+    }
+
+    setSavedTrainingOFPs(data || []);
+  } catch (error) {
+    console.error("Unable to load Training OFPs:", error);
+    } finally {
+    setLoadingTrainingOFPs(false);
+  }
+};
+
+const viewTrainingOFP = async (filePath) => {
+  const pdfWindow = window.open("", "_blank");
+
+  if (!pdfWindow) {
+    alert("Please allow pop-ups to view the OFP.");
+    return;
+  }
+
+  try {
+    const { data, error } = await supabase.storage
+      .from("training-ofps")
+      .createSignedUrl(filePath, 60);
+
+    if (error || !data?.signedUrl) {
+      throw error || new Error("Signed URL unavailable");
+    }
+
+    pdfWindow.location.href = data.signedUrl;
+  } catch (error) {
+    console.error("Training OFP view error:", error);
+    pdfWindow.close();
+    alert("Unable to open the saved OFP.");
+  }
+};
+React.useEffect(() => {
+  loadTrainingOFPs();
+}, []);
 const selectedTrainingRoute = findTrainingRoute(
   departure,
   destination,
@@ -343,6 +409,15 @@ policyFuel: policyFuel === '' ? 0 : Number(policyFuel),
 };
 const generateOFPPDF = async () => {
   const element = document.getElementById("operdat-training-ofp");
+    const { data: userData, error: userError } =
+    await supabase.auth.getUser();
+
+  if (userError || !userData.user) {
+    alert("Unable to identify the authenticated training user.");
+    return;
+  }
+
+  const trainingUserId = userData.user.id;
 
   if (!element) {
     alert("OPERDAT OFP document not found.");
@@ -351,7 +426,7 @@ const generateOFPPDF = async () => {
 
   try {
     const canvas = await html2canvas(element, {
-      scale: 2,
+      scale: 1,
       backgroundColor: "#ffffff",
       useCORS: true,
       logging: false,
@@ -400,7 +475,59 @@ const generateOFPPDF = async () => {
       flightNumber.trim().replace(/[^a-zA-Z0-9_-]/g, "") ||
       "TRAINING";
 
-    pdf.save(`OPERDAT_OFP_${safeFlightNumber}.pdf`);
+    const pdfFileName = `OPERDAT_OFP_${safeFlightNumber}.pdf`;
+
+const pdfBlob = pdf.output("blob");
+console.log(
+  "OPERDAT OFP upload size:",
+  pdfBlob.size,
+  "bytes",
+  (pdfBlob.size / 1024).toFixed(2),
+  "KB"
+);
+// Mantener la descarga actual del OFP
+pdf.save(pdfFileName);
+console.log("Downloaded OFP:", pdfFileName);
+console.log("PDF size:", pdfBlob.size, "bytes");
+// Crear un nombre único para evitar sobrescribir documentos
+const uniqueFileName = `${crypto.randomUUID()}_${pdfFileName}`;
+
+const storagePath = `${trainingUserId}/${uniqueFileName}`;
+
+// Guardar una copia privada en Supabase
+const { error: uploadError } = await supabase.storage
+  .from("training-ofps")
+  .upload(storagePath, pdfBlob, {
+    contentType: "application/pdf",
+    upsert: false
+  });
+
+if (uploadError) {
+  console.error("Training OFP upload error:", uploadError);
+  alert("OFP downloaded, but could not be saved to training history.");
+} else {
+  console.log("Training OFP uploaded successfully:", storagePath);
+
+  const { error: recordError } = await supabase
+    .from("training_ofps")
+    .insert({
+      user_id: trainingUserId,
+      flight_number: flightNumber || "TRAINING",
+      departure: departure || null,
+      destination: destination || null,
+      file_name: pdfFileName,
+      file_path: storagePath
+    });
+
+  if (recordError) {
+  console.error("Training OFP history error:", recordError);
+  alert("OFP saved to Storage, but history registration failed.");
+} else {
+  console.log("Training OFP history registered successfully.");
+
+  await loadTrainingOFPs();
+}
+}
   } catch (error) {
     console.error("OFP PDF generation error:", error);
     alert("Unable to generate OPERDAT OFP PDF.");
@@ -1526,6 +1653,78 @@ cursor: generatedOFP ? 'pointer' : 'not-allowed',
   fuel planning and simulated flight plan
   generation will be added progressively.
 </p>
+<div
+  style={{
+    marginTop: 24,
+    padding: 20,
+    border: "1px solid #34445a",
+    borderRadius: 10,
+    backgroundColor: "#172235",
+  }}
+>
+  <h3 style={{ color: "#ffffff", marginTop: 0 }}>
+    Saved Training OFPs
+  </h3>
+
+  {loadingTrainingOFPs ? (
+    <p style={{ color: "#b9c4d3" }}>
+      Loading saved OFPs...
+    </p>
+  ) : savedTrainingOFPs.length === 0 ? (
+    <p style={{ color: "#b9c4d3" }}>
+      No saved OFPs yet.
+    </p>
+  ) : (
+    <div>
+      {savedTrainingOFPs.map((ofp, index) => (
+        <div
+          key={ofp.id}
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 12,
+            padding: "12px 0",
+            borderBottom: "1px solid #34445a",
+          }}
+        >
+          <div>
+            <strong style={{ color: "#ffffff" }}>
+              {String(index + 1).padStart(3, "0")} —{" "}
+              {ofp.flight_number || "TRAINING"}
+            </strong>
+
+            <div style={{ color: "#8ca9d8", marginTop: 4 }}>
+              {ofp.departure || "----"} →{" "}
+              {ofp.destination || "----"}
+            </div>
+
+            <small style={{ color: "#b9c4d3" }}>
+              {new Date(ofp.created_at).toLocaleString()}
+            </small>
+          </div>
+
+          <button
+  type="button"
+  onClick={() => viewTrainingOFP(ofp.file_path)}
+  style={{
+    padding: "8px 14px",
+    backgroundColor: "#2563eb",
+    color: "#ffffff",
+    border: "none",
+    borderRadius: 6,
+    cursor: "pointer",
+    fontWeight: 600,
+    whiteSpace: "nowrap",
+  }}
+>
+  View OFP
+</button>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
 </div>
 {/* OPERDAT TRAINING — NEW FLIGHT */}
 {generatedOFP && (
