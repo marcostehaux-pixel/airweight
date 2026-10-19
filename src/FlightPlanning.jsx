@@ -10,6 +10,7 @@ import {
   calculateFuelDistribution
 } from './flightPlanningEngine.js';
 import FuelPlanningSummary from './FuelPlanningSummary.jsx';
+import TrainingMissionGenerator from './TrainingMissionGenerator';
 import TrainingOFP from './TrainingOFP.jsx';
 import {
   findTrainingRoute,
@@ -423,6 +424,10 @@ const generateOFPPDF = async () => {
             fontWeight: '700'
           }}
         >
+          <TrainingMissionGenerator
+  passengerAircraft={passengerAircraft}
+  cargoAircraft={cargoAircraft}
+/>
           OPERDAT TRAINING
         </div>
 
