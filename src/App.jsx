@@ -1,5 +1,6 @@
 import Login from './Login'
 import Landing from './Landing'
+import TrainingLanding from './TrainingLanding'
 import FlightPlanning from './FlightPlanning.jsx';
 import { getCargoFuelIndex } from './utilit/cargoFuelIndex'
 import aircraftCargoDatabase from './data/aircraftCargoDatabase'
@@ -219,6 +220,7 @@ const cargoEditorInputStyle = {
 }
 function App() {
   const [showLandingLogin, setShowLandingLogin] = useState(false)
+  const [showTrainingLanding, setShowTrainingLanding] = useState(false)
 const [logged,setLogged]=useState(false)
 const [userRole, setUserRole] = useState(null)
 const [passwordRecoveryMode, setPasswordRecoveryMode] = useState(false)
@@ -2514,8 +2516,20 @@ console.log({
 })
 if (!logged) {
   if (!showLandingLogin && !passwordRecoveryMode) {
+
+    if (showTrainingLanding) {
+      return (
+        <TrainingLanding
+          onBack={() => setShowTrainingLanding(false)}
+        />
+      )
+    }
+
     return (
-      <Landing onSignIn={() => setShowLandingLogin(true)} />
+      <Landing
+        onSignIn={() => setShowLandingLogin(true)}
+        onOpenTraining={() => setShowTrainingLanding(true)}
+      />
     )
   }
 

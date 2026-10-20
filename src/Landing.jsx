@@ -1,10 +1,11 @@
 
 import loginAircraft from './assets/login-aircraft.png'
 import operdatLogo from './assets/airweight-Logo.png'
-import passengerImage from './assets/operdat-passenger.png'
-import freighterImage from './assets/operdat-freighter.png'
-import weatherImage from './assets/operdat-weather.png'
-export default function Landing({ onSignIn }) {
+import passengerImage from './assets/passenger2026.png'
+import freighterImage from './assets/freighter2026.png'
+import flightPlanningImage from './assets/planingmiss4.png'
+import weatherImage from './assets/weather2026.png'
+export default function Landing({ onSignIn, onOpenTraining }) {
   const buttonStyle = {
     background: '#1769e8',
     color: '#fff',
@@ -43,18 +44,25 @@ export default function Landing({ onSignIn }) {
   borderBottom: '1px solid #28486c',
   boxShadow: '0 4px 16px rgba(0,0,0,0.15)'
 }}>
-  {[
-    ['Inicio', '#inicio'],
-    ['Beneficios', '#beneficios'],
-    ['Cómo funciona', '#funcionamiento'],
-    ['Meteorología', '#meteorologia'],
-    ['Plataforma', '#plataforma'],
-    ['Nosotros', '#nosotros'],
-    ['Contacto', '#contacto']
-  ].map(([label, link]) => (
+ {[
+  ['Inicio', '#inicio'],
+  ['Beneficios', '#beneficios'],
+  ['Cómo funciona', '#funcionamiento'],
+  ['Meteorología', '#meteorologia'],
+  ['Plataforma', '#plataforma'],
+  ['Training', '#training'],
+  ['Nosotros', '#nosotros'],
+  ['Contacto', '#contacto']
+].map(([label, link]) => (
     <a
       key={link}
       href={link}
+      onClick={(e) => {
+        if (label === 'Training') {
+          e.preventDefault()
+          onOpenTraining()
+        }
+      }}
       style={{
         color: '#ffffff',
         textDecoration: 'none',
@@ -254,7 +262,58 @@ export default function Landing({ onSignIn }) {
             </article>
           ))}
         </div>
-        
+      </section>
+        <section
+  id="training"
+  style={{
+    padding: '65px 6%',
+    background: '#081a30',
+    color: '#ffffff',
+    textAlign: 'center'
+  }}
+>
+  <div style={{
+    maxWidth: 850,
+    margin: '0 auto'
+  }}>
+    <p style={{
+      color: '#75b4ff',
+      fontSize: 12,
+      fontWeight: 700,
+      letterSpacing: 2
+    }}>
+      OPERDAT TRAINING
+    </p>
+
+    <h2 style={{
+      fontSize: 'clamp(28px, 4vw, 42px)',
+      marginBottom: 18
+    }}>
+      Entrenamiento en operaciones de vuelo
+    </h2>
+
+    <p style={{
+      color: '#c8d7e8',
+      fontSize: 17,
+      lineHeight: 1.8,
+      marginBottom: 30
+    }}>
+      Una plataforma de simulación para pilotos,
+      despachantes y centros de instrucción.
+      Practicá Flight Planning, peso y balance
+      de aeronaves Passenger y Freighter,
+      y generación de OFP.
+    </p>
+
+    <button
+      type="button"
+      onClick={onOpenTraining}
+      style={buttonStyle}
+    >
+      Conocer OPERDAT Training →
+    </button>
+  </div>
+</section>
 <section id="beneficios" style={{
   padding: '75px 6%',
   background: '#ffffff',
@@ -378,19 +437,13 @@ export default function Landing({ onSignIn }) {
       procedimientos aplicables de cada operador.
     </p>
   </div>
-</section>
-
       </section>
-
-      <section id="funcionamiento" style={{
-        padding: '65px 6%',
-        textAlign: 'center'
-      }}>
-      
-<section style={{
+<section id="funcionamiento" style={{
   padding: '75px 6%',
   background: '#eaf0f7',
-  color: '#15253a'
+  color: '#15253a',
+  textAlign: 'center',
+  scrollMarginTop: 80
 }}>
   <div style={{
   maxWidth: 1150,
@@ -448,11 +501,16 @@ margin: '0 auto 40px'
           title: 'Verificar resultados',
           text: 'Consultá los pesos calculados, el centro de gravedad y las alertas de límites.'
         },
-        {
-          number: '04',
-          title: 'Generar documentación',
-          text: 'Obtené una loadsheet PDF con los resultados de la operación.'
-        }
+       {
+  number: '04',
+  title: 'Generar documentación',
+  text: 'Obtené una loadsheet PDF con los resultados de peso y balance.'
+},
+{
+  number: '05',
+  title: 'Flight Planning Simulator',
+  text: 'En OPERDAT Training, practicá planificación de vuelos con el Boeing 737-800: rutas, viento, tiempos, combustible, alternados y reservas. Generá un OFP simulado para analizar los resultados.'
+}
       ].map(step => (
         <article key={step.number} style={{
           background: '#ffffff',
@@ -488,7 +546,6 @@ margin: '0 auto 40px'
     </div>
   </div>
 </section>
-
 <section id="meteorologia" style={{
   padding: '70px 6%',
   background: '#102c4d',
@@ -653,14 +710,23 @@ margin: '0 auto 45px'
         image: freighterImage
       },
       {
-        title: 'Weather Center',
-        subtitle: 'AVIATION WEATHER',
-        description:
-          'Consulta de METAR y TAF de múltiples aeródromos ' +
-          'desde la misma plataforma, sin necesidad ' +
-          'de utilizar sitios externos.',
-        image: weatherImage
-      }
+  title: 'Weather Center',
+  subtitle: 'AVIATION WEATHER',
+  description:
+    'Consulta de METAR y TAF de múltiples aeródromos ' +
+    'desde la misma plataforma, sin necesidad ' +
+    'de utilizar sitios externos.',
+  image: weatherImage
+},
+{
+  title: 'Flight Planning Simulator',
+  subtitle: 'OPERDAT TRAINING',
+  description:
+    'Simulación de planificación de vuelo con Boeing 737-800. ' +
+    'Cálculo de distancias, viento, tiempos, combustible, ' +
+    'alternados y reservas, con generación de OFP para entrenamiento.',
+  image: flightPlanningImage
+}
     ].map((module, index) => (
       <article key={module.title} style={{
         background: '#ffffff',
@@ -726,36 +792,7 @@ margin: '0 auto 45px'
   </div>
 </section>
 
-        <h2>Weight & Balance · Passenger · Freighter</h2>
-        <p style={{ color: '#bdcde0', lineHeight: 1.7 }}>
-          Configuraciones de aeronaves, verificación de límites,
-          generación de loadsheets PDF e información meteorológica
-          METAR y TAF.
-        </p>
-        <p style={{ marginTop: 35 }}>
-          ¿Querés conocer OPERDAT?
-        </p>
-        <a
-          href="https://wa.me/5492233497378"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={buttonStyle}
-        >
-          Contactar por WhatsApp
-        </a>
-      </section>
-
-      <footer style={{
-        padding: '25px 6%',
-        borderTop: '1px solid #263a53',
-        color: '#a8bbd2',
-        textAlign: 'center',
-        fontSize: 13
-      }}>
-        OPERDAT — Developed by NG Entrenamiento Aeronáutico
-        <p>info@operdat.com</p>
-        
-<section id="nosotros"  style={{
+      <section id="nosotros"  style={{
   padding: '85px 6%',
   background: '#081a30',
   color: '#ffffff'
@@ -914,7 +951,18 @@ margin: '0 auto 45px'
   </div>
 </section>
 
-      </footer>
+<footer style={{
+  padding: '25px 6%',
+  borderTop: '1px solid #263a53',
+  background: '#071629',
+  color: '#a8bbd2',
+  textAlign: 'center',
+  fontSize: 13
+}}>
+  OPERDAT — Developed by NG Entrenamiento Aeronáutico
+  <p>info@operdat.com</p>
+</footer>
+
     </main>
   )
 }
