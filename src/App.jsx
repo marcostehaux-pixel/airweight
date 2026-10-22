@@ -1,6 +1,7 @@
 import Login from './Login'
 import Landing from './Landing'
 import TrainingLanding from './TrainingLanding'
+import TakeoffPerformance from './TakeoffPerformance'
 import FlightPlanning from './FlightPlanning.jsx';
 import { getCargoFuelIndex } from './utilit/cargoFuelIndex'
 import aircraftCargoDatabase from './data/aircraftCargoDatabase'
@@ -3239,6 +3240,41 @@ translate="no"
     }}
   >
     Flight Planning
+  </div>
+)}
+{/* TAKEOFF PERFORMANCE — TRAINING */}
+
+{(
+  userRole === 'student' ||
+  userRole === 'super_admin'
+) && (
+  <div
+    onClick={() => setActiveMenu('Takeoff Performance')}
+    style={{
+      marginBottom: '10px',
+      padding: '12px 15px',
+      borderRadius: '9px',
+      background:
+        activeMenu === 'Takeoff Performance'
+          ? 'rgba(21,101,255,0.16)'
+          : 'transparent',
+      border:
+        activeMenu === 'Takeoff Performance'
+          ? '1px solid rgba(21,101,255,0.40)'
+          : '1px solid transparent',
+      color:
+        activeMenu === 'Takeoff Performance'
+          ? '#ffffff'
+          : '#b9c4d3',
+      fontWeight:
+        activeMenu === 'Takeoff Performance'
+          ? '700'
+          : '500',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease'
+    }}
+  >
+    Takeoff Performance
   </div>
 )}
 {/* PASSENGER */}
@@ -14039,6 +14075,16 @@ await refreshCargoFleet()
   passengerAircraft={passengerAircraftFleet}
   cargoAircraft={cargoAircraftFleet}
 />
+)}
+
+{/* TAKEOFF PERFORMANCE — TRAINING ONLY */}
+
+{(
+  userRole === 'student' ||
+  userRole === 'super_admin'
+) &&
+  activeMenu === 'Takeoff Performance' && (
+    <TakeoffPerformance />
 )}
 
 {(
