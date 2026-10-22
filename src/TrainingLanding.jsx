@@ -1,5 +1,7 @@
 import flightPlanningImage from './assets/planingmiss4.png'
 import ofpImage from './assets/planingmiss6.png'
+import takeoffFieldClimbImage from './assets/takeoff-field-climb.png'
+import takeoffObstacleImage from './assets/takeoff-obstacle.png'
 export default function TrainingLanding({ onBack }) {
   return (
     <main
@@ -176,6 +178,119 @@ export default function TrainingLanding({ onBack }) {
   }}>
     Ejemplo de documentación generada para entrenamiento.
     No válida para operaciones reales.
+  </p>
+</section>
+<section style={{
+  marginTop: 55,
+  padding: 28,
+  background: '#102c4d',
+  border: '1px solid #35628d',
+  borderRadius: 16
+}}>
+  <p style={{
+    color: '#82bcff',
+    fontSize: 12,
+    fontWeight: 700,
+    letterSpacing: 2
+  }}>
+    BOEING 737-800W · TAKEOFF PERFORMANCE
+  </p>
+
+  <h2 style={{ fontSize: 30 }}>
+    Takeoff Performance Simulator
+  </h2>
+
+  <p style={{
+    color: '#d2dfef',
+    fontSize: 16,
+    lineHeight: 1.8
+  }}>
+    Practicá la evaluación de performance de despegue
+    con el Boeing 737-800W mediante un entorno
+    de simulación diseñado para pilotos,
+    despachantes y centros de instrucción.
+  </p>
+
+  <ul style={{
+    color: '#c8d7e8',
+    lineHeight: 2,
+    paddingLeft: 24
+  }}>
+    <li>FIELD LIMIT: condiciones DRY y WET.</li>
+    <li>CLIMB LIMIT: evaluación de limitaciones de ascenso.</li>
+    <li>OBSTACLE LIMIT: análisis de limitaciones por obstáculos.</li>
+    <li>Configuraciones FLAPS 1, 5, 10, 15 y 25.</li>
+    <li>Correcciones por condiciones y configuración de despegue.</li>
+    <li>Comparación de los pesos limitantes para el ejercicio.</li>
+  </ul>
+
+  <p style={{
+    color: '#82bcff',
+    fontSize: 16,
+    fontWeight: 700,
+    marginTop: 22
+  }}>
+    Del Flight Planning al análisis de performance,
+    en un mismo entorno de entrenamiento.
+  </p>
+<div style={{ marginTop: 35 }}>
+  <h3 style={{ color: '#82bcff', fontSize: 21 }}>
+    Field Limit & Climb Limit
+  </h3>
+
+  <p style={{ color: '#c8d7e8', lineHeight: 1.7 }}>
+    Evaluación de los pesos limitantes de despegue
+    según las condiciones de pista, configuración
+    de la aeronave y performance de ascenso.
+  </p>
+
+  <img
+    src={takeoffFieldClimbImage}
+    alt="OPERDAT Training - Field Limit y Climb Limit"
+    loading="lazy"
+    style={{
+      display: 'block',
+      width: '100%',
+      height: 'auto',
+      marginTop: 20,
+      borderRadius: 12,
+      border: '1px solid #35628d'
+    }}
+  />
+</div>
+
+<div style={{ marginTop: 45 }}>
+  <h3 style={{ color: '#82bcff', fontSize: 21 }}>
+    Obstacle Limit
+  </h3>
+
+  <p style={{ color: '#c8d7e8', lineHeight: 1.7 }}>
+    Simulación de limitaciones de peso al despegue
+    por obstáculos, considerando las condiciones
+    y parámetros del ejercicio.
+  </p>
+
+  <img
+    src={takeoffObstacleImage}
+    alt="OPERDAT Training - Obstacle Limit"
+    loading="lazy"
+    style={{
+      display: 'block',
+      width: '100%',
+      height: 'auto',
+      marginTop: 20,
+      borderRadius: 12,
+      border: '1px solid #35628d'
+    }}
+  />
+</div>
+  <p style={{
+    color: '#a9bdd4',
+    fontSize: 12,
+    marginTop: 18
+  }}>
+    Simulación didáctica con datos y modelos
+    de entrenamiento. No válida para operaciones reales.
   </p>
 </section>
 <section style={{ marginTop: 65 }}>

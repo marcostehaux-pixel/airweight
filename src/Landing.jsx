@@ -292,18 +292,20 @@ export default function Landing({ onSignIn, onOpenTraining }) {
       Entrenamiento en operaciones de vuelo
     </h2>
 
-    <p style={{
-      color: '#c8d7e8',
-      fontSize: 17,
-      lineHeight: 1.8,
-      marginBottom: 30
-    }}>
-      Una plataforma de simulación para pilotos,
-      despachantes y centros de instrucción.
-      Practicá Flight Planning, peso y balance
-      de aeronaves Passenger y Freighter,
-      y generación de OFP.
-    </p>
+   <p style={{
+  color: '#c8d7e8',
+  fontSize: 17,
+  lineHeight: 1.8,
+  marginBottom: 30
+}}>
+  Una plataforma de simulación para pilotos,
+  despachantes y centros de instrucción aeronáutica.
+  Practicá Flight Planning, Takeoff Performance
+  para Boeing 737-800W y peso y balance
+  de aeronaves Passenger y Freighter.
+  Generá OFP y loadsheets para desarrollar
+  ejercicios integrales de operaciones de vuelo.
+</p>
 
     <button
       type="button"
@@ -510,6 +512,11 @@ margin: '0 auto 40px'
   number: '05',
   title: 'Flight Planning Simulator',
   text: 'En OPERDAT Training, practicá planificación de vuelos con el Boeing 737-800: rutas, viento, tiempos, combustible, alternados y reservas. Generá un OFP simulado para analizar los resultados.'
+},
+{
+  number: '06',
+  title: 'Takeoff Performance Simulator',
+  text: 'En OPERDAT Training, practicá cálculos de performance de despegue con el Boeing 737-800W. Evaluá FIELD LIMIT en condiciones DRY/WET, CLIMB LIMIT y OBSTACLE LIMIT, considerando distintas configuraciones de FLAPS y condiciones de despegue.'
 }
       ].map(step => (
         <article key={step.number} style={{
