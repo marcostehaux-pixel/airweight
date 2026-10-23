@@ -367,7 +367,9 @@ export default function TrainingLanding({ onBack }) {
       </p>
 
       <a
-        href="mailto:info@operdat.com?subject=Consulta%20OPERDAT%20Training%20Academy"
+  href="https://wa.me/5492233497378?text=Hola%2C%20represento%20una%20escuela%20o%20centro%20de%20instrucci%C3%B3n%20aeron%C3%A1utica%20y%20quisiera%20recibir%20informaci%C3%B3n%20sobre%20las%20licencias%20institucionales%20de%20OPERDAT%20Training%20Academy."
+  target="_blank"
+  rel="noopener noreferrer"
         style={{
           display: 'inline-block',
           marginTop: 15,
