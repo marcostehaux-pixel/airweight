@@ -125,11 +125,13 @@ export default function Landing({ onSignIn, onOpenTraining }) {
             entrenamiento aeronáutico.
           </p>
           <a
-            href="mailto:info@operdat.com?subject=Solicitar%20demostracion%20OPERDAT"
-            style={buttonStyle}
-          >
-            Solicitar demostración
-          </a>
+  href="https://wa.me/5492233497378?text=Hola%2C%20me%20interesa%20conocer%20OPERDAT%20y%20quisiera%20solicitar%20una%20demostraci%C3%B3n%20de%20la%20plataforma."
+  target="_blank"
+  rel="noopener noreferrer"
+  style={buttonStyle}
+>
+  Solicitar demostración por WhatsApp
+</a>
         </div>
       </section>
 
@@ -915,7 +917,9 @@ margin: '0 auto 45px'
       gap: 16
     }}>
       <a
-        href="mailto:info@operdat.com?subject=Solicitud%20de%20demostraci%C3%B3n%20OPERDAT"
+        href="https://wa.me/5492233497378?text=Hola%2C%20me%20interesa%20conocer%20OPERDAT%20y%20quisiera%20solicitar%20una%20demostraci%C3%B3n%20de%20la%20plataforma."
+       target="_blank"
+rel="noopener noreferrer"
         style={{
           background: '#ffffff',
           color: '#0a3772',
@@ -924,6 +928,7 @@ margin: '0 auto 45px'
           textDecoration: 'none',
           fontWeight: 700,
           display: 'inline-block'
+          
         }}
       >
         Solicitar demostración
