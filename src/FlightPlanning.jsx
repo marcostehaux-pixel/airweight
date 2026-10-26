@@ -31,6 +31,10 @@ export default function FlightPlanning({
     React.useState('');
     // OPERDAT TRAINING — GENERATED OFP
 const [generatedOFP, setGeneratedOFP] = React.useState(null);
+const [ofpInputsChanged, setOfpInputsChanged] = React.useState(false);
+const [savingOFP, setSavingOFP] = React.useState(false);
+const [ofpSaveError, setOfpSaveError] = React.useState("");
+const [pendingOFPSave, setPendingOFPSave] = React.useState(false);
 const [flightNumber, setFlightNumber] = React.useState('');
 const [departure, setDeparture] = React.useState('');
 const [destination, setDestination] = React.useState('');
@@ -265,6 +269,36 @@ const preliminaryFuelDistribution =
     aircraft =>
       aircraft.registration === selectedRegistration
   );
+  
+const currentOFPInputs = JSON.stringify({
+  flightNumber,
+  selectedRegistration,
+  departure,
+  destination,
+  alternate,
+  zfw,
+  cruiseLevel,
+  averageWind,
+  alternateGroundSpeed,
+  alternateHoldingTime,
+  taxiFuel,
+  extraFuel,
+  tankeringFuel,
+  etopsFuel,
+  ballastFuel,
+  policyFuel,
+});
+
+const generatedOFPInputsRef = React.useRef(null);
+
+React.useEffect(() => {
+  if (!generatedOFP || !generatedOFPInputsRef.current) return;
+
+  setOfpInputsChanged(
+    currentOFPInputs !== generatedOFPInputsRef.current
+  );
+}, [currentOFPInputs, generatedOFP]);
+
   // OPERDAT TRAINING — OFP DISPLAY DATA
 const ofpDisplayData = generatedOFP ?? {
   flightNumber,
@@ -311,7 +345,10 @@ afterHoldingFuel:
 // OPERDAT TRAINING — NEW FLIGHT
 const startNewFlight = () => {
   // Clear generated OFP
-  setGeneratedOFP(null);
+  
+setGeneratedOFP(null);
+setOfpInputsChanged(false);
+generatedOFPInputsRef.current = null;
 
   // Flight identification
   setFlightNumber('');
@@ -342,9 +379,74 @@ const startNewFlight = () => {
   setExtraFuel('');
   setTankeringFuel('');
 };
-  // OPERDAT TRAINING — GENERATE OFP
+  
+// OPERDAT TRAINING — GENERATE OFP
 const generateOFP = () => {
+  const requiredFields = [
+    ["Flight Number", flightNumber],
+    ["Aircraft Registration", selectedRegistration],
+    ["Departure ICAO", departure],
+    ["Destination ICAO", destination],
+    ["Alternate ICAO", alternate],
+    ["Estimated Zero Fuel Weight", zfw],
+    ["Cruise Flight Level", cruiseLevel],
+    ["Average Wind Component", averageWind],
+    ["Alternate Average Ground Speed", alternateGroundSpeed],
+    ["Alternate Holding Time", alternateHoldingTime],
+    ["Taxi / APU Fuel", taxiFuel],
+    ["Extra Fuel", extraFuel],
+    ["Tankering Fuel", tankeringFuel],
+    ["ETOPS Fuel", etopsFuel],
+    ["Ballast Fuel", ballastFuel],
+    ["Policy Fuel", policyFuel],
+  ];
+
+  const missingFields = requiredFields
+    .filter(([, value]) => value == null || String(value).trim() === "")
+    .map(([label]) => label);
+
+  if (missingFields.length > 0) {
+    alert(
+      "INCOMPLETE FLIGHT PLANNING DATA\n\n" +
+      "Please complete the following fields:\n\n" +
+      missingFields.map((field) => "• " + field).join("\n") +
+      "\n\nEnter 0 where applicable."
+    );
+    return;
+  }
+
+  const invalidFuelFields = [
+    ["Taxi / APU Fuel", taxiFuel],
+    ["Extra Fuel", extraFuel],
+    ["Tankering Fuel", tankeringFuel],
+    ["ETOPS Fuel", etopsFuel],
+    ["Ballast Fuel", ballastFuel],
+    ["Policy Fuel", policyFuel],
+  ].filter(([, value]) => !Number.isFinite(Number(value)) || Number(value) < 0);
+
+  if (invalidFuelFields.length > 0) {
+    alert("INVALID FUEL VALUES\n\nFuel quantities must be zero or greater.");
+    return;
+  }
+
+  if (
+    !selectedTrainingRoute ||
+    !selectedAlternateRoute ||
+    !lrcTripResult ||
+    !alternateFuelResult ||
+    !preliminaryHoldingResult ||
+    !preliminaryFuelDistribution
+  ) {
+    alert(
+      "OFP CALCULATION INCOMPLETE\n\n" +
+      "Verify the selected routes, cruise level, air distance " +
+      "and fuel calculations before generating the OFP."
+    );
+    return;
+  }
+
   const generatedAtUTC = new Date().toISOString();
+
 
   const ofpData = {
     generatedAtUTC,
@@ -405,134 +507,216 @@ policyFuel: policyFuel === '' ? 0 : Number(policyFuel),
       preliminaryFuelDistribution?.afterHoldingFuel ?? null,
   };
 
-  setGeneratedOFP(ofpData);
-};
-const generateOFPPDF = async () => {
-  const element = document.getElementById("operdat-training-ofp");
-    const { data: userData, error: userError } =
-    await supabase.auth.getUser();
+  
 
-  if (userError || !userData.user) {
-    alert("Unable to identify the authenticated training user.");
+
+generatedOFPInputsRef.current = currentOFPInputs;
+setOfpSaveError("");
+setOfpInputsChanged(false);
+setPendingOFPSave(true);
+setGeneratedOFP(ofpData);
+
+
+};
+
+const saveGeneratedOFP = async (ofpData) => {
+  setSavingOFP(true);
+  setOfpSaveError("");
+
+  let storagePath = null;
+
+  try {
+    const { data: userData, error: userError } =
+      await supabase.auth.getUser();
+
+    if (userError || !userData?.user) {
+      throw new Error("Unable to identify the authenticated user.");
+    }
+
+    const pdf = await createOFPDocument();
+    const pdfBlob = pdf.output("blob");
+
+    const safeFlightNumber =
+      String(ofpData.flightNumber || "TRAINING")
+        .trim()
+        .replace(/[^a-zA-Z0-9_-]/g, "") || "TRAINING";
+
+    const pdfFileName = `OPERDAT_OFP_${safeFlightNumber}.pdf`;
+
+    storagePath =
+      `${userData.user.id}/${crypto.randomUUID()}_${pdfFileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("training-ofps")
+      .upload(storagePath, pdfBlob, {
+        contentType: "application/pdf",
+        upsert: false,
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { error: recordError } = await supabase
+      .from("training_ofps")
+      .insert({
+        user_id: userData.user.id,
+        flight_number: ofpData.flightNumber,
+        departure: ofpData.origin,
+        destination: ofpData.destination,
+        file_name: pdfFileName,
+        file_path: storagePath,
+      });
+
+    if (recordError) throw recordError;
+
+    await loadTrainingOFPs();
+
+    return true;
+  } catch (error) {
+    console.error("Automatic OFP save error:", error);
+
+    if (storagePath) {
+      // Avoid leaving a PDF without a history record.
+      // A removal attempt is harmless if the upload failed.
+      await supabase.storage
+        .from("training-ofps")
+        .remove([storagePath]);
+    }
+
+    setOfpSaveError(
+      "Unable to save the OFP. Please try again."
+    );
+
+    return false;
+  } finally {
+    setSavingOFP(false);
+  }
+};
+
+const createOFPDocument = async () => {
+  const element = document.getElementById("operdat-training-ofp");
+
+  if (!element) {
+    throw new Error("OPERDAT OFP document not found.");
+  }
+
+  const canvas = await html2canvas(element, {
+    scale: 1,
+    backgroundColor: "#ffffff",
+    useCORS: true,
+    logging: false,
+  });
+
+  const imageData = canvas.toDataURL("image/png");
+
+  const pdf = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4",
+  });
+
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+
+  const margin = 10;
+  const usableWidth = pageWidth - margin * 2;
+  const usableHeight = pageHeight - margin * 2;
+
+  const imageHeight = (canvas.height * usableWidth) / canvas.width;
+
+  let remainingHeight = imageHeight;
+  let offset = 0;
+
+  while (remainingHeight > 0) {
+    if (offset > 0) {
+      pdf.addPage();
+    }
+
+    pdf.addImage(
+      imageData,
+      "PNG",
+      margin,
+      margin - offset,
+      usableWidth,
+      imageHeight
+    );
+
+    remainingHeight -= usableHeight;
+    offset += usableHeight;
+  }
+
+  return pdf;
+};
+
+React.useEffect(() => {
+  if (!pendingOFPSave || !generatedOFP) return;
+
+  let cancelled = false;
+
+  const saveAfterRender = async () => {
+    // Wait until React has rendered the generated OFP.
+    await new Promise((resolve) =>
+      requestAnimationFrame(() =>
+        requestAnimationFrame(resolve)
+      )
+    );
+
+    if (cancelled) return;
+
+    setPendingOFPSave(false);
+    await saveGeneratedOFP(generatedOFP);
+  };
+
+  saveAfterRender();
+
+  return () => {
+    cancelled = true;
+  };
+}, [pendingOFPSave, generatedOFP]);
+
+
+const generateOFPPDF = async () => {
+  if (!generatedOFP) {
+    alert("Generate the OFP before downloading the PDF.");
     return;
   }
 
-  const trainingUserId = userData.user.id;
+if (
+  ofpInputsChanged ||
+  (generatedOFPInputsRef.current !== null &&
+    currentOFPInputs !== generatedOFPInputsRef.current)
+) {
+  alert(
+    "OFP PARAMETERS MODIFIED\n\n" +
+    "Flight planning parameters have changed since the OFP was generated.\n\n" +
+    "Please generate a new OFP before downloading the PDF."
+  );
+  return;
+}
 
-  if (!element) {
-    alert("OPERDAT OFP document not found.");
+  if (savingOFP || pendingOFPSave) {
+    alert("Please wait until the OFP saving process finishes.");
     return;
   }
 
   try {
-    const canvas = await html2canvas(element, {
-      scale: 1,
-      backgroundColor: "#ffffff",
-      useCORS: true,
-      logging: false,
-    });
-
-    const imageData = canvas.toDataURL("image/png");
-
-    const pdf = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4",
-    });
-
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-
-    const margin = 10;
-    const usableWidth = pageWidth - margin * 2;
-    const usableHeight = pageHeight - margin * 2;
-
-    const imageHeight =
-      (canvas.height * usableWidth) / canvas.width;
-
-    let remainingHeight = imageHeight;
-    let offset = 0;
-
-    while (remainingHeight > 0) {
-      if (offset > 0) {
-        pdf.addPage();
-      }
-
-      pdf.addImage(
-        imageData,
-        "PNG",
-        margin,
-        margin - offset,
-        usableWidth,
-        imageHeight
-      );
-
-      remainingHeight -= usableHeight;
-      offset += usableHeight;
-    }
+    const pdf = await createOFPDocument();
 
     const safeFlightNumber =
-      flightNumber.trim().replace(/[^a-zA-Z0-9_-]/g, "") ||
-      "TRAINING";
+      String(generatedOFP.flightNumber || "TRAINING")
+        .trim()
+        .replace(/[^a-zA-Z0-9_-]/g, "") || "TRAINING";
 
     const pdfFileName = `OPERDAT_OFP_${safeFlightNumber}.pdf`;
 
-const pdfBlob = pdf.output("blob");
-console.log(
-  "OPERDAT OFP upload size:",
-  pdfBlob.size,
-  "bytes",
-  (pdfBlob.size / 1024).toFixed(2),
-  "KB"
-);
-// Mantener la descarga actual del OFP
-pdf.save(pdfFileName);
-console.log("Downloaded OFP:", pdfFileName);
-console.log("PDF size:", pdfBlob.size, "bytes");
-// Crear un nombre único para evitar sobrescribir documentos
-const uniqueFileName = `${crypto.randomUUID()}_${pdfFileName}`;
+    pdf.save(pdfFileName);
 
-const storagePath = `${trainingUserId}/${uniqueFileName}`;
-
-// Guardar una copia privada en Supabase
-const { error: uploadError } = await supabase.storage
-  .from("training-ofps")
-  .upload(storagePath, pdfBlob, {
-    contentType: "application/pdf",
-    upsert: false
-  });
-
-if (uploadError) {
-  console.error("Training OFP upload error:", uploadError);
-  alert("OFP downloaded, but could not be saved to training history.");
-} else {
-  console.log("Training OFP uploaded successfully:", storagePath);
-
-  const { error: recordError } = await supabase
-    .from("training_ofps")
-    .insert({
-      user_id: trainingUserId,
-      flight_number: flightNumber || "TRAINING",
-      departure: departure || null,
-      destination: destination || null,
-      file_name: pdfFileName,
-      file_path: storagePath
-    });
-
-  if (recordError) {
-  console.error("Training OFP history error:", recordError);
-  alert("OFP saved to Storage, but history registration failed.");
-} else {
-  console.log("Training OFP history registered successfully.");
-
-  await loadTrainingOFPs();
-}
-}
+    console.log("OFP PDF downloaded:", pdfFileName);
   } catch (error) {
-    console.error("OFP PDF generation error:", error);
-    alert("Unable to generate OPERDAT OFP PDF.");
+    console.error("OFP PDF download error:", error);
+    alert("Unable to download OPERDAT OFP PDF.");
   }
 };
+
   return (
     <div
       style={{
@@ -1686,12 +1870,19 @@ takeoffFuel={
 </div>
 {/* OPERDAT TRAINING — GENERATE OFP */}
 <div style={{ marginTop: '20px' }}>
-  <button
-    type="button"
-    onClick={generateOFP}
+  
+<button
+  type="button"
+  onClick={generateOFP}
+  disabled={savingOFP || pendingOFPSave}
+
     style={{
       padding: '12px 24px',
-      backgroundColor: '#1769aa',
+      
+backgroundColor: savingOFP || pendingOFPSave
+  ? '#64748b'
+  : '#1769aa',
+
       color: '#ffffff',
       border: 'none',
       borderRadius: '6px',
@@ -1699,7 +1890,11 @@ takeoffFuel={
       cursor: 'pointer',
     }}
   >
-    Generate OFP
+    
+{savingOFP || pendingOFPSave
+  ? 'Saving OFP...'
+  : 'Generate OFP'}
+
   </button>
 </div>
 {/* OPERDAT TRAINING — PDF EXPORT */}
@@ -1735,6 +1930,30 @@ cursor: generatedOFP ? 'pointer' : 'not-allowed',
   fuel planning and simulated flight plan
   generation will be added progressively.
 </p>
+{/* OPERDAT TRAINING — NEW FLIGHT */}
+{generatedOFP && (
+  <div style={{ marginTop: '10px' }}>
+    <button
+      type="button"
+      onClick={startNewFlight}
+      disabled={savingOFP || pendingOFPSave}
+      style={{
+        padding: '10px 20px',
+        backgroundColor: '#64748b',
+        color: '#ffffff',
+        border: 'none',
+        borderRadius: '6px',
+        fontWeight: 'bold',
+        cursor: savingOFP || pendingOFPSave
+  ? 'not-allowed'
+  : 'pointer',
+opacity: savingOFP || pendingOFPSave ? 0.5 : 1,
+      }}
+    >
+      New Flight
+    </button>
+  </div>
+)}
 <div
   style={{
     marginTop: 24,
@@ -1808,26 +2027,7 @@ cursor: generatedOFP ? 'pointer' : 'not-allowed',
   )}
 </div>
 </div>
-{/* OPERDAT TRAINING — NEW FLIGHT */}
-{generatedOFP && (
-  <div style={{ marginTop: '10px' }}>
-    <button
-      type="button"
-      onClick={startNewFlight}
-      style={{
-        padding: '10px 20px',
-        backgroundColor: '#64748b',
-        color: '#ffffff',
-        border: 'none',
-        borderRadius: '6px',
-        fontWeight: 'bold',
-        cursor: 'pointer',
-      }}
-    >
-      New Flight
-    </button>
-  </div>
-)}
+
 </div>
 );
 }
