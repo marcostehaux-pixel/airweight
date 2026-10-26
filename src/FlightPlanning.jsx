@@ -868,6 +868,33 @@ readOnly
     }}
   />
 </div>
+{/* OPERDAT TRAINING — ALTERNATE AVAILABILITY WARNING */}
+
+{destination &&
+  getAvailableDestinations(destination, 'B738').length === 0 && (
+    <div
+      role="alert"
+      style={{
+        padding: '14px 18px',
+        marginBottom: '20px',
+        borderRadius: '8px',
+        background: 'rgba(245, 158, 11, 0.12)',
+        border: '1px solid #f59e0b',
+        color: '#fbbf24',
+        fontSize: '13px',
+        lineHeight: '1.6'
+      }}
+    >
+      <strong>ALTERNATE ROUTE NOT AVAILABLE</strong>
+
+      <div style={{ marginTop: '6px' }}>
+        No alternate route is currently configured for
+        destination {destination}.
+        Alternate distance and fuel calculations
+        cannot be completed.
+      </div>
+    </div>
+)}
 {/* ALTERNATE ROUTE DISTANCE */}
 
 <div style={{ marginBottom: '24px' }}>
@@ -1517,7 +1544,62 @@ readOnly
 </div>
 
 {/* OPERDAT TRAINING — DISPATCH FUEL SUMMARY */}
+{/* LRC AIR DISTANCE RANGE WARNING */}
 
+{airDistanceResult &&
+  (airDistanceResult.airDistance < 200 ||
+    airDistanceResult.airDistance > 5000) && (
+    <div
+      role="alert"
+      style={{
+        padding: '14px 18px',
+        marginBottom: '20px',
+        borderRadius: '8px',
+        background: 'rgba(245, 158, 11, 0.12)',
+        border: '1px solid #f59e0b',
+        color: '#fbbf24',
+        fontSize: '13px',
+        lineHeight: '1.6'
+      }}
+    >
+      <strong>LRC AIR DISTANCE LIMITATION</strong>
+
+      <div style={{ marginTop: '6px' }}>
+        The current B737-800 LRC training model supports
+        air distances between 200 and 5,000 NM only.
+        The selected route is outside the supported range.
+        LRC fuel calculations are unavailable.
+      </div>
+    </div>
+)}
+{/* LRC PERFORMANCE RANGE WARNING */}
+
+{cruiseLevel !== '' &&
+  (Number(cruiseLevel) < 290 ||
+    Number(cruiseLevel) > 370) && (
+    <div
+      role="alert"
+      style={{
+        padding: '14px 18px',
+        marginBottom: '20px',
+        borderRadius: '8px',
+        background: 'rgba(245, 158, 11, 0.12)',
+        border: '1px solid #f59e0b',
+        color: '#fbbf24',
+        fontSize: '13px',
+        lineHeight: '1.6'
+      }}
+    >
+      <strong>LRC PERFORMANCE LIMITATION</strong>
+
+      <div style={{ marginTop: '6px' }}>
+        The current B737-800 LRC training model supports
+        cruise levels FL290 through FL370 only.
+        Select a level within this range to enable
+        LRC fuel calculations.
+      </div>
+    </div>
+)}
 <FuelPlanningSummary
   tripFuel={lrcTripResult?.referenceTripFuel ?? null}
   tripTimeMinutes={lrcTripResult?.referenceTripTimeMinutes ?? null}

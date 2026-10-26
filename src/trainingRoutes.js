@@ -564,6 +564,149 @@ source: "GOL G37617 OFP - 17NOV2018 - SAAR/SBGL",
     "GOL GLO1111 OFP - 31DEC2009 - SPIM/SPSO alternate",
 
   trainingOnly: true
+},
+{
+  id: "SCEL-SCFA-01",
+  from: "SCEL",
+  to: "SCFA",
+  aircraft: "B738",
+
+  waypoints: [
+    "DONTI",
+    "TENUT",
+    "ITAVA",
+    "KUGAP",
+    "EDRON",
+    "TITKI",
+    "ANDAK",
+    "KILIN",
+    "VUGUS",
+    "PUNAP",
+    "ILSOT",
+    "DOVKA",
+    "PUNSO",
+    "DOVRI",
+    "LOMUN",
+    "SCFA"
+  ],
+
+  distanceNM: 605,
+
+  complete: false,
+  navigationVerified: false,
+  testEnabled: true,
+
+  referenceCruiseLevel: 350,
+
+  routeText:
+    "SCEL DONTI6A DONTI Q802 DOVRI DOVRI6C LOMUN ILS RWY01 SCFA",
+
+  source:
+    "AIP Chile - SCEL SID DONTI 6A / Q802 / SCFA STAR DOVRI 6C / ILS RWY 01 - Simulated training distance",
+
+  trainingOnly: true
+},
+{
+  id: "SCFA-SCDA-01",
+  from: "SCFA",
+  to: "SCDA",
+  aircraft: "B738",
+
+  waypoints: [
+    "ARPOM",
+    "GAXIR",
+    "SIREX",
+    "KETUM",
+    "DA357",
+    "DA025",
+    "BOKIK",
+    "SCDA"
+  ],
+
+  distanceNM: 225,
+
+  complete: false,
+  navigationVerified: false,
+  testEnabled: true,
+
+  referenceCruiseLevel: 190,
+
+  routeText:
+    "SCFA ARPOM3B ARPOM Q802 GAXIR GAXIR6B BOKIK ILS Z RWY19 SCDA",
+
+  source:
+    "AIP Chile - SCFA SID ARPOM 3B / Q802 / SCDA STAR GAXIR 6B / ILS Z RWY 19 - Simulated training distance",
+
+  trainingOnly: true
+},
+{
+  id: "SCEL-SCIE-01",
+  from: "SCEL",
+  to: "SCIE",
+  aircraft: "B738",
+
+  waypoints: [
+    "GELUS",
+    "DALAX",
+    "ETAGA",
+    "ARUNI",
+    "IE461",
+    "IE344",
+    "MASLI",
+    "DAPSO",
+    "SCIE"
+  ],
+
+  distanceNM: 275,
+
+  complete: false,
+  navigationVerified: false,
+  testEnabled: true,
+
+  referenceCruiseLevel: 250,
+
+  routeText:
+    "SCEL GELUS6A GELUS Q809 ARUNI ARUNI1D DAPSO ILS W RWY02 SCIE",
+
+  source:
+    "AIP Chile - SCEL SID GELUS 6A / Q809 / SCIE STAR ARUNI 1D / ILS W RWY 02 - Simulated training distance",
+
+  trainingOnly: true
+},
+{
+  id: "SCIE-SCQP-01",
+  from: "SCIE",
+  to: "SCQP",
+  aircraft: "B738",
+
+  waypoints: [
+    "MUBUG",
+    "DAGEN",
+    "PANEX",
+    "ILNUT",
+    "NEKOR",
+    "KOLTI",
+    "PULMO",
+    "DORGA",
+    "QP026",
+    "SCQP"
+  ],
+
+  distanceNM: 215,
+
+  complete: false,
+  navigationVerified: false,
+  testEnabled: true,
+
+  referenceCruiseLevel: 190,
+
+  routeText:
+    "SCIE PANEX3M PANEX Q809 NEKOR NEKOR4B KOLTI RNP RWY19 SCQP",
+
+  source:
+    "AIP Chile - SCIE SID PANEX 3M / Q809 / SCQP STAR NEKOR 4B / RNP RWY 19 - Simulated training distance",
+
+  trainingOnly: true
 }
 ];
 export function findTrainingRoute(from, to, aircraft) {
@@ -596,7 +739,10 @@ export function getAvailableDestinations(from, aircraft) {
         )
         .map((route) => route.to)
     )
+    
   ];
+  
+  
 }
 // OPERDAT TRAINING
 // Available departure airports
