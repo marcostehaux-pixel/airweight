@@ -1051,7 +1051,7 @@ if (response.ok) {
     <span style={{ color: 'rgba(255,255,255,0.25)' }}>•</span>
 
     <a
-      href="https://wa.me/5492233497378"
+      href="https://wa.me/5492236000305"
       target="_blank"
       rel="noopener noreferrer"
       style={{

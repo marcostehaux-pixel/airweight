@@ -125,7 +125,7 @@ export default function Landing({ onSignIn, onOpenTraining }) {
             entrenamiento aeronáutico.
           </p>
           <a
-  href="https://wa.me/5492233497378?text=Hola%2C%20me%20interesa%20conocer%20OPERDAT%20y%20quisiera%20solicitar%20una%20demostraci%C3%B3n%20de%20la%20plataforma."
+  href="https://wa.me/5492236000305?text=Hola%2C%20me%20interesa%20conocer%20OPERDAT%20y%20quisiera%20solicitar%20una%20demostraci%C3%B3n%20de%20la%20plataforma."
   target="_blank"
   rel="noopener noreferrer"
   style={buttonStyle}
@@ -917,7 +917,7 @@ margin: '0 auto 45px'
       gap: 16
     }}>
       <a
-        href="https://wa.me/5492233497378?text=Hola%2C%20me%20interesa%20conocer%20OPERDAT%20y%20quisiera%20solicitar%20una%20demostraci%C3%B3n%20de%20la%20plataforma."
+        href="https://wa.me/5492236000305?text=Hola%2C%20me%20interesa%20conocer%20OPERDAT%20y%20quisiera%20solicitar%20una%20demostraci%C3%B3n%20de%20la%20plataforma."
        target="_blank"
 rel="noopener noreferrer"
         style={{
@@ -935,7 +935,7 @@ rel="noopener noreferrer"
       </a>
 
       <a
-        href="https://wa.me/5492233497378?text=Hola%2C%20quisiera%20conocer%20m%C3%A1s%20sobre%20OPERDAT."
+        href="https://wa.me/5492236000305?text=Hola%2C%20quisiera%20conocer%20m%C3%A1s%20sobre%20OPERDAT."
         target="_blank"
         rel="noopener noreferrer"
         style={{
