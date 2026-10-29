@@ -595,8 +595,81 @@ forwardCargoArm:320,
 aftCargoArm:900
 
 
+},
+{
+registration:'EC-LXV',
+
+type:'B737-800',
+
+datum:0,
+
+mac:155.8,
+
+lemac:627.1,
+
+basicWeight:42788,
+
+basicIndex:53,
+indexReferenceArm: 658.3,
+
+indexConstant: 35000,
+
+indexOffset: 45,
+basicConfig:'2/4',
+basicCrew:'STD CREW',
+maxZFW:61688,
+maxTOW:79015,
+maxRW:79300,
+maxLW:65317,
+envelope: {
+
+zf:{
+
+indexMin:42,
+
+indexMax:58,
+
+cgMin:18,
+
+cgMax:32
+
+},
+
+tow:{
+
+indexMin:12,
+
+indexMax:92,
+
+cgMin:19,
+
+cgMax:31
+
+},
+
+lw:{
+
+indexMin:11,
+
+indexMax:91,
+
+cgMin:18,
+
+cgMax:31
+
 }
 
+},
+seatArmFwd:360,
+seatArmMid:620,
+seatArmAft:930,
+
+fuelArm:650,
+
+forwardCargoArm:320,
+aftCargoArm:900
+
+},
 
 ]
 

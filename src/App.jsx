@@ -7151,10 +7151,7 @@ width:'120px'
 
         onChange={(e) => {
 
-         const passengerFleet =
-  userRole === 'student'
-    ? aircraftDatabase
-    : passengerAircraftFleet
+  const passengerFleet = passengerAircraftFleet
 
 const aircraft =
   passengerFleet.find(
@@ -7190,12 +7187,8 @@ boxShadow:
 >
       
 
-        {
-  (
-    userRole === 'student'
-      ? aircraftDatabase
-      : passengerAircraftFleet
-  ).map((aircraft) => (
+      {
+  passengerAircraftFleet.map((aircraft) => (
 
           <option
 
