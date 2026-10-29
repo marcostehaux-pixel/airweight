@@ -7071,14 +7071,8 @@ placeholder="FROM-ICAO"
 
 value={flightFrom}
 
-onChange={(e)=>
-
-setFlightFrom(
-
-e.target.value
-
-)
-
+onChange={(e) =>
+  setFlightFrom(e.target.value.toUpperCase())
 }
 
 style={{
@@ -7097,14 +7091,8 @@ placeholder="TO-ICAO"
 
 value={flightTo}
 
-onChange={(e)=>
-
-setFlightTo(
-
-e.target.value
-
-)
-
+onChange={(e) =>
+  setFlightTo(e.target.value.toUpperCase())
 }
 
 style={{
@@ -7123,14 +7111,8 @@ placeholder="FLIGHT NR"
 
 value={flightNumber}
 
-onChange={(e)=>
-
-setFlightNumber(
-
-e.target.value
-
-)
-
+onChange={(e) =>
+  setFlightNumber(e.target.value.toUpperCase())
 }
 
 style={{

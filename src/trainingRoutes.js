@@ -707,8 +707,86 @@ source: "GOL G37617 OFP - 17NOV2018 - SAAR/SBGL",
     "AIP Chile - SCIE SID PANEX 3M / Q809 / SCQP STAR NEKOR 4B / RNP RWY 19 - Simulated training distance",
 
   trainingOnly: true
+},
+{
+  id: "LEBL-LEMD-01",
+  from: "LEBL",
+  to: "LEMD",
+  aircraft: "B738",
+
+  waypoints: [
+    "GAVMA",
+    "BL829",
+    "BL806",
+    "BL836",
+    "SENIA",
+    "DORMI",
+    "CRETA",
+    "NEXAS",
+    "CMA",
+    "EDIMU",
+    "TERSA",
+    "MD540",
+    "MD535",
+    "NOSKO",
+    "MD530",
+    "RUDBI",
+    "MD519",
+    "MD516",
+    "MD11L",
+    "LEMD"
+  ],
+
+  distanceNM: 290,
+
+  complete: false,
+  navigationVerified: false,
+  testEnabled: true,
+
+  referenceCruiseLevel: 290,
+
+  routeText:
+    "LEBL SENIA4P SENIA Z596 TERSA TERSA4Z RUDBI ILS W RWY32L LEMD",
+
+  source:
+    "AIP España / ENAIRE INSIGNIA - AIRAC OCT2026 - Training scenario",
+
+  
+  trainingOnly: true
+},
+{
+  id: "LEMD-LEVD-01",
+  from: "LEMD",
+  to: "LEVD",
+  aircraft: "B738",
+
+  waypoints: [
+    "LEMD",
+    "NVS",
+    "AVILA",
+    "NUB",
+    "LEVD"
+  ],
+
+  distanceNM: 150,
+
+  complete: false,
+  navigationVerified: false,
+  testEnabled: true,
+
+  referenceCruiseLevel: 150,
+
+  routeText:
+    "LEMD DCT NVS DCT AVILA DCT NUB ILS RWY23 LEVD - SIMULATED TRAINING ROUTE",
+
+  source:
+    "OPERDAT Training - Provisional alternate route. LEVD IAC 2 ILS RWY23",
+
+  trainingOnly: true
 }
 ];
+
+
 export function findTrainingRoute(from, to, aircraft) {
   return trainingRoutes.find(
     (route) =>
