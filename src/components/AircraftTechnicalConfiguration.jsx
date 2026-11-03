@@ -443,7 +443,7 @@ showRevisionHistory,
   title="WEIGHT & BALANCE CONFIGURATION"
   onEdit={onEditWeightBalance}
   rows={[
-            ['Basic Weight', configuration.basic_weight],
+            ['DOW', configuration.basic_weight],
             ['Basic Index', configuration.basic_index],
             ['Basic Configuration', configuration.basic_config],
             ['Basic Crew', configuration.basic_crew],

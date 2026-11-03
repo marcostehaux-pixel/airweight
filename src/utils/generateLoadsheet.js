@@ -734,7 +734,7 @@ doc.text(
 )
 drawRow(
 
-'BASIC WT',
+'DOW',
 
 `${
 
@@ -766,7 +766,7 @@ payload.toFixed(
 )
 drawRow(
 
-'BASIC INDEX',
+'DOW INDEX',
 
 effectiveBasicIndex
 

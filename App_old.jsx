@@ -2838,7 +2838,7 @@ alignItems:'center'
 
 <span style={{width:'100px'}}>
 
-BASIC
+DOW
 
 </span>
 
@@ -2948,7 +2948,7 @@ marginBottom:'10px'
 >
 <span>
 
-BASIC WEIGHT
+DOW
 
 </span>
 
@@ -4087,7 +4087,7 @@ TYPE<br/>
 
 <div>
 
-BASIC WT<br/>
+DOW<br/>
 
 <strong>
 
@@ -4102,7 +4102,7 @@ kg
 
 <div>
 
-BASIC INDEX<br/>
+DOW INDEX<br/>
 
 <strong>
 
@@ -4480,7 +4480,7 @@ boxShadow:
 
 <StatusCard
 
-title="Basic WT"
+title="DOW"
 
 value={effectiveBasicWeight}
 
@@ -4498,7 +4498,7 @@ subtitle={
 
 <StatusCard
 
-title="BWI"
+title="DOW INDEX"
 
 value={effectiveBasicIndex?.toFixed(2)}
 

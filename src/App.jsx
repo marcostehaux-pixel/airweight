@@ -5019,7 +5019,7 @@ alignItems:'center'
 
 <span style={{width:'100px'}}>
 
-BASIC
+DOW
 
 </span>
 
@@ -5232,7 +5232,7 @@ marginBottom:'10px'
   
 <span>
 
-BASIC WEIGHT
+DOW
 
 </span>
 
@@ -5653,7 +5653,7 @@ style={{
 }}
 >
 
-BASIC INDEX
+DOW INDEX
 
 </span>
 
@@ -6847,7 +6847,7 @@ TYPE<br/>
 
 <div>
 
-BASIC WT<br/>
+DOW<br/>
 
 <strong>
 
@@ -6862,7 +6862,7 @@ kg
 
 <div>
 
-BASIC INDEX<br/>
+DOW INDEX<br/>
 
 <strong>
 
@@ -7224,7 +7224,7 @@ flexWrap: 'wrap'
 
 <StatusCard
   compact={true}
-  title="Basic WT"
+  title="DOW"
   value={effectiveBasicWeight}
 
 unit="kg"
@@ -7241,7 +7241,7 @@ subtitle={
 
 <StatusCard
 compact={true}
-title="BWI"
+title="DOW INDEX"
 
 value={effectiveBasicIndex?.toFixed(2)}
 
@@ -11563,7 +11563,7 @@ onShowRevisionHistory={() => {
     }}
   >
     {[
-      ['Basic Weight', 'basicWeight'],
+      ['DOW', 'basicWeight'],
       ['Basic Index', 'basicIndex'],
       ['Basic Configuration', 'basicConfig'],
       ['Basic Crew', 'basicCrew']
@@ -12881,8 +12881,8 @@ setSelectedAircraftTechnicalRevisions(
       }}
     >
       {[
-        ['basicWeight', 'BASIC WEIGHT', 'number'],
-        ['basicIndex', 'BASIC INDEX', 'number'],
+        ['basicWeight', 'DOW', 'number'],
+        ['basicIndex', 'DOW INDEX', 'number'],
         ['basicConfig', 'BASIC CONFIG', 'text'],
         ['basicCrew', 'BASIC CREW', 'text']
       ].map(([field, label, type]) => (
@@ -15476,7 +15476,7 @@ maxWidth: '100%',
       </div>
 
       {[
-  ['Basic Weight', selectedAdminAircraftFullData.configuration.basic_weight],
+  ['DOW', selectedAdminAircraftFullData.configuration.basic_weight],
   ['Basic Index', selectedAdminAircraftFullData.configuration.basic_index],
 
   ['Basic Configuration', selectedAdminAircraftFullData.configuration.basic_config],

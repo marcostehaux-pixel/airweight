@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { calculateObstacleLimit } from './performance/obstacleLimitEngine.js'
 
 /**
@@ -10,7 +10,9 @@ import { calculateObstacleLimit } from './performance/obstacleLimitEngine.js'
  * NOT FOR OPERATIONAL USE.
  */
 
-export default function ObstacleLimitPanel() {
+export default function ObstacleLimitPanel({
+  onResultChange
+}) {
   const [data, setData] = useState({
     flaps: '1',
     obstacleHeightFt: '450',
@@ -126,7 +128,14 @@ export default function ObstacleLimitPanel() {
       error = err.message
     }
   }
+  const obstacleWeight =
+  result?.obstacleLimitWeightKg ?? null
 
+useEffect(() => {
+  onResultChange?.(obstacleWeight, {
+    ...data
+  })
+}, [obstacleWeight, data, onResultChange])
   const formatKg = value =>
     new Intl.NumberFormat('es-AR').format(value)
 

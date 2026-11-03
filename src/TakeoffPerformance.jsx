@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { calculateTakeoffFieldLimit } from './performance/takeoffPerformanceEngine.js'
 import { calculateClimbLimit } from './performance/climbLimitEngine.js'
 import ObstacleLimitPanel from './ObstacleLimitPanel.jsx'
@@ -16,6 +16,22 @@ import ObstacleLimitPanel from './ObstacleLimitPanel.jsx'
  */
 
 export default function TakeoffPerformance() {
+  const [registration, setRegistration] = useState('')
+const [departure, setDeparture] = useState('')
+const [obstacleWeight, setObstacleWeight] = useState(null)
+const [obstacleInputs, setObstacleInputs] = useState(null)
+const [savedResults, setSavedResults] = useState(() => {
+  try {
+    const stored = sessionStorage.getItem(
+      'operdat_takeoff_performance_results'
+    )
+    const parsed = stored ? JSON.parse(stored) : []
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+})
+
   const [data, setData] = useState({
     flaps: '5',
     runwayCondition: 'DRY',
@@ -200,6 +216,56 @@ if (!fieldError) {
     lineHeight: 1.6
   }
 
+const savePerformance = () => {
+  const aircraft = registration.trim().toUpperCase()
+  const airport = departure.trim().toUpperCase()
+
+  if (!aircraft || !/^[A-Z]{4}$/.test(airport)) {
+    alert('Enter aircraft registration and a valid 4-letter ICAO aerodrome.')
+    return
+  }
+
+  if (
+    !fieldResult ||
+    !climbResult ||
+    !Number.isFinite(obstacleWeight)
+  ) {
+    alert('All three performance results must be valid before saving.')
+    return
+  }
+
+  const record = {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    date: new Date().toLocaleString('es-AR'),
+    registration: aircraft,
+    departure: airport,
+    inputs: { ...data },
+    fieldLimitKg: fieldResult.fieldLimitWeightKg,
+    climbLimitKg: climbResult.climbLimitWeightKg,
+    obstacleLimitKg: obstacleWeight,
+obstacleInputs: { ...obstacleInputs }
+  }
+
+  try {
+    const updated = [record, ...savedResults]
+
+    sessionStorage.setItem(
+      'operdat_takeoff_performance_results',
+      JSON.stringify(updated)
+    )
+
+    setSavedResults(updated)
+  } catch {
+    alert('Unable to save results in this browser session.')
+  }
+}
+const handleObstacleResultChange = useCallback(
+  (weight, inputs) => {
+    setObstacleWeight(weight)
+    setObstacleInputs(inputs)
+  },
+  []
+)
   return (
     <div
       style={{
@@ -220,6 +286,50 @@ if (!fieldError) {
         Aircraft configuration, runway and atmospheric
         conditions
       </p>
+
+<div
+  style={{
+    display: 'grid',
+    gridTemplateColumns:
+      'repeat(auto-fit, minmax(220px, 1fr))',
+    gap: '18px',
+    marginTop: '22px'
+  }}
+>
+  <div>
+    <label style={labelStyle}>
+      Aircraft Registration
+    </label>
+
+    <input
+      type="text"
+      placeholder="LV-ABC"
+      maxLength={12}
+      value={registration}
+      onChange={e =>
+        setRegistration(e.target.value.toUpperCase())
+      }
+      style={fieldStyle}
+    />
+  </div>
+
+  <div>
+    <label style={labelStyle}>
+      Departure Aerodrome (ICAO)
+    </label>
+
+    <input
+      type="text"
+      placeholder="LEBL"
+      maxLength={4}
+      value={departure}
+      onChange={e =>
+        setDeparture(e.target.value.toUpperCase())
+      }
+      style={fieldStyle}
+    />
+  </div>
+</div>
 
       <div
         style={{
@@ -454,7 +564,142 @@ if (!fieldError) {
           the available limitations independently.
         </div>
       </div>
-      <ObstacleLimitPanel />
+     <ObstacleLimitPanel
+  onResultChange={handleObstacleResultChange}
+/>
+
+<div style={{ marginTop: '25px' }}>
+  <button
+    type="button"
+    onClick={savePerformance}
+    style={{
+      padding: '13px 24px',
+      background: '#1769aa',
+      color: '#ffffff',
+      border: 'none',
+      borderRadius: '8px',
+      fontWeight: 700,
+      cursor: 'pointer'
+    }}
+  >
+    SAVE RESULTS
+  </button>
+
+  <h3 style={{ marginTop: '30px' }}>
+    SAVED PERFORMANCE RESULTS
+  </h3>
+
+  {savedResults.length === 0 ? (
+    <p style={{ color: '#9eafc1' }}>
+      No saved results in this session.
+    </p>
+  ) : (
+    savedResults.map(record => (
+      <details
+        key={record.id}
+        style={{
+          marginBottom: '12px',
+          padding: '16px',
+          background: '#192b3e',
+          border: '1px solid #36516b',
+          borderRadius: '8px'
+        }}
+      >
+        <summary style={{ cursor: 'pointer' }}>
+          <strong>
+            {record.registration} — {record.departure}
+          </strong>
+          {' | '}
+          {record.date}
+        </summary>
+
+        <div style={{ marginTop: '14px', lineHeight: 2 }}>
+          <div>
+            FIELD LIMIT: {formatKg(record.fieldLimitKg)} kg
+          </div>
+          <div>
+            CLIMB LIMIT: {formatKg(record.climbLimitKg)} kg
+          </div>
+          <div>
+            OBSTACLE LIMIT: {formatKg(record.obstacleLimitKg)} kg
+          </div>
+          
+{record.obstacleInputs && (
+  <div
+    style={{
+      marginTop: '12px',
+      paddingTop: '12px',
+      borderTop: '1px solid #36516b'
+    }}
+  >
+    <strong>TAKEOFF PERFORMANCE PARAMETERS</strong>
+
+    <div>
+      FLAPS: {record.obstacleInputs.flaps}
+    </div>
+    <div>
+      OBSTACLE HEIGHT: {record.obstacleInputs.obstacleHeightFt} ft
+    </div>
+    <div>
+      DISTANCE FROM BRAKE RELEASE:
+      {' '}
+      {record.obstacleInputs.distanceFromBrakeReleaseM} m
+    </div>
+    <div>
+      OAT: {record.obstacleInputs.oatC} °C
+    </div>
+    <div>
+      PRESSURE ALTITUDE:
+      {' '}
+      {record.obstacleInputs.pressureAltitudeFt} ft
+    </div>
+    <div>
+      WIND COMPONENT:
+      {' '}
+      {record.obstacleInputs.windComponentKt} kt
+    </div>
+    <div>
+      PACKS: {record.obstacleInputs.packs}
+    </div>
+    <div>
+      ANTI-ICE: {record.obstacleInputs.antiIce}
+    </div>
+  </div>
+)}
+
+          <div>
+            FLAPS: {record.inputs.flaps}
+          </div>
+          <div>
+            RUNWAY CONDITION: {record.inputs.runwayCondition}
+          </div>
+          <div>
+            TORA: {record.inputs.runwayLength} m
+          </div>
+          <div>
+            OAT: {record.inputs.oat} °C
+          </div>
+          <div>
+            PRESSURE ALTITUDE: {record.inputs.pressureAltitude} ft
+          </div>
+          <div>
+            WIND: {record.inputs.wind} kt
+          </div>
+          <div>
+            SLOPE: {record.inputs.slope} %
+          </div>
+          <div>
+            PACKS: {record.inputs.packs}
+          </div>
+          <div>
+            ANTI-ICE: {record.inputs.antiIce}
+          </div>
+        </div>
+      </details>
+    ))
+  )}
+</div>
+
     </div>
   )
 }

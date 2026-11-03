@@ -470,14 +470,14 @@ doc.text(
 const balanceData = [
 
   {
-    label: 'BASIC WT',
+    label: 'DOW',
     value: basicWeight,
     x: 20,
     y: 157
   },
 
   {
-    label: 'BASIC INDEX',
+    label: 'DOW INDEX',
     value: basicIndex,
     x: 75,
     y: 157,
