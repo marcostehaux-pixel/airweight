@@ -407,14 +407,26 @@ export async function createCargoPositions({
 }
 export async function getCargoAircraftFleet() {
   const aircraftList = await getAircraft()
-
+console.log(
+  'CARGO AIRCRAFT FROM SUPABASE:',
+  aircraftList.map(aircraft => ({
+    registration: aircraft.registration,
+    status: aircraft.status,
+    operation_type: aircraft.operation_type,
+    organization_id: aircraft.organization_id
+  }))
+)
   // Only active aircraft are candidates for operational use
   const activeAircraft = aircraftList.filter(
   (item) =>
     item.status === 'active' &&
     item.operation_type === 'FREIGHTER'
 )
-
+console.log('FREIGHTER FLEET CHECK:', {
+  total: aircraftList.length,
+  freighters: activeAircraft.length,
+  registrations: activeAircraft.map(a => a.registration)
+})
   const adaptedFleet = []
 
   for (const aircraft of activeAircraft) {
@@ -469,7 +481,15 @@ export async function getCargoAircraftFleet() {
 }
 export async function getPassengerAircraftFleet() {
   const aircraftList = await getAircraft()
-
+console.log(
+  'CARGO AIRCRAFT DIAGNOSTIC:',
+  aircraftList.map(aircraft => ({
+    registration: aircraft.registration,
+    status: aircraft.status,
+    operation_type: aircraft.operation_type,
+    id: aircraft.id
+  }))
+)
   // Only active passenger aircraft are candidates for operational use
   const activeAircraft = aircraftList.filter(
     (item) =>

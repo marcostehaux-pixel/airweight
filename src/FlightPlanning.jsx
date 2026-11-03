@@ -26,7 +26,11 @@ export default function FlightPlanning({
   passengerAircraft = [],
   cargoAircraft = []
 }) {
-  
+  console.log('FLIGHT PLANNING COMPONENT LOADED')
+
+console.log('PASSENGER FLEET:', passengerAircraft)
+
+console.log('CARGO FLEET:', cargoAircraft)
   const [selectedRegistration, setSelectedRegistration] =
     React.useState('');
     // OPERDAT TRAINING — GENERATED OFP
@@ -256,9 +260,16 @@ const preliminaryFuelDistribution =
       operationType: 'FREIGHTER'
     }))
   ]
-    .filter(aircraft =>
-      /^B737-800/i.test(aircraft.type || '')
-    )
+    .filter(aircraft => {
+  console.log('FLIGHT PLANNING AIRCRAFT:', {
+    registration: aircraft.registration,
+    type: aircraft.type,
+    model: aircraft.model,
+    operationType: aircraft.operationType
+  })
+
+  return /^B737-800/i.test(aircraft.type || '')
+})
     .filter((aircraft, index, array) =>
       array.findIndex(item =>
         item.registration === aircraft.registration

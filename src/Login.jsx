@@ -241,7 +241,19 @@ const response = await fetch(
     })
   }
 )
+if (!response.ok) {
+  console.error(
+    'USERNAME LOGIN API ERROR:',
+    response.status,
+    response.statusText
+  )
 
+  alert(
+    'Unable to authenticate username. Check local API server.'
+  )
+
+  return
+}
 if (response.ok) {
   const result = await response.json()
 

@@ -696,31 +696,28 @@ if (
   }
 }
 async function refreshCargoFleet() {
-  if (userRole === 'student') {
-  setCargoAircraftFleet(aircraftCargoDatabase)
 
-  setSelectedCargoAircraft((current) => {
-    const availableAircraft =
-      aircraftCargoDatabase.find(
-        aircraft =>
-          aircraft.registration === current?.registration
-      )
-
-    return availableAircraft || aircraftCargoDatabase[0]
-  })
-
-  return
-}
   try {
     const fleet = await getCargoAircraftFleet()
 
     setCargoAircraftFleet(fleet || [])
 
     setSelectedCargoAircraft((current) => {
-  if (!fleet || fleet.length === 0) {
-    return current || aircraftCargoDatabase[0]
-  }
+ if (!fleet || fleet.length === 0) {
+  console.warn(
+    'CARGO FLEET EMPTY — USER:',
+    currentUser?.username,
+    'ORGANIZATION:',
+    currentUser?.organizationId
+  )
 
+  return null
+}
+console.log('CARGO FLEET USER:', {
+  role: userRole,
+  organizationId: currentUser?.organizationId,
+  username: currentUser?.username
+})
   const currentStillAvailable =
     fleet.find(
       aircraft =>
@@ -731,19 +728,14 @@ async function refreshCargoFleet() {
 })
 
   } catch (error) {
-    console.error(
-      'CARGO FLEET SUPABASE ERROR - USING LOCAL FALLBACK:',
-      error
-    )
+  console.error(
+    'CARGO FLEET SUPABASE ERROR:',
+    error
+  )
 
-    setCargoAircraftFleet(
-  aircraftCargoDatabase
-)
-
-setSelectedCargoAircraft((current) =>
-  current || aircraftCargoDatabase[0]
-)
-  }
+  setCargoAircraftFleet([])
+  setSelectedCargoAircraft(null)
+}
 }
 
 useEffect(() => {
