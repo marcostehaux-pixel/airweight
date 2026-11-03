@@ -2326,10 +2326,10 @@ const maxCg=34
 return (18+(index-35)*0.235)
 }
  function getCgFromEnvelope(index,weight){return Number(getNearestCg(index).toFixed(1))}
- const aircraftSummaryFleet =
-  userRole === 'student'
-    ? [...passengerAircraftFleet, ...aircraftCargoDatabase]
-    : [...passengerAircraftFleet, ...cargoAircraftFleet];
+ const aircraftSummaryFleet = [
+  ...passengerAircraftFleet,
+  ...cargoAircraftFleet
+];
 const aircraftSummary =
   aircraftSummaryFleet.find(
     aircraft =>
