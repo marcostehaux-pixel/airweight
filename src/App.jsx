@@ -1795,7 +1795,7 @@ function newPassengerFlight() {
   setTaxiFuel(0)
   setTripFuel(0)
 
-  setActiveMenu('Loadsheet')
+  // setActiveMenu('Loadsheet')
 }
 function newFreighterFlight() {
 
