@@ -645,6 +645,14 @@ const [tripFuel, setTripFuel] = useState(0)
 const [taxiFuel,setTaxiFuel ]= useState(0)
 const [fuel, setFuel] = useState(0)
 const [selectedAircraft, setSelectedAircraft] = useState(aircraftDatabase[0])
+const [passengerAllowedMaxTow, setPassengerAllowedMaxTow] = useState('')
+const passengerEffectiveMaxTow =
+  Number(passengerAllowedMaxTow) > 0
+    ? Math.min(
+        selectedAircraft?.maxTOW ?? 0,
+        Number(passengerAllowedMaxTow)
+      )
+    : selectedAircraft?.maxTOW ?? 0
 const [aircraftSummaryRegistration, setAircraftSummaryRegistration] = useState('')
 const [selectedCargoAircraft,setSelectedCargoAircraft] = useState(aircraftCargoDatabase[0]
 )
@@ -1794,6 +1802,7 @@ function newPassengerFlight() {
   setFuel(0)
   setTaxiFuel(0)
   setTripFuel(0)
+  setPassengerAllowedMaxTow('')
 
   // setActiveMenu('Loadsheet')
 }
@@ -2233,6 +2242,7 @@ const [activeFreighterFlightId, setActiveFreighterFlightId] =
   useState(null)
   const [activePassengerFlightId, setActivePassengerFlightId] =
   useState(null)
+  
   const [historySearch, setHistorySearch] =
   useState('')
 
@@ -2446,9 +2456,17 @@ const cgStatus =
   passengerZfwInside &&
   passengerTowInside;
 
-const loadStatus = cgStatus
-  ? 'READY FOR DISPATCH'
-  : 'CG OUT OF LIMITS';
+const loadStatus = !cgStatus
+  ? 'CG OUT OF LIMITS'
+  : zfw > selectedAircraft.maxZFW
+    ? 'ZFW LIMIT EXCEEDED'
+    : tow > passengerEffectiveMaxTow
+      ? 'TOW LIMIT EXCEEDED'
+      : ldw > selectedAircraft.maxLW
+        ? 'LANDING WEIGHT LIMIT EXCEEDED'
+        : rw > selectedAircraft.maxRW
+          ? 'RAMP WEIGHT LIMIT EXCEEDED'
+          : 'READY FOR DISPATCH';
 const cgLabel = cg < 18 ? 'FORWARD' : cg > 32 ? 'AFT' : 'NORMAL'
 const zfwStatus = zfw <= selectedAircraft.maxZFW
 const towStatus = tow <= selectedAircraft.maxTOW
@@ -7319,9 +7337,51 @@ selectedAircraft.maxRW
   title="TOW"
   value={tow}
   unit="kg"
-  status={tow <= selectedAircraft.maxTOW}
-  limit={selectedAircraft.maxTOW}
+  status={tow <= passengerEffectiveMaxTow}
+  limit={passengerEffectiveMaxTow}
 />
+
+<div
+  style={{
+    marginTop: '8px',
+    marginBottom: '12px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    flexWrap: 'wrap'
+  }}
+>
+  <label
+    style={{
+      color: '#b9c4d3',
+      fontSize: '12px',
+      fontWeight: '700'
+    }}
+  >
+    ALLOWED MAX TOW
+  </label>
+
+  <input
+    type="number"
+    min="1"
+    step="1"
+    value={passengerAllowedMaxTow}
+    onChange={(e) =>
+      setPassengerAllowedMaxTow(e.target.value)
+    }
+    placeholder="kg"
+    style={{
+      width: '110px',
+      padding: '8px',
+      borderRadius: '8px',
+      background: '#1f2937',
+      color: '#ffffff',
+      border: '1px solid #374151',
+      textAlign: 'center'
+    }}
+  />
+</div>
+
       <StatusCard
 compact={true}
 title="TOI"
@@ -7647,7 +7707,7 @@ flexDirection: 'column',
   if (
   !cgStatus ||
   zfw > selectedAircraft.maxZFW ||
-  tow > selectedAircraft.maxTOW ||
+  tow > passengerEffectiveMaxTow ||
   ldw > selectedAircraft.maxLW ||
   rw > selectedAircraft.maxRW
 ) {
@@ -7664,8 +7724,8 @@ if (zfw > selectedAircraft.maxZFW) {
   message += 'MAXIMUM ZFW EXCEEDED\n'
 }
 
-if (tow > selectedAircraft.maxTOW) {
-  message += 'MAXIMUM TOW EXCEEDED\n'
+if (tow > passengerEffectiveMaxTow) {
+  message += 'ALLOWED MAX TOW EXCEEDED\n'
 }
 
 if (ldw > selectedAircraft.maxLW) {
@@ -8411,23 +8471,16 @@ searchTaf ||
 
 <div>
 
-CG Status:
+Load Status:
 
 <strong
 
 style={{
 
 color:
-
-cgStatus
-
-?
-
-'#00ff88'
-
-:
-
-'#ff4444',
+  loadStatus === 'READY FOR DISPATCH'
+    ? '#00ff88'
+    : '#ff4444',
 
 marginLeft:'8px'
 
