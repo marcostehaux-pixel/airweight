@@ -55,7 +55,7 @@ async function updatePassword() {
       return
     }
 
-    await supabase.auth.signOut()
+    await supabase.auth.signOut({ scope: 'local' })
 
     setNewPassword('')
     setConfirmNewPassword('')
@@ -157,6 +157,57 @@ useEffect(() => {
     setShowPasswordRecovery(false)
   }
 }, [appPasswordRecoveryMode])
+async function acquireOperdatSession(accessToken) {
+  if (!accessToken) {
+    return {
+      allowed: false,
+      message: 'Authentication token is missing.'
+    }
+  }
+
+  try {
+    const response = await fetch('/api/session/acquire', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({})
+    })
+
+    const result = await response.json()
+
+    if (response.ok &&
+        ['ACQUIRED', 'EXEMPT'].includes(result.status)) {
+      return {
+        allowed: true,
+        message: null
+      }
+    }
+
+    if (response.status === 409) {
+      return {
+        allowed: false,
+        message:
+          'This account is already active on another device.'
+      }
+    }
+
+    return {
+      allowed: false,
+      message:
+        'Unable to authorize this session. Please try again.'
+    }
+  } catch (error) {
+    console.error('OPERDAT SESSION ERROR:', error)
+
+    return {
+      allowed: false,
+      message:
+        'Unable to connect to the session verification service.'
+    }
+  }
+}
   async function login() {
   try {
     // ==========================================
@@ -198,7 +249,7 @@ useEffect(() => {
 
       if (profileError) {
         console.error('PROFILE ERROR:', profileError)
-        await supabase.auth.signOut()
+        await supabase.auth.signOut({ scope: 'local' })
         alert('User profile not found')
         return
       }
@@ -208,7 +259,19 @@ useEffect(() => {
         alert('User account is not active')
         return
       }
+// ============================
+// OPERDAT — SESSION VALIDATION
+// ============================
 
+const sessionCheck = await acquireOperdatSession(
+  data.session?.access_token
+)
+
+if (!sessionCheck.allowed) {
+  await supabase.auth.signOut({ scope: 'local' })
+  alert(sessionCheck.message)
+  return
+}
       console.log('OPERDAT AUTH USER:', authenticatedUser.email)
       console.log('OPERDAT PROFILE:', profile)
 console.log('OPERDAT LOGIN ROLE:', profile.role)
@@ -284,7 +347,19 @@ if (response.ok) {
     alert('Unable to create user session')
     return
   }
+// ============================
+// OPERDAT — USERNAME SESSION VALIDATION
+// ============================
 
+const usernameSessionCheck = await acquireOperdatSession(
+  result.session.access_token
+)
+
+if (!usernameSessionCheck.allowed) {
+  await supabase.auth.signOut({ scope: 'local' })
+  alert(usernameSessionCheck.message)
+  return
+}
   console.log(
     'OPERDAT USERNAME LOGIN:',
     result.profile.username

@@ -15,7 +15,256 @@ const app = express()
 app.use(express.json())
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
+// ============================
+// OPERDAT — JWT SESSION ID
+// ============================
 
+function getSessionIdFromToken(accessToken) {
+  try {
+    const parts = accessToken.split('.')
+
+    if (parts.length !== 3) {
+      return null
+    }
+
+    const payload = JSON.parse(
+      Buffer.from(parts[1], 'base64url').toString('utf8')
+    )
+
+    const sessionId = payload.session_id
+
+    if (
+      typeof sessionId !== 'string' ||
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sessionId)
+    ) {
+      return null
+    }
+
+    return sessionId
+  } catch {
+    return null
+  }
+}
+function createUserSupabaseClient(accessToken) {
+  return createClient(
+    process.env.SUPABASE_URL,
+    process.env.VITE_SUPABASE_ANON_KEY,
+    {
+      global: {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      },
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false
+      }
+    }
+  )
+}
+// ============================
+// OPERDAT SESSION — ACQUIRE
+// ============================
+
+app.post('/api/session/acquire', async (req, res) => {
+  try {
+    const authorization = req.headers.authorization || ''
+
+    if (!authorization.startsWith('Bearer ')) {
+      return res.status(401).json({
+        error: 'Authentication required'
+      })
+    }
+
+    const accessToken = authorization.slice(7).trim()
+
+    const {
+      data: { user },
+      error: authError
+    } = await supabaseAdmin.auth.getUser(accessToken)
+
+    if (authError || !user) {
+      return res.status(401).json({
+        error: 'Invalid authentication token'
+      })
+    }
+
+    const userClient = createUserSupabaseClient(accessToken)
+
+    const { data, error } = await userClient.rpc(
+      'acquire_operdat_session',
+      {
+        p_session_id: getSessionIdFromToken(accessToken)
+      }
+    )
+
+    if (error) {
+      console.error('SESSION ACQUIRE ERROR:', error)
+
+      return res.status(500).json({
+        error: 'Unable to verify session'
+      })
+    }
+
+    if (data === 'ALREADY_ACTIVE') {
+      return res.status(409).json({
+        status: data,
+        error: 'This account is already active on another device'
+      })
+    }
+
+    if (data !== 'ACQUIRED' && data !== 'EXEMPT') {
+      return res.status(403).json({
+        status: data,
+        error: 'Session not authorized'
+      })
+    }
+
+    return res.status(200).json({
+      status: data
+    })
+
+  } catch (error) {
+    console.error('SESSION ACQUIRE ERROR:', error)
+
+    return res.status(500).json({
+      error: 'Unable to acquire session'
+    })
+  }
+})
+// ============================
+// OPERDAT SESSION — RELEASE
+// ============================
+
+app.post('/api/session/release', async (req, res) => {
+  try {
+    const authorization = req.headers.authorization || ''
+
+    if (!authorization.startsWith('Bearer ')) {
+      return res.status(401).json({
+        error: 'Authentication required'
+      })
+    }
+
+    const accessToken = authorization.slice(7).trim()
+
+    const {
+      data: { user },
+      error: authError
+    } = await supabaseAdmin.auth.getUser(accessToken)
+
+    if (authError || !user) {
+      return res.status(401).json({
+        error: 'Invalid authentication token'
+      })
+    }
+
+    const userClient = createUserSupabaseClient(accessToken)
+
+    const { data, error } = await userClient.rpc(
+      'release_operdat_session'
+    )
+
+    if (error) {
+      console.error('SESSION RELEASE ERROR:', error)
+
+      return res.status(500).json({
+        error: 'Unable to release session'
+      })
+    }
+
+    if (data === 'UNAUTHORIZED') {
+      return res.status(403).json({
+        status: data,
+        error: 'Session release not authorized'
+      })
+    }
+
+    if (data !== 'RELEASED' && data !== 'SESSION_NOT_FOUND') {
+      return res.status(500).json({
+        error: 'Unexpected session release result'
+      })
+    }
+
+    return res.status(200).json({
+      status: data
+    })
+
+  } catch (error) {
+    console.error('SESSION RELEASE ERROR:', error)
+
+    return res.status(500).json({
+      error: 'Unable to release session'
+    })
+  }
+})
+// ============================
+// OPERDAT SESSION — RENEW
+// ============================
+
+app.post('/api/session/renew', async (req, res) => {
+  try {
+    const authorization = req.headers.authorization || ''
+
+    if (!authorization.startsWith('Bearer ')) {
+      return res.status(401).json({
+        error: 'Authentication required'
+      })
+    }
+
+    const accessToken = authorization.slice(7).trim()
+
+    const {
+      data: { user },
+      error: authError
+    } = await supabaseAdmin.auth.getUser(accessToken)
+
+    if (authError || !user) {
+      return res.status(401).json({
+        error: 'Invalid authentication token'
+      })
+    }
+
+    const userClient = createUserSupabaseClient(accessToken)
+
+    const { data, error } = await userClient.rpc(
+      'renew_operdat_session'
+    )
+
+    if (error) {
+      console.error('SESSION RENEW ERROR:', error)
+
+      return res.status(500).json({
+        error: 'Unable to renew session'
+      })
+    }
+
+    if (data === 'SESSION_EXPIRED') {
+      return res.status(409).json({
+        status: data,
+        error: 'Session expired or no longer active'
+      })
+    }
+
+    if (data !== 'RENEWED') {
+      return res.status(403).json({
+        status: data,
+        error: 'Session renewal not authorized'
+      })
+    }
+
+    return res.status(200).json({
+      status: 'RENEWED'
+    })
+
+  } catch (error) {
+    console.error('SESSION RENEW ERROR:', error)
+
+    return res.status(500).json({
+      error: 'Unable to renew session'
+    })
+  }
+})
 // ============================
 // LOGIN RATE LIMIT
 // ============================

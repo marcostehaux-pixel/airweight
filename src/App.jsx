@@ -138,7 +138,6 @@ import {
 } from './services/userService'
 import aircraftImage from './assets/a320.png'
 
-console.log('APP FILE LOADED - SUPABASE TEST')
 function CargoPositionEditorRow({
   position,
   onChange,
@@ -395,10 +394,6 @@ useEffect(() => {
           adaptSupabaseFlightToOperdat
         )
 
-      console.log(
-        'OPERDAT ADAPTED FLIGHTS:',
-        adaptedFlights
-      )
      setCargoFlightRecords(
   adaptedFlights
 )
@@ -418,11 +413,6 @@ useEffect(() => {
   async function loadPlatformOrganizations() {
     try {
       const organizations = await getOrganizations()
-
-      console.log(
-        'PLATFORM ORGANIZATIONS:',
-        organizations
-      )
 
       setPlatformOrganizations(organizations)
 
@@ -481,9 +471,56 @@ if (isPasswordRecovery) {
     }
 
     if (profile.status !== 'active') {
-      await supabase.auth.signOut()
-      return
-    }
+  await supabase.auth.signOut({ scope: 'local' })
+  return
+}
+
+// ====================================
+// OPERDAT — RESTORED SESSION VALIDATION
+// ====================================
+
+try {
+  const response = await fetch('/api/session/acquire', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({})
+  })
+
+  const result = await response.json()
+
+  if (
+    !response.ok ||
+    !['ACQUIRED', 'EXEMPT'].includes(result.status)
+  ) {
+    console.warn(
+      'OPERDAT RESTORED SESSION REJECTED:',
+      result.status
+    )
+
+    await supabase.auth.signOut({ scope: 'local' })
+    setLogged(false)
+    setUserRole(null)
+    setCurrentUser(null)
+
+    return
+  }
+
+} catch (error) {
+  console.error(
+    'OPERDAT SESSION RESTORE ERROR:',
+    error
+  )
+
+  await supabase.auth.signOut({ scope: 'local' })
+  setLogged(false)
+  setUserRole(null)
+  setCurrentUser(null)
+
+  return
+}
 
     setUserRole(profile.role)
 setCurrentUser({
@@ -541,6 +578,82 @@ useEffect(() => {
   currentUser?.id,
   userRole
 ])
+// ====================================
+// OPERDAT — SESSION AUTO RENEWAL
+// ====================================
+
+useEffect(() => {
+  if (!logged || !currentUser || userRole === 'super_admin') {
+    return
+  }
+
+  let cancelled = false
+  let renewing = false
+
+  async function renewSession() {
+    if (cancelled || renewing) return
+
+    renewing = true
+
+    try {
+      const {
+        data: { session }
+      } = await supabase.auth.getSession()
+
+      if (!session?.access_token) {
+        throw new Error('Authentication session missing')
+      }
+
+      const response = await fetch('/api/session/renew', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      })
+
+      if (cancelled) return
+
+      if (
+  response.status === 401 ||
+  response.status === 403 ||
+  response.status === 409
+) {
+        console.warn('OPERDAT SESSION NO LONGER AUTHORIZED')
+
+        await supabase.auth.signOut({ scope: 'local' })
+
+        if (cancelled) return
+
+        localStorage.removeItem('user')
+        setLogged(false)
+        setUserRole(null)
+        setCurrentUser(null)
+        setActiveMenu('Dashboard')
+
+        alert('Your session has expired. Please sign in again.')
+        return
+      }
+
+      if (!response.ok) {
+        console.error('SESSION RENEWAL ERROR:', response.status)
+      }
+
+    } catch (error) {
+      console.error('SESSION RENEWAL ERROR:', error)
+    } finally {
+      renewing = false
+    }
+  }
+
+  renewSession()
+
+  const interval = setInterval(renewSession, 60000)
+
+  return () => {
+    cancelled = true
+    clearInterval(interval)
+  }
+}, [logged, currentUser?.id, userRole])
 useEffect(() => {
   if (!logged || userRole !== 'admin') return
 
@@ -552,10 +665,6 @@ useEffect(() => {
       setAdminAircraft(
         aircraft || []
       )
-console.log(
-  'ADMIN AIRCRAFT:',
-  aircraft
-)
     } catch (error) {
       console.error(
         'AIRCRAFT MANAGEMENT LOAD ERROR:',
@@ -689,10 +798,6 @@ if (
     return currentStillAvailable || fleet[0]
   })
 }
-    console.log(
-      'PASSENGER AIRCRAFT FLEET:',
-      fleet
-    )
 
   } catch (error) {
     console.error(
@@ -721,11 +826,7 @@ async function refreshCargoFleet() {
 
   return null
 }
-console.log('CARGO FLEET USER:', {
-  role: userRole,
-  organizationId: currentUser?.organizationId,
-  username: currentUser?.username
-})
+
   const currentStillAvailable =
     fleet.find(
       aircraft =>
@@ -917,15 +1018,7 @@ flightFrom
 ){
 
 setMetar(null)
-console.log(
-  'selectedAircraft',
-  selectedAircraft?.registration
-)
 
-console.log(
-  'selectedCargoAircraft',
-  selectedCargoAircraft?.registration
-)
 return
 
 }
@@ -1177,7 +1270,6 @@ async function closeFreighterFlight(id) {
   )
 
   if (!flight) {
-    console.log('Flight not found:', id)
     return
   }
 
@@ -1223,10 +1315,6 @@ async function closeFreighterFlight(id) {
       setActiveFreighterFlightId(null)
     }
 
-    console.log(
-      'OPERDAT FLIGHT CLOSED:',
-      adaptedClosedFlight
-    )
 
     alert('Flight closed')
 
@@ -1250,10 +1338,6 @@ function openPassengerFlight(id) {
     )
 
   if (!flight) {
-    console.log(
-      'Passenger flight not found:',
-      id
-    )
     return
   }
 
@@ -1399,10 +1483,6 @@ function openFreighterFlight(id) {
     )
 
   if (!flight) {
-    console.log(
-      'Flight not found:',
-      id
-    )
     return
   }
 const canModifyFlight =
@@ -1427,12 +1507,6 @@ if (!canModifyFlight) {
   if (flight.status !== 'OPEN') {
     return
   }
-
-  console.log(
-    'OPENING FLIGHT:',
-    flight.id,
-    flight.flightNumber
-  )
 
   // Este pasa a ser el vuelo activo
   setActiveFreighterFlightId(
@@ -1854,7 +1928,6 @@ const [aftChildren, setAftChildren] = useState(0)
 const [aftInfants, setAftInfants] = useState(0)
 const [activeMenu, setActiveMenu] =
   useState(userRole === 'freighter' ? 'FreighterLoadsheet' : 'Dashboard')
-  console.log('ACTIVE MENU:', activeMenu)
  const passengerWeight =
 
 (fwdAdults + midAdults + aftAdults) * 80 +
@@ -1999,22 +2072,8 @@ selectedSeats.forEach(seat => {
 
   const row = Math.ceil((seat + 1) / 6)
 
-  console.log({
-
-    seat,
-
-    row
-
-  })
-
 })
 const paxIndex = (fwdPax * -0.7) + (aftPax * 0.7)
-console.log({
-  fwdPax,
-  midPax,
-  aftPax,
-  paxIndex
-})
 const FuelMoment = calculateMoment(fuel,selectedAircraft.FuelArm)
 const forwardCargoMoment = forwardCargo * selectedAircraft.forwardCargoArm
 const aftCargoMoment = aftCargo * selectedAircraft.aftCargoArm
@@ -2106,14 +2165,6 @@ const cargoZfwCg = getCgFromIndex(
   cargoZfwIndex,
   cargoZfw
 )
-console.log(
-  'ZFW CG DEBUG:',
-  {
-    cargoZfwIndex,
-    cargoZfwArm,
-    cargoZfwCg
-  }
-)
 const cargoTowCg = getCgFromIndex(
   cargoTowIndex,
   weightData.takeoffWeight
@@ -2123,23 +2174,6 @@ const cargoLandingCg = getCgFromIndex(
   cargoLandingIndex,
   weightData.landingWeight
 )
-console.log('CARGO CG TABLE DEBUG', {
-  zfw: {
-    weight: cargoZfw,
-    index: cargoZfwIndex,
-    cg: cargoZfwCg
-  },
-  tow: {
-    weight: weightData.takeoffWeight,
-    index: cargoTowIndex,
-    cg: cargoTowCg
-  },
-  lw: {
-    weight: weightData.landingWeight,
-    index: cargoLandingIndex,
-    cg: cargoLandingCg
-  }
-})
 function isInsideFreighterEnvelope(
   index,
   weight
@@ -2306,13 +2340,6 @@ const cargoIndex =
   getForwardBagIndex(forwardCargo) +
   getAftBagIndex(aftCargo)
 
-console.log({
-  forwardCargo,
-  aftCargo,
-  forwardIndex: getForwardBagIndex(forwardCargo),
-  aftIndex: getAftBagIndex(aftCargo),
-  cargoIndex
-})
 const zfi = effectiveBasicIndex + paxIndex + cargoIndex
 const zfiDebug = effectiveBasicIndex + cargoIndex
 const FuelIndex = getFuelIndex(fuel)
@@ -2320,13 +2347,6 @@ const toi = zfi + FuelIndex
 
 const tripFuelIndex = getFuelIndex(tripFuel)
 const li = toi - tripFuelIndex
-console.log({
-  effectiveBasicIndex,
-  paxIndex,
-  cargoIndex,
-  zfi,
-  toi
-})
 function getNearestCg(index){
 const minIndex=25
 const maxIndex=90
@@ -2439,14 +2459,7 @@ const passengerEnvelopeCheck = validatePassengerEnvelope({
   zfw,
   tow
 })
-console.log('PASSENGER ENVELOPE VALIDATION', {
-  zfi,
-  toi,
-  zfw,
-  tow,
-  zfwInside: passengerEnvelopeCheck.zfwInside,
-  towInside: passengerEnvelopeCheck.towInside
-})
+
 const passengerZfwInside = passengerEnvelopeCheck.zfwInside
 const passengerTowInside = passengerEnvelopeCheck.towInside
 const trimLabel = trim < 4 ? 'NOSE UP' : trim > 7 ? 'NOSE DOWN' : 'SET'
@@ -3689,18 +3702,50 @@ translate="no"
 
   <div
    onClick={async () => {
-  const { error } = await supabase.auth.signOut()
+  try {
+    const {
+      data: { session }
+    } = await supabase.auth.getSession()
 
-  if (error) {
+    if (session?.access_token) {
+      const response = await fetch('/api/session/release', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      })
+
+      if (!response.ok) {
+        console.error(
+          'SESSION RELEASE ERROR:',
+          response.status
+        )
+        alert(
+          'Unable to release the session. Please try again.'
+        )
+        return
+      }
+    }
+
+    const { error } = await supabase.auth.signOut({
+      scope: 'local'
+    })
+
+    if (error) {
+      console.error('SIGN OUT ERROR:', error)
+      return
+    }
+
+    localStorage.removeItem('user')
+    setLogged(false)
+    setUserRole(null)
+    setCurrentUser(null)
+    setActiveMenu('Dashboard')
+
+  } catch (error) {
     console.error('SIGN OUT ERROR:', error)
-    return
+    alert('Unable to sign out. Please try again.')
   }
-
-  localStorage.removeItem('user')
-  setLogged(false)
-  setUserRole(null)
-  setCurrentUser(null)
-  setActiveMenu('Dashboard')
 }}
     style={{
       marginTop: '0',
