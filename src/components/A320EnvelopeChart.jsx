@@ -1,8 +1,6 @@
 
 import { a320Envelope } from '../envelopes/a320Envelopes';
-import {
-  validateA320CGEnvelope
-} from '../utilit/a320WeightbalanceEngine';
+import { validateA320CGEnvelope } from "../utilit/a320WeightBalanceEngine";
 export default function A320EnvelopeChart({
   zfw,
   tow,

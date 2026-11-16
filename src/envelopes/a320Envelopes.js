@@ -1,5 +1,5 @@
 
-import { A320_CG_ENVELOPES } from '../utilit/a320WeightbalanceEngine';
+import { A320_CG_ENVELOPES } from '../utilit/a320WeightBalanceEngine';
 
 const buildPolygon = (phase, maximumWeight) => {
   const envelope = A320_CG_ENVELOPES[phase];
