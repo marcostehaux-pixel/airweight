@@ -268,7 +268,11 @@ const preliminaryFuelDistribution =
     operationType: aircraft.operationType
   })
 
-  return /^B737-800/i.test(aircraft.type || '')
+  const aircraftType = String(
+  aircraft.type || aircraft.model || ''
+).trim();
+
+return /^(B737-800|A320)/i.test(aircraftType);
 })
     .filter((aircraft, index, array) =>
       array.findIndex(item =>
@@ -758,7 +762,7 @@ if (
         </h1>
 
         <p style={{ color: '#b9c4d3' }}>
-          Boeing 737-800 — Flight Dispatch Training
+            Flight Dispatch Training
         </p>
       </div>
 
@@ -863,9 +867,7 @@ if (
       {selectedAircraft.maxTOW?.toLocaleString()} kg
     </p>
 
-    <p>
-      Performance Model: B737-800 Training
-    </p>
+  
   </div>
 )}
 

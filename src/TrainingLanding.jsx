@@ -321,7 +321,7 @@ export default function TrainingLanding({ onBack }) {
       <h3>Training Student</h3>
 
       <p style={{ color: '#82bcff', fontSize: 28, fontWeight: 700 }}>
-        ARS 10.000 / mes
+        Licencia mensual para estudiantes
       </p>
 
       <p style={{ color: '#c8d7e8', lineHeight: 1.8 }}>

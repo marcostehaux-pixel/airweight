@@ -1,6 +1,8 @@
 import { isInsidePolygon } from '../envelopeValidation'
 function EnvelopeChart(props) {
-
+const isAirbusA320 =
+  String(props.model || '').trim().toUpperCase().includes('A320') ||
+  String(props.variant || '').trim().toUpperCase().includes('A320');
 const mapIndex = (index) => {
   const min = 35;
   const max = 90;

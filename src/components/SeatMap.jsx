@@ -1,23 +1,36 @@
 function SeatMap(props) {
 
+  const aircraftModel = String(props.aircraftModel || '').toUpperCase()
+  const aircraftVariant = String(props.aircraftVariant || '').toUpperCase()
+
+  const isA320 =
+    aircraftModel.includes('A320') ||
+    aircraftVariant.includes('A320')
+
+  const seatCount = isA320 ? 168 : 180
+
   const seats = Array.from(
-    { length: 180 },
+    { length: seatCount },
     (_, index) => index
   )
 
-  function getSeatZone(seat) {
+  
+function getSeatZone(seat) {
 
-    if (seat < 60) {
-      return 'FWD'
-    }
+  if (isA320) {
+    const row = Math.floor(seat / 6) + 1
 
-    if (seat < 130) {
-      return 'MID'
-    }
-
+    if (row <= 9) return 'FWD'
+    if (row <= 19) return 'MID'
     return 'AFT'
-
   }
+
+  // B737-800: mantener la distribución existente
+  if (seat < 60) return 'FWD'
+  if (seat < 130) return 'MID'
+  return 'AFT'
+}
+
 
   return (
 

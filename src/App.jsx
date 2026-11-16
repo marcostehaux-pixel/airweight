@@ -32,11 +32,16 @@ import a320Perfil from './assets/A320 perfil.png'
 import b737cfPerfil from './assets/b737cfPerfil.png'
 import b737Perfil from './assets/b737 perfil.png'
 import EnvelopeChart from './components/EnvelopeChart'
+import A320EnvelopeChart from './components/A320EnvelopeChart'
 import { generateFreighterLoadsheet } from './utilit/generateFreighterLoadsheet'
 import { generateWeatherPdf } from './utilit/generateWeatherPdf'
 import {lowerDeckFactors,mainDeckTables} from './utilit/cargoIndexTables'
 import FreighterEnvelope from './components/FreighterEnvelope'
 import { generateCargoLoadOrder } from './utilit/generateCargoLoadOrder'
+import { calculateA320FuelIndex } from "./utilit/a320WeightbalanceEngine";
+import {
+  validateA320CGEnvelope
+} from './utilit/a320WeightbalanceEngine'
 import {
   getForwardBagIndex,
   getAftBagIndex
@@ -44,6 +49,7 @@ import {
 import { supabase } from './lib/supabase'
 import AircraftTechnicalConfiguration
   from './components/AircraftTechnicalConfiguration'
+  
 import { calculatePassengerTrim } from './utilit/trimCalculator'
 function getMainIndex(position,weight){
 if(!mainDeckTables[position])
@@ -1935,30 +1941,35 @@ const [activeMenu, setActiveMenu] =
 (fwdChildren + midChildren + aftChildren) * 40 +
 
 (fwdInfants + midInfants + aftInfants) * 20
-  const forwardSeats =
+  
+const isA320SeatMap =
+  String(selectedAircraft?.model || '').toUpperCase().includes('A320') ||
+  String(selectedAircraft?.variant || '').toUpperCase().includes('A320')
 
-selectedSeats.filter(
+const forwardSeats = selectedSeats.filter(seat => {
+  const row = Math.floor(seat / 6) + 1
 
-seat => seat <= 59
+  return isA320SeatMap
+    ? row <= 9
+    : seat <= 59
+}).length
 
-).length
+const midSeats = selectedSeats.filter(seat => {
+  const row = Math.floor(seat / 6) + 1
 
-const midSeats =
+  return isA320SeatMap
+    ? row >= 10 && row <= 19
+    : seat > 59 && seat <= 129
+}).length
 
-selectedSeats.filter(
+const aftSeats = selectedSeats.filter(seat => {
+  const row = Math.floor(seat / 6) + 1
 
-seat =>
+  return isA320SeatMap
+    ? row >= 20 && row <= 28
+    : seat > 129 && seat <= 179
+}).length
 
-seat > 59 &&
-
-seat <= 129
-
-).length
-
-const aftSeats = selectedSeats.filter(
-  seat => seat > 129 && seat <= 180
-
-).length
 const paxMoment =
 
   calculateMoment(
@@ -2032,19 +2043,37 @@ const weightData = calculateWeight(
 
 
 const rampWeight = cargoZfw + fuel
-const basicArm = selectedAircraft.lemac + (selectedAircraft.mac *22) /100
+const basicArm = selectedAircraft.lemac +
+  (selectedAircraft.mac * (isA320SeatMap ? 25 : 22)) / 100
 
 const basicMoment =(selectedAircraft.basicWeight || 0) * basicArm
 
-const passengerMoment = selectedSeats.reduce((total,seat)=>{
+const passengerMoment = isA320SeatMap
+  ? (
+      (fwdAdults * 80 + fwdChildren * 40 + fwdInfants * 20) *
+        selectedAircraft.seatArmFwd +
 
-const row = Math.ceil(seat /6)
+      (midAdults * 80 + midChildren * 40 + midInfants * 20) *
+        selectedAircraft.seatArmMid +
 
-let rowArm = selectedAircraft.seatArmMid 
-if (row <= 8) {rowArm = selectedAircraft.seatArmFwd}
-else if (row <= 18) {rowArm =selectedAircraft.seatArmMid}
-else {rowArm = selectedAircraft.seatArmAft}
-return (total + calculateMoment(84,rowArm))}, 0)
+      (aftAdults * 80 + aftChildren * 40 + aftInfants * 20) *
+        selectedAircraft.seatArmAft
+    )
+  : selectedSeats.reduce((total, seat) => {
+      const row = Math.floor(seat / 6) + 1
+
+      let rowArm = selectedAircraft.seatArmMid
+
+      if (row <= 8) {
+        rowArm = selectedAircraft.seatArmFwd
+      } else if (row <= 18) {
+        rowArm = selectedAircraft.seatArmMid
+      } else {
+        rowArm = selectedAircraft.seatArmAft
+      }
+
+      return total + calculateMoment(84, rowArm)
+    }, 0)
 const fwdPax = selectedSeats.filter(seat => {
 
   const row = Math.ceil((seat + 1) / 6)
@@ -2342,11 +2371,25 @@ const cargoIndex =
 
 const zfi = effectiveBasicIndex + paxIndex + cargoIndex
 const zfiDebug = effectiveBasicIndex + cargoIndex
-const FuelIndex = getFuelIndex(fuel)
-const toi = zfi + FuelIndex
+const FuelIndex = isA320SeatMap
+  ? calculateA320FuelIndex(fuel)
+  : getFuelIndex(fuel)
 
-const tripFuelIndex = getFuelIndex(tripFuel)
-const li = toi - tripFuelIndex
+const toi = isA320SeatMap
+  ? zfi + calculateA320FuelIndex(
+      Math.max(fuel - taxiFuel, 0)
+    )
+  : zfi + FuelIndex
+
+const tripFuelIndex = isA320SeatMap
+  ? 0
+  : getFuelIndex(tripFuel)
+
+const li = isA320SeatMap
+  ? zfi + calculateA320FuelIndex(
+      Math.max(fuel - taxiFuel - tripFuel, 0)
+    )
+  : toi - tripFuelIndex
 function getNearestCg(index){
 const minIndex=25
 const maxIndex=90
@@ -2411,7 +2454,20 @@ const lwCg = getCG(
   selectedAircraft.mac
 )
 
-const toWithinEnvelope = toCg >= 18 && toCg <= 32 && tow <= selectedAircraft.maxTOW
+const toWithinEnvelope = isA320SeatMap
+  ? (
+      validateA320CGEnvelope({
+        phase: 'TAKEOFF',
+        weightKg: Number(tow),
+        cgMacPercent: Number(toCg)
+      }).ok === true &&
+      tow <= selectedAircraft.maxTOW
+    )
+  : (
+      toCg >= 18 &&
+      toCg <= 32 &&
+      tow <= selectedAircraft.maxTOW
+    );
 function isInsideEnvelope(x, y){
 const polygon=[
 
@@ -2452,7 +2508,20 @@ if(intersect) inside=!inside
 return inside
 }
 
-const zfWithinEnvelope = zfw <= selectedAircraft.maxZFW && zfCg >= 18 && zfCg <= 34
+const zfWithinEnvelope = isA320SeatMap
+  ? (
+      validateA320CGEnvelope({
+        phase: 'ZFW',
+        weightKg: Number(zfw),
+        cgMacPercent: Number(zfCg)
+      }).ok === true &&
+      zfw <= selectedAircraft.maxZFW
+    )
+  : (
+      zfw <= selectedAircraft.maxZFW &&
+      zfCg >= 18 &&
+      zfCg <= 34
+    );
 const passengerEnvelopeCheck = validatePassengerEnvelope({
   zfi,
   toi,
@@ -2460,8 +2529,13 @@ const passengerEnvelopeCheck = validatePassengerEnvelope({
   tow
 })
 
-const passengerZfwInside = passengerEnvelopeCheck.zfwInside
-const passengerTowInside = passengerEnvelopeCheck.towInside
+const passengerZfwInside = isA320SeatMap
+  ? zfWithinEnvelope
+  : passengerEnvelopeCheck.zfwInside;
+
+const passengerTowInside = isA320SeatMap
+  ? toWithinEnvelope
+  : passengerEnvelopeCheck.towInside;
 const trimLabel = trim < 4 ? 'NOSE UP' : trim > 7 ? 'NOSE DOWN' : 'SET'
 const cgStatus =
   zfWithinEnvelope &&
@@ -2490,48 +2564,43 @@ function toggleSeat(seat) {if (selectedSeats.includes(seat)) {setSelectedSeats(s
   } else {setSelectedSeats( [...selectedSeats, seat])
 }
 }
-function loadCabins(){
-const seats=[]
 
-for (let i = 0; i < Math.min(calculatedFwdCabinPax, 60); i++)
+function loadCabins() {
+  const model = String(selectedAircraft?.model || '').toUpperCase()
+  const variant = String(selectedAircraft?.variant || '').toUpperCase()
 
-{
+  const isA320 =
+    model.includes('A320') ||
+    variant.includes('A320')
 
-seats.push(
+  const zones = isA320
+    ? [
+        { start: 0, capacity: 54, passengers: calculatedFwdCabinPax },
+        { start: 54, capacity: 60, passengers: calculatedMidCabinPax },
+        { start: 114, capacity: 54, passengers: calculatedAftCabinPax }
+      ]
+    : [
+        { start: 0, capacity: 60, passengers: calculatedFwdCabinPax },
+        { start: 60, capacity: 70, passengers: calculatedMidCabinPax },
+        { start: 130, capacity: 50, passengers: calculatedAftCabinPax }
+      ]
 
-i
+  const seats = []
 
-)
+  for (const zone of zones) {
+    const count = Math.min(
+      Math.max(0, Number(zone.passengers) || 0),
+      zone.capacity
+    )
 
+    for (let i = 0; i < count; i++) {
+      seats.push(zone.start + i)
+    }
+  }
+
+  setSelectedSeats(seats)
 }
 
-for (let i = 60; i < 60 + Math.min(calculatedMidCabinPax, 70); i++){
-
-seats.push(
-
-i
-
-)
-
-}
-
-for (let i = 130; i < 130 + Math.min(calculatedAftCabinPax, 50); i++){
-
-seats.push(
-
-i
-
-)
-
-}
-
-setSelectedSeats(
-
-seats
-
-)
-
-}
 console.log({
   fwdPax,
   midPax,
@@ -6671,20 +6740,12 @@ maxWidth:'600px'
 >
 
 <SeatMap
-
-selectedSeats={
-
-selectedSeats
-
-}
-
-toggleSeat={
-
-toggleSeat
-
-}
-
+  selectedSeats={selectedSeats}
+  toggleSeat={toggleSeat}
+  aircraftModel={selectedAircraft?.model}
+  aircraftVariant={selectedAircraft?.variant}
 />
+
 
 </div>
 
@@ -7214,10 +7275,16 @@ const aircraft =
       acft.registration === e.target.value
   )
 
+
 if (aircraft) {
+  if (aircraft.id !== selectedAircraft?.id) {
+    setSelectedSeats([]);
+  }
+
   setSelectedAircraft(aircraft);
   setAircraftSummaryRegistration(aircraft.registration);
 }
+
 
         }}
 style={{
@@ -7632,9 +7699,25 @@ compact={true}
    flexWrap: 'nowrap'
   }}
 >
+  {isA320SeatMap ? (
+ <A320EnvelopeChart
+  zfw={zfw}
+  tow={tow}
+  zfi={zfi}
+  toi={toi}
+  zfCg={zfCg}
+  toCg={toCg}
+  indexReferenceArm={selectedAircraft.indexReferenceArm}
+  indexConstant={selectedAircraft.indexConstant}
+  indexOffset={selectedAircraft.indexOffset}
+  lemac={selectedAircraft.lemac}
+  mac={selectedAircraft.mac}
+/>
+) : (
   
    <EnvelopeChart
-
+manufacturer={selectedAircraft.manufacturer}
+model={selectedAircraft.model}
 cg={cg}
 
 zfCg={zfCg}
@@ -7676,6 +7759,7 @@ selectedAircraft.maxZFW
 }
 
 />
+)}
 <div
   style={{
     width: '220px',
