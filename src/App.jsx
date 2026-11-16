@@ -38,10 +38,8 @@ import { generateWeatherPdf } from './utilit/generateWeatherPdf'
 import {lowerDeckFactors,mainDeckTables} from './utilit/cargoIndexTables'
 import FreighterEnvelope from './components/FreighterEnvelope'
 import { generateCargoLoadOrder } from './utilit/generateCargoLoadOrder'
-import { calculateA320FuelIndex } from "./utilit/a320WeightbalanceEngine";
-import {
-  validateA320CGEnvelope
-} from './utilit/a320WeightbalanceEngine'
+import { calculateA320FuelIndex } from "./utilit/a320WeightBalanceEngine";
+import { validateA320CGEnvelope } from "./utilit/a320WeightBalanceEngine";
 import {
   getForwardBagIndex,
   getAftBagIndex
