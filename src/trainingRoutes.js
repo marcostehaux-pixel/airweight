@@ -783,66 +783,117 @@ source: "GOL G37617 OFP - 17NOV2018 - SAAR/SBGL",
     "OPERDAT Training - Provisional alternate route. LEVD IAC 2 ILS RWY23",
 
   trainingOnly: true
+},
+
+{
+  id: "SKCL-SKCG-01",
+  from: "SKCL",
+  to: "SKCG",
+  aircraft: "A320",
+  waypoints: ["SKCL", "SKCG"],
+  distanceNM: 430,
+  complete: false,
+  navigationVerified: false,
+  testEnabled: true,
+  referenceCruiseLevel: 330,
+  routeText: "SKCL DCT SKCG — SIMULATED TRAINING ROUTE",
+  source: "OPERDAT Training - Colombia navigation charts - provisional distance",
+  trainingOnly: true
+},
+{
+  id: "SKCG-SKBQ-01",
+  from: "SKCG",
+  to: "SKBQ",
+  aircraft: "A320",
+  waypoints: ["SKCG", "SKBQ"],
+  distanceNM: 65,
+  complete: false,
+  navigationVerified: false,
+  testEnabled: true,
+  referenceCruiseLevel: 150,
+  routeText: "SKCG DCT SKBQ — SIMULATED ALTERNATE ROUTE",
+  source: "OPERDAT Training - Colombia navigation charts - provisional distance",
+  trainingOnly: true
+},
+{
+  id: "SKCG-SKCL-01",
+  from: "SKCG",
+  to: "SKCL",
+  aircraft: "A320",
+  waypoints: ["SKCG", "SKCL"],
+  distanceNM: 430,
+  complete: false,
+  navigationVerified: false,
+  testEnabled: true,
+  referenceCruiseLevel: 340,
+  routeText: "SKCG DCT SKCL — SIMULATED TRAINING ROUTE",
+  source: "OPERDAT Training - Colombia navigation charts - provisional distance",
+  trainingOnly: true
+},
+{
+  id: "SKCL-SKPE-01",
+  from: "SKCL",
+  to: "SKPE",
+  aircraft: "A320",
+  waypoints: ["SKCL", "SKPE"],
+  distanceNM: 100,
+  complete: false,
+  navigationVerified: false,
+  testEnabled: true,
+  referenceCruiseLevel: 170,
+  routeText: "SKCL DCT SKPE — SIMULATED ALTERNATE ROUTE",
+  source: "OPERDAT Training - Colombia navigation charts - provisional distance",
+  trainingOnly: true
 }
+
+    
 ];
 
 
 export function findTrainingRoute(from, to, aircraft) {
-  return trainingRoutes.find(
-    (route) =>
-      route.from === from &&
-      route.to === to &&
-      route.aircraft === aircraft
+  return trainingRoutes.find(route =>
+    route.from === from &&
+    route.to === to &&
+    (
+      (route.complete === true && route.navigationVerified === true) ||
+      route.testEnabled === true
+    ) &&
+    Number.isFinite(route.distanceNM) &&
+    route.distanceNM > 0 &&
+    Array.isArray(route.waypoints) &&
+    route.waypoints.length > 0
   ) ?? null;
 }
 
 export function getAvailableDestinations(from, aircraft) {
-  return [
-    ...new Set(
-      trainingRoutes
-        .filter(
-          (route) =>
-            route.from === from &&
-            route.aircraft === aircraft &&
-
-(
-  (route.complete === true &&
-    route.navigationVerified === true) ||
-  route.testEnabled === true
-) &&
-
-            Number.isFinite(route.distanceNM) &&
-            route.distanceNM > 0 &&
-            route.waypoints.length > 0
-        )
-        .map((route) => route.to)
-    )
-    
-  ];
-  
-  
+  return [...new Set(
+    trainingRoutes
+      .filter(route =>
+        route.from === from &&
+        ((route.complete === true && route.navigationVerified === true) ||
+          route.testEnabled === true) &&
+        Number.isFinite(route.distanceNM) &&
+        route.distanceNM > 0 &&
+        Array.isArray(route.waypoints) &&
+        route.waypoints.length > 0
+      )
+      .map(route => route.to)
+  )].sort();
 }
 // OPERDAT TRAINING
 // Available departure airports
 
 export function getAvailableOrigins(aircraft = "B738") {
-  return [
-    ...new Set(
-      trainingRoutes
-        .filter(
-          (route) =>
-            route.aircraft === aircraft &&
-            (
-              (route.complete === true &&
-                route.navigationVerified === true) ||
-              route.testEnabled === true
-            ) &&
-            Number.isFinite(route.distanceNM) &&
-            route.distanceNM > 0 &&
-            Array.isArray(route.waypoints) &&
-            route.waypoints.length > 0
-        )
-        .map((route) => route.from)
-    )
-  ].sort();
+  return [...new Set(
+    trainingRoutes
+      .filter(route =>
+        ((route.complete === true && route.navigationVerified === true) ||
+          route.testEnabled === true) &&
+        Number.isFinite(route.distanceNM) &&
+        route.distanceNM > 0 &&
+        Array.isArray(route.waypoints) &&
+        route.waypoints.length > 0
+      )
+      .map(route => route.from)
+  )].sort();
 }
