@@ -767,6 +767,7 @@ const passengerEffectiveMaxTow =
       )
     : selectedAircraft?.maxTOW ?? 0
 const [aircraftSummaryRegistration, setAircraftSummaryRegistration] = useState('')
+const [fuelAircraftRegistration, setFuelAircraftRegistration] = useState('')
 const [selectedCargoAircraft,setSelectedCargoAircraft] = useState(aircraftCargoDatabase[0]
 )
 function clearCargo(){setCargoWeights(
@@ -2401,12 +2402,27 @@ return (18+(index-35)*0.235)
   ...passengerAircraftFleet,
   ...cargoAircraftFleet
 ];
+
+const aircraftFuelCapacityKg = {
+  'B737-700': 20820,
+
+  'B737-800': 20598,
+  'B737-800CF': 20598,
+  'B737-800SFP': 20598,
+  'B737-800W': 20598,
+
+  'B737-800MAX': 20730,
+  'B737-8MAX': 20730,
+
+  'A320-232': 19004,
+};
 const aircraftSummary =
   aircraftSummaryFleet.find(
     aircraft =>
       aircraft.registration === aircraftSummaryRegistration
   ) ||
     aircraftSummaryFleet[0];
+     console.log('FLEET SAMPLE:', aircraftSummaryFleet[0])
 const paxZfwArm = indexToArm(
   zfi,
   zfw,
@@ -2651,7 +2667,38 @@ if (
 
 }
 async function saveCurrentPassengerFlight() {
+  // Validate aircraft registration and fuel capacity
 
+  if (!selectedAircraft) {
+    window.alert('Please select an aircraft.')
+    return
+  }
+
+  if (
+    fuelAircraftRegistration !== selectedAircraft.registration
+  ) {
+    window.alert(
+      'Fuel Load aircraft registration does not match the Passenger aircraft. Please select the correct aircraft in Fuel Load.'
+    )
+    return
+  }
+
+  const maxFuel =
+    aircraftFuelCapacityKg[selectedAircraft.type]
+
+  if (maxFuel == null) {
+    window.alert(
+      `Maximum fuel capacity is not configured for ${selectedAircraft.registration} (${selectedAircraft.type}).`
+    )
+    return
+  }
+
+  if (!Number.isFinite(Number(fuel)) || Number(fuel) < 0 || Number(fuel) > maxFuel) {
+    window.alert(
+      `Invalid Ramp Fuel. Maximum capacity for ${selectedAircraft.registration} is ${maxFuel.toLocaleString('en-US')} kg.`
+    )
+    return
+  }
   const now =
     new Date().toISOString()
 
@@ -2836,7 +2883,42 @@ if (currentUser?.role === 'super_admin') {
   }
 }
 async function saveCurrentFreighterFlight() {
+  // FUEL CAPACITY VALIDATION — FREIGHTER
 
+  if (!selectedCargoAircraft) {
+    window.alert('Please select a freighter aircraft.')
+    return
+  }
+
+  if (
+    fuelAircraftRegistration !== selectedCargoAircraft.registration
+  ) {
+    window.alert(
+      'Fuel Load aircraft registration does not match the Freighter aircraft. Please select the correct aircraft in Fuel Load.'
+    )
+    return
+  }
+
+  const maxFuel =
+    aircraftFuelCapacityKg[selectedCargoAircraft.type]
+
+  if (maxFuel == null) {
+    window.alert(
+      `Maximum fuel capacity is not configured for ${selectedCargoAircraft.registration} (${selectedCargoAircraft.type}).`
+    )
+    return
+  }
+
+  if (
+    !Number.isFinite(Number(fuel)) ||
+    Number(fuel) < 0 ||
+    Number(fuel) > maxFuel
+  ) {
+    window.alert(
+      `Invalid Ramp Fuel. Maximum capacity for ${selectedCargoAircraft.registration} is ${maxFuel.toLocaleString('en-US')} kg.`
+    )
+    return
+  }
   const now =
     new Date().toISOString()
 console.log(
@@ -16006,7 +16088,43 @@ maxWidth: '100%',
       Fuel
 
     </h1>
+<div style={{ marginBottom: '25px' }}>
+  <label>Aircraft Registration</label>
 
+  <select
+    value={fuelAircraftRegistration}
+    onChange={(e) => {
+  setFuelAircraftRegistration(e.target.value)
+  setFuelAircraftRegistration(e.target.value)
+
+  setFuel(0)
+  setTaxiFuel(0)
+  setTripFuel(0)
+}}
+    style={{
+      display: 'block',
+      width: '100%',
+      maxWidth: '350px',
+      padding: '12px',
+      marginTop: '8px',
+      borderRadius: '10px',
+      background: '#1f2937',
+      color: 'white',
+      border: '1px solid #374151'
+    }}
+  >
+    <option value="">Select aircraft</option>
+
+    {aircraftSummaryFleet.map((aircraft) => (
+      <option
+        key={aircraft.registration}
+        value={aircraft.registration}
+      >
+        {aircraft.registration} — {aircraft.type}
+      </option>
+    ))}
+  </select>
+</div>
 
     <div>
 
@@ -16023,25 +16141,61 @@ maxWidth: '100%',
         value={fuel === 0 ? '' : fuel}
 
         onChange={(e) => {
+  const value = parseInt(e.target.value, 10) || 0
 
-          const value =
-            parseInt(e.target.value) || 0
+  const fuelAircraft = aircraftSummaryFleet.find(
+  aircraft =>
+    aircraft.registration === fuelAircraftRegistration
+)
 
-          setFuel(
+const maxFuel = fuelAircraft
+  ? aircraftFuelCapacityKg[fuelAircraft.type]
+  : null
 
-            Math.min(
-              value,
-              20598
-            )
+  if (maxFuel == null) {
+  window.alert(
+    'Maximum fuel capacity is not configured for the selected aircraft.'
+  )
+  return
+}
 
-          )
+if (value > maxFuel) {
+    window.alert(
+      `Maximum Ramp Fuel capacity for this aircraft is ${maxFuel.toLocaleString('en-US')} kg.`
+    )
+    return
+  }
 
-        }}
+  setFuel(Math.max(0, value))
+}}
 
       />
 
     </div>
+<div style={{ marginTop: '10px', marginBottom: '25px' }}>
+  {(() => {
+    const aircraft = aircraftSummaryFleet.find(
+      a => a.registration === fuelAircraftRegistration
+    )
 
+    const maxFuel = aircraft
+      ? aircraftFuelCapacityKg[aircraft.type]
+      : null
+
+    return (
+      <div
+        style={{
+          fontSize: '14px',
+          color: maxFuel == null ? '#f59e0b' : '#9ca3af'
+        }}
+      >
+        {maxFuel != null
+          ? `Maximum Fuel Capacity: ${maxFuel.toLocaleString('en-US')} kg`
+          : 'Maximum Fuel Capacity: Not configured'}
+      </div>
+    )
+  })()}
+</div>
 
     <div
 

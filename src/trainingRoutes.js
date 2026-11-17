@@ -844,9 +844,67 @@ source: "GOL G37617 OFP - 17NOV2018 - SAAR/SBGL",
   routeText: "SKCL DCT SKPE — SIMULATED ALTERNATE ROUTE",
   source: "OPERDAT Training - Colombia navigation charts - provisional distance",
   trainingOnly: true
-}
+},
+{
+  id: "SKBO-KMIA-01",
+  from: "SKBO",
+  to: "KMIA",
+  aircraft: "B738",
 
-    
+  waypoints: [
+    "SKBO",
+    "MUGOP",
+    "BUTAL",
+    "KILER",
+    "UCA",
+    "URSUS",
+    "ELLEE",
+    "KMIA"
+  ],
+
+  distanceNM: 1330,
+
+  complete: false,
+  navigationVerified: false,
+  testEnabled: true,
+
+  referenceCruiseLevel: 350,
+
+  routeText:
+    "SKBO MUGOP W23 BUTAL UQ105 KILER UG430 UCA UA301 URSUS A509 ELLEE KMIA",
+
+  source:
+    "OPERDAT Training - SKBO/KMIA central Caribbean corridor - provisional",
+
+  trainingOnly: true
+},
+    {
+  id: "KMIA-KFLL-01",
+  from: "KMIA",
+  to: "KFLL",
+  aircraft: "B738",
+
+  waypoints: [
+    "KMIA",
+    "KFLL"
+  ],
+
+  distanceNM: 30,
+
+  complete: false,
+  navigationVerified: false,
+  testEnabled: true,
+
+  referenceCruiseLevel: 100,
+
+  routeText:
+    "KMIA DCT KFLL — SIMULATED ALTERNATE ROUTE",
+
+  source:
+    "OPERDAT Training - Miami/Fort Lauderdale - provisional distance",
+
+  trainingOnly: true
+},
 ];
 
 
