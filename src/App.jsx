@@ -33,6 +33,11 @@ import b737cfPerfil from './assets/b737cfPerfil.png'
 import b737Perfil from './assets/b737 perfil.png'
 import EnvelopeChart from './components/EnvelopeChart'
 import A320EnvelopeChart from './components/A320EnvelopeChart'
+import B787EnvelopeChart from "./components/B787EnvelopeChart";
+import {
+  b787IndexToCg,
+  validateB787TrainingEnvelope
+} from './utilit/b787WeightBalanceEngine'
 import { generateFreighterLoadsheet } from './utilit/generateFreighterLoadsheet'
 import { generateWeatherPdf } from './utilit/generateWeatherPdf'
 import {lowerDeckFactors,mainDeckTables} from './utilit/cargoIndexTables'
@@ -1941,11 +1946,18 @@ const [activeMenu, setActiveMenu] =
 
 (fwdInfants + midInfants + aftInfants) * 20
   
+
 const isA320SeatMap =
   String(selectedAircraft?.model || '').toUpperCase().includes('A320') ||
   String(selectedAircraft?.variant || '').toUpperCase().includes('A320')
 
+const isB787SeatMap =
+  String(selectedAircraft?.model || '').toUpperCase().includes('787') ||
+  String(selectedAircraft?.variant || '').toUpperCase().includes('787')
+
 const forwardSeats = selectedSeats.filter(seat => {
+  if (isB787SeatMap) return seat >= 0 && seat < 30
+
   const row = Math.floor(seat / 6) + 1
 
   return isA320SeatMap
@@ -1954,6 +1966,8 @@ const forwardSeats = selectedSeats.filter(seat => {
 }).length
 
 const midSeats = selectedSeats.filter(seat => {
+  if (isB787SeatMap) return seat >= 30 && seat < 174
+
   const row = Math.floor(seat / 6) + 1
 
   return isA320SeatMap
@@ -1962,12 +1976,15 @@ const midSeats = selectedSeats.filter(seat => {
 }).length
 
 const aftSeats = selectedSeats.filter(seat => {
+  if (isB787SeatMap) return seat >= 174 && seat < 300
+
   const row = Math.floor(seat / 6) + 1
 
   return isA320SeatMap
     ? row >= 20 && row <= 28
     : seat > 129 && seat <= 179
 }).length
+
 
 const paxMoment =
 
@@ -2047,7 +2064,7 @@ const basicArm = selectedAircraft.lemac +
 
 const basicMoment =(selectedAircraft.basicWeight || 0) * basicArm
 
-const passengerMoment = isA320SeatMap
+const passengerMoment = (isA320SeatMap || isB787SeatMap)
   ? (
       (fwdAdults * 80 + fwdChildren * 40 + fwdInfants * 20) *
         selectedAircraft.seatArmFwd +
@@ -2101,7 +2118,24 @@ selectedSeats.forEach(seat => {
   const row = Math.ceil((seat + 1) / 6)
 
 })
-const paxIndex = (fwdPax * -0.7) + (aftPax * 0.7)
+
+const paxIndex = isB787SeatMap
+  ? (
+      (
+        (fwdAdults * 80 + fwdChildren * 40 + fwdInfants * 20) *
+        (selectedAircraft.seatArmFwd - selectedAircraft.indexReferenceArm)
+      ) +
+      (
+        (midAdults * 80 + midChildren * 40 + midInfants * 20) *
+        (selectedAircraft.seatArmMid - selectedAircraft.indexReferenceArm)
+      ) +
+      (
+        (aftAdults * 80 + aftChildren * 40 + aftInfants * 20) *
+        (selectedAircraft.seatArmAft - selectedAircraft.indexReferenceArm)
+      )
+    ) / selectedAircraft.indexConstant
+  : (fwdPax * -0.7) + (aftPax * 0.7)
+
 const FuelMoment = calculateMoment(fuel,selectedAircraft.FuelArm)
 const forwardCargoMoment = forwardCargo * selectedAircraft.forwardCargoArm
 const aftCargoMoment = aftCargo * selectedAircraft.aftCargoArm
@@ -2364,9 +2398,15 @@ useEffect(() => {
 }, [cargoFlightTo])
 const index = Number.isFinite(totalMoment) ? calculateIndex(totalMoment) :0
 const effectiveBasicIndex = doi + (extraCrew *0.1) + (catering? 0.2 : 0)
-const cargoIndex =
-  getForwardBagIndex(forwardCargo) +
-  getAftBagIndex(aftCargo)
+const cargoIndex = isB787SeatMap
+  ? (
+      (Number(forwardCargo || 0) * (647.2 - 1199.2)) / 200000 +
+      (Number(aftCargo || 0) * (1763.2 - 1199.2)) / 200000
+    )
+  : (
+      getForwardBagIndex(forwardCargo) +
+      getAftBagIndex(aftCargo)
+    )
 
 const zfi = effectiveBasicIndex + paxIndex + cargoIndex
 const zfiDebug = effectiveBasicIndex + cargoIndex
@@ -2403,6 +2443,7 @@ return (18+(index-35)*0.235)
   ...cargoAircraftFleet
 ];
 
+
 const aircraftFuelCapacityKg = {
   'B737-700': 20820,
 
@@ -2415,7 +2456,11 @@ const aircraftFuelCapacityKg = {
   'B737-8MAX': 20730,
 
   'A320-232': 19004,
+
+  // B787-9 — Generic Training
+  'B787-9': 101000,
 };
+
 const aircraftSummary =
   aircraftSummaryFleet.find(
     aircraft =>
@@ -2468,20 +2513,31 @@ const lwCg = getCG(
   selectedAircraft.mac
 )
 
-const toWithinEnvelope = isA320SeatMap
+
+const toWithinEnvelope = isB787SeatMap
   ? (
-      validateA320CGEnvelope({
+      validateB787TrainingEnvelope({
         phase: 'TAKEOFF',
         weightKg: Number(tow),
         cgMacPercent: Number(toCg)
       }).ok === true &&
       tow <= selectedAircraft.maxTOW
     )
-  : (
-      toCg >= 18 &&
-      toCg <= 32 &&
-      tow <= selectedAircraft.maxTOW
-    );
+  : isA320SeatMap
+    ? (
+        validateA320CGEnvelope({
+          phase: 'TAKEOFF',
+          weightKg: Number(tow),
+          cgMacPercent: Number(toCg)
+        }).ok === true &&
+        tow <= selectedAircraft.maxTOW
+      )
+    : (
+        toCg >= 18 &&
+        toCg <= 32 &&
+        tow <= selectedAircraft.maxTOW
+      );
+
 function isInsideEnvelope(x, y){
 const polygon=[
 
@@ -2522,20 +2578,28 @@ if(intersect) inside=!inside
 return inside
 }
 
-const zfWithinEnvelope = isA320SeatMap
-  ? (
-      validateA320CGEnvelope({
-        phase: 'ZFW',
-        weightKg: Number(zfw),
-        cgMacPercent: Number(zfCg)
-      }).ok === true &&
-      zfw <= selectedAircraft.maxZFW
-    )
-  : (
-      zfw <= selectedAircraft.maxZFW &&
-      zfCg >= 18 &&
-      zfCg <= 34
-    );
+
+const zfWithinEnvelope = isB787SeatMap
+  ? validateB787TrainingEnvelope({
+      phase: 'ZFW',
+      weightKg: Number(zfw),
+      cgMacPercent: Number(zfCg)
+    }).ok === true
+  : isA320SeatMap
+    ? (
+        validateA320CGEnvelope({
+          phase: 'ZFW',
+          weightKg: Number(zfw),
+          cgMacPercent: Number(zfCg)
+        }).ok === true &&
+        zfw <= selectedAircraft.maxZFW
+      )
+    : (
+        zfw <= selectedAircraft.maxZFW &&
+        zfCg >= 18 &&
+        zfCg <= 34
+      );
+
 const passengerEnvelopeCheck = validatePassengerEnvelope({
   zfi,
   toi,
@@ -2543,11 +2607,11 @@ const passengerEnvelopeCheck = validatePassengerEnvelope({
   tow
 })
 
-const passengerZfwInside = isA320SeatMap
+const passengerZfwInside = (isA320SeatMap || isB787SeatMap)
   ? zfWithinEnvelope
   : passengerEnvelopeCheck.zfwInside;
 
-const passengerTowInside = isA320SeatMap
+const passengerTowInside = (isA320SeatMap || isB787SeatMap)
   ? toWithinEnvelope
   : passengerEnvelopeCheck.towInside;
 const trimLabel = trim < 4 ? 'NOSE UP' : trim > 7 ? 'NOSE DOWN' : 'SET'
@@ -2557,9 +2621,8 @@ const cgStatus =
   passengerZfwInside &&
   passengerTowInside;
 
-const loadStatus = !cgStatus
-  ? 'CG OUT OF LIMITS'
-  : zfw > selectedAircraft.maxZFW
+const loadStatus =
+  zfw > selectedAircraft.maxZFW
     ? 'ZFW LIMIT EXCEEDED'
     : tow > passengerEffectiveMaxTow
       ? 'TOW LIMIT EXCEEDED'
@@ -2567,7 +2630,11 @@ const loadStatus = !cgStatus
         ? 'LANDING WEIGHT LIMIT EXCEEDED'
         : rw > selectedAircraft.maxRW
           ? 'RAMP WEIGHT LIMIT EXCEEDED'
-          : 'READY FOR DISPATCH';
+          : isB787SeatMap
+            ? 'CG VALIDATION PENDING'
+            : !cgStatus
+              ? 'CG OUT OF LIMITS'
+              : 'READY FOR DISPATCH';
 const cgLabel = cg < 18 ? 'FORWARD' : cg > 32 ? 'AFT' : 'NORMAL'
 const zfwStatus = zfw <= selectedAircraft.maxZFW
 const towStatus = tow <= selectedAircraft.maxTOW
@@ -2579,6 +2646,7 @@ function toggleSeat(seat) {if (selectedSeats.includes(seat)) {setSelectedSeats(s
 }
 }
 
+
 function loadCabins() {
   const model = String(selectedAircraft?.model || '').toUpperCase()
   const variant = String(selectedAircraft?.variant || '').toUpperCase()
@@ -2587,17 +2655,27 @@ function loadCabins() {
     model.includes('A320') ||
     variant.includes('A320')
 
-  const zones = isA320
+  const isB787 =
+    model.includes('787') ||
+    variant.includes('787')
+
+  const zones = isB787
     ? [
-        { start: 0, capacity: 54, passengers: calculatedFwdCabinPax },
-        { start: 54, capacity: 60, passengers: calculatedMidCabinPax },
-        { start: 114, capacity: 54, passengers: calculatedAftCabinPax }
+        { start: 0, capacity: 30, passengers: calculatedFwdCabinPax },
+        { start: 30, capacity: 144, passengers: calculatedMidCabinPax },
+        { start: 174, capacity: 126, passengers: calculatedAftCabinPax }
       ]
-    : [
-        { start: 0, capacity: 60, passengers: calculatedFwdCabinPax },
-        { start: 60, capacity: 70, passengers: calculatedMidCabinPax },
-        { start: 130, capacity: 50, passengers: calculatedAftCabinPax }
-      ]
+    : isA320
+      ? [
+          { start: 0, capacity: 54, passengers: calculatedFwdCabinPax },
+          { start: 54, capacity: 60, passengers: calculatedMidCabinPax },
+          { start: 114, capacity: 54, passengers: calculatedAftCabinPax }
+        ]
+      : [
+          { start: 0, capacity: 60, passengers: calculatedFwdCabinPax },
+          { start: 60, capacity: 70, passengers: calculatedMidCabinPax },
+          { start: 130, capacity: 50, passengers: calculatedAftCabinPax }
+        ]
 
   const seats = []
 
@@ -2614,6 +2692,7 @@ function loadCabins() {
 
   setSelectedSeats(seats)
 }
+
 
 console.log({
   fwdPax,
@@ -6749,23 +6828,31 @@ LOAD CABINS
 
 </button>
 
+
 <button
+  onClick={() => {
+    // Limpiar Seat Map
+    setSelectedSeats([])
 
-onClick={()=>
+    // Limpiar pasajeros FWD
+    setFwdAdults(0)
+    setFwdChildren(0)
+    setFwdInfants(0)
 
-setSelectedSeats(
+    // Limpiar pasajeros MID
+    setMidAdults(0)
+    setMidChildren(0)
+    setMidInfants(0)
 
-[]
-
-)
-
-}
-
+    // Limpiar pasajeros AFT
+    setAftAdults(0)
+    setAftChildren(0)
+    setAftInfants(0)
+  }}
 >
-
-CLEAR ALL
-
+  CLEAR ALL
 </button>
+
 
 </div>
 
@@ -7470,15 +7557,15 @@ unit="IU"status={true}
 
 />
  <StatusCard
- compact={true}
-title="ZF CG"
-
-value={
-zfCg?.toFixed?.(1)
+  compact={true}
+  title="ZF CG"
+  value={zfCg?.toFixed?.(1)}
+  unit="%"
+  status={
+  isB787SeatMap
+    ? zfWithinEnvelope
+    : zfWithinEnvelope && passengerZfwInside
 }
-
-unit="%"
-status={zfWithinEnvelope && passengerZfwInside}
 />
 <StatusCard
 compact={true}
@@ -7663,7 +7750,11 @@ toCg?.toFixed?.(1)
 
 unit="%"
 
-status={toWithinEnvelope && passengerTowInside}
+status={
+  isB787SeatMap
+    ? toWithinEnvelope
+    : toWithinEnvelope && passengerTowInside
+}
 /> 
 <StatusCard
   compact={true}
@@ -7779,7 +7870,16 @@ compact={true}
    flexWrap: 'nowrap'
   }}
 >
-  {isA320SeatMap ? (
+  
+{isB787SeatMap ? (
+  <B787EnvelopeChart
+    zfw={zfw}
+    tow={tow}
+    zfi={zfi}
+    toi={toi}
+  />
+) : isA320SeatMap ? (
+
  <A320EnvelopeChart
   zfw={zfw}
   tow={tow}
@@ -7973,10 +8073,12 @@ crewConfiguration,
 
 catering,
           cgStatus,
-          zfCg,
+zfCg,
+zfi,
 
 toCg,
-          flightFrom,
+toi,
+flightFrom,
 
 flightTo,
 

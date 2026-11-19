@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf'
 import logo from '../assets/logo.png'
+import { addPassengerEnvelopePage } from '../utilit/passengerEnvelopePdf'
  export default function generateLoadsheet({
 
 selectedAircraft,
@@ -19,8 +20,10 @@ tow,
 payload,
 cg,
 zfCg,
+zfi,
 trim,
 toCg,
+toi,
 cgStatus,
 taxiFuel,
 extraCrew,
@@ -1013,6 +1016,20 @@ metarTo || '-'
 )
 
 }
+
+addPassengerEnvelopePage(doc, {
+  selectedAircraft,
+  flightNumber,
+  flightFrom,
+  flightTo,
+  zfw,
+  tow,
+  zfCg,
+  toCg,
+  zfi,
+  toi
+})
+
 doc.save('OPERDAT_LOADSHEET.pdf')
 
 

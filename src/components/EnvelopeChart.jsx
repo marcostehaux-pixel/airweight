@@ -209,25 +209,20 @@ return (
 
   >
 
-    <h3
-
-      style={{
-
-        fontSize: '22px',
-
-        letterSpacing: '1px',
-
-        marginBottom: '20px',
-
-        color: '#f5f5f5'
-
-      }}
-
-    >
-
-      CG Envelope
-
-    </h3>  
+    
+<h3
+  style={{
+    textAlign: 'center',
+    fontSize: '18px',
+    fontWeight: '700',
+    letterSpacing: '0.4px',
+    marginBottom: '16px',
+    color: '#f1f5f9'
+  }}
+>
+  B737-800 — WEIGHT & BALANCE ENVELOPE
+</h3>
+ 
       <svg
 
       width="950"

@@ -173,26 +173,38 @@ const cgReferenceLines = cgReferenceValues.map(cgPercent => ({
   x2: mapIndex(cgToIndex(cgPercent, chartScale.maxWeight)),
   y2: mapWeight(chartScale.maxWeight)
 }));
-  return (
-    <div style={{
-      background: 'rgba(255,255,255,0.06)',
-      border: '1px solid rgba(255,255,255,0.08)',
-      borderRadius: '20px',
-      padding: '30px',
-      marginTop: '30px',
-      width: '920px',
-      boxSizing: 'border-box'
-    }}>
-    
+  
+return (
+  <div style={{
+    background: 'rgba(255,255,255,0.06)',
+    border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: '20px',
+    padding: '30px',
+    marginTop: '30px',
+    width: '920px',
+    boxSizing: 'border-box'
+  }}>
 
-      <svg
-        viewBox="0 0 920 400"
-        style={{
-          width: '100%',
-          background: 'rgba(0,0,0,0.18)',
-          borderRadius: '14px'
-        }}
-      >
+    <div style={{
+      textAlign: 'center',
+      fontSize: '18px',
+      fontWeight: '700',
+      color: '#f1f5f9',
+      marginBottom: '16px',
+      letterSpacing: '0.4px'
+    }}>
+      A320 — WEIGHT & BALANCE ENVELOPE
+    </div>
+
+    <svg
+      viewBox="0 0 920 400"
+      style={{
+        width: '100%',
+        background: 'rgba(0,0,0,0.18)',
+        borderRadius: '14px'
+      }}
+    >
+
         {weightTicks.map(weight => (
           <g key={weight}>
             <line
