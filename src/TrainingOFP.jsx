@@ -16,7 +16,8 @@ export default function TrainingOFP({
 
   tripFuel = null,
   contingencyFuel = null,
-  alternateFuel = null,
+    alternateFuel = null,
+  alternateTimeMinutes = null,
   holdingFuel = null,
   holdingTimeMinutes = null,
   taxiFuel = null,
@@ -253,9 +254,19 @@ estimatedTimeHours = null
         </h3>
 
        {[
-  ["TRIP", tripFuel],
+    [
+    `TRIP (${Number.isFinite(estimatedTimeHours)
+      ? `${Math.round(estimatedTimeHours * 60)} MIN`
+      : "—"})`,
+    tripFuel
+  ],
   ["ENRTE RSV", contingencyFuel],
-  ["ALTN", alternateFuel],
+  [
+    `ALTN (${Number.isFinite(alternateTimeMinutes)
+      ? `${alternateTimeMinutes} MIN`
+      : "—"})`,
+    alternateFuel
+  ],
   [
   `HOLD ALTN (${holdingTimeMinutes != null
     ? `${holdingTimeMinutes} MIN`

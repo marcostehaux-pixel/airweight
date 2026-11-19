@@ -21,6 +21,10 @@ import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import { supabase } from './lib/supabase';
 import TrainingRouteDetails from './TrainingRouteDetails';
+import {
+  calculateB787FuelPlan,
+  calculateB787HoldingFuel
+} from './b787FlightPlanningEngine.js';
 export default function FlightPlanning({
   
   passengerAircraft = [],
@@ -141,13 +145,72 @@ const viewTrainingOFP = async (filePath) => {
 React.useEffect(() => {
   loadTrainingOFPs();
 }, []);
+// OPERDAT TRAINING — ROUTE SELECTION BY AIRCRAFT
+
+const routeAircraft = [
+  ...passengerAircraft,
+  ...cargoAircraft
+].find(
+  aircraft => aircraft.registration === selectedRegistration
+);
+
+const routeAircraftType = String(
+  routeAircraft?.type ||
+  routeAircraft?.model ||
+  ''
+).trim().toUpperCase();
+
+const routeAircraftCode = /^B787(?:-9)?(?:\b|$)/.test(
+  routeAircraftType
+)
+  ? 'B789'
+  : 'B738';
+
 const selectedTrainingRoute = findTrainingRoute(
   departure,
   destination,
-  "B738"
+  routeAircraftCode
 );
+// OPERDAT TRAINING — B787-9 FUEL PLANNING
 
+const b787FuelPlan = routeAircraftCode === 'B789'
+  ? calculateB787FuelPlan({
+      departure,
+      destination,
+      alternate,
+      averageWind: averageWind === '' ? NaN : Number(averageWind),
+      zeroFuelWeight: Number(zfw),
+      cruiseLevel: Number(cruiseLevel),
 
+      taxiFuelKg: taxiFuel === '' ? NaN : Number(taxiFuel),
+
+      holdingFuelKg:
+        alternateHoldingTime === ''
+          ? 0
+          : (
+              calculateB787HoldingFuel({
+                holdingTimeMinutes: Number(alternateHoldingTime)
+              })?.holdingFuel ?? NaN
+            ),
+
+      extraFuelKg: extraFuel === '' ? 0 : Number(extraFuel),
+      tankeringFuelKg: tankeringFuel === '' ? 0 : Number(tankeringFuel),
+      etopsFuelKg: etopsFuel === '' ? 0 : Number(etopsFuel),
+      ballastFuelKg: ballastFuel === '' ? 0 : Number(ballastFuel),
+      policyFuelKg: policyFuel === '' ? 0 : Number(policyFuel)
+    })
+  : null;
+// OPERDAT TRAINING — B787-9 HOLDING CALCULATION
+
+const b787HoldingResult =
+  routeAircraftCode === 'B789' &&
+  b787FuelPlan &&
+  alternateHoldingTime !== '' &&
+  Number.isFinite(Number(alternateHoldingTime))
+    ? calculateB787HoldingFuel({
+        holdingTimeMinutes: Number(alternateHoldingTime)
+      })
+    : null;
 
 const airDistanceResult =
   selectedTrainingRoute?.distanceNM != null &&
@@ -180,7 +243,7 @@ const airDistanceResult =
 const selectedAlternateRoute = findTrainingRoute(
   destination,
   alternate,
-  "B738"
+  routeAircraftCode
 );
 
 
@@ -272,7 +335,7 @@ const preliminaryFuelDistribution =
   aircraft.type || aircraft.model || ''
 ).trim();
 
-return /^(B737-800|A320)/i.test(aircraftType);
+return /^(B737-800|A320|B787-9)/i.test(aircraftType);
 })
     .filter((aircraft, index, array) =>
       array.findIndex(item =>
@@ -284,7 +347,21 @@ return /^(B737-800|A320)/i.test(aircraftType);
     aircraft =>
       aircraft.registration === selectedRegistration
   );
-  
+  // OPERDAT TRAINING — AIRCRAFT ENGINE SELECTION
+
+const selectedAircraftType = String(
+  selectedAircraft?.type ||
+  selectedAircraft?.model ||
+  ''
+).trim().toUpperCase();
+
+const isB787 = /^B787(?:-9)?(?:\b|$)/.test(
+  selectedAircraftType
+);
+
+const trainingAircraftCode = isB787
+  ? 'B789'
+  : 'B738';
 const currentOFPInputs = JSON.stringify({
   flightNumber,
   selectedRegistration,
@@ -315,6 +392,12 @@ React.useEffect(() => {
 }, [currentOFPInputs, generatedOFP]);
 
   // OPERDAT TRAINING — OFP DISPLAY DATA
+  // OPERDAT TRAINING — B787-9 OFP PREVIEW
+const isB787Preview = routeAircraftCode === 'B789';
+
+const b787Preview = isB787Preview
+  ? b787FuelPlan
+  : null;
 const ofpDisplayData = generatedOFP ?? {
   flightNumber,
   registration: selectedRegistration,
@@ -327,35 +410,91 @@ const ofpDisplayData = generatedOFP ?? {
   cruiseLevel,
   averageWind: averageWind === '' ? null : Number(averageWind),
 
-  groundDistance: airDistanceResult?.groundDistance ?? null,
-  alternateDistance: alternateFuelResult?.alternateDistance ?? null,
-  airDistance: airDistanceResult?.airDistance ?? null,
-  estimatedTimeHours: airDistanceResult?.estimatedTimeHours ?? null,
+ groundDistance: isB787Preview
+  ? 1330
+  : (airDistanceResult?.groundDistance ?? null),
 
-  tripFuel: lrcTripResult?.referenceTripFuel ?? null,
-  contingencyFuel: preliminaryContingencyResult?.contingencyFuel ?? null,
-  alternateFuel: alternateFuelResult?.alternateFuel ?? null,
-  holdingFuel: preliminaryHoldingResult?.holdingFuel ?? null,
-  holdingTimeMinutes: preliminaryHoldingResult
-  ? Number(alternateHoldingTime)
-  : null,
+alternateDistance: isB787Preview
+  ? 30
+  : (alternateFuelResult?.alternateDistance ?? null),
+
+airDistance: isB787Preview
+  ? (b787Preview?.airDistance ?? null)
+  : (airDistanceResult?.airDistance ?? null),
+
+estimatedTimeHours: isB787Preview
+  ? (
+      Number.isFinite(b787Preview?.estimatedTripTimeMinutes)
+        ? b787Preview.estimatedTripTimeMinutes / 60
+        : null
+    )
+  : (airDistanceResult?.estimatedTimeHours ?? null),
+
+alternateTimeMinutes: isB787Preview
+  ? (b787Preview?.alternateTimeMinutes ?? null)
+  : (alternateFuelResult?.alternateTimeMinutes ?? null),
+
+  tripFuel: isB787Preview
+  ? (b787Preview?.tripFuel ?? null)
+  : (lrcTripResult?.referenceTripFuel ?? null),
+
+contingencyFuel: isB787Preview
+  ? (b787Preview?.contingencyFuel ?? null)
+  : (preliminaryContingencyResult?.contingencyFuel ?? null),
+
+alternateFuel: isB787Preview
+  ? (b787Preview?.alternateFuel ?? null)
+  : (alternateFuelResult?.alternateFuel ?? null),
+
+holdingFuel: isB787Preview
+  ? (b787Preview?.holdingFuel ?? null)
+  : (preliminaryHoldingResult?.holdingFuel ?? null),
+
+holdingTimeMinutes: isB787Preview
+  ? (
+      b787Preview
+        ? Number(alternateHoldingTime)
+        : null
+    )
+  : (
+      preliminaryHoldingResult
+        ? Number(alternateHoldingTime)
+        : null
+    ),
   taxiFuel: taxiFuel === '' ? null : Number(taxiFuel),
   extraFuel: extraFuel === '' ? null : Number(extraFuel),
   tankeringFuel: tankeringFuel === '' ? null : Number(tankeringFuel),
 etopsFuel: etopsFuel === '' ? 0 : Number(etopsFuel),
 ballastFuel: ballastFuel === '' ? 0 : Number(ballastFuel),
 policyFuel: policyFuel === '' ? 0 : Number(policyFuel),
-  requiredFuel: preliminaryFuelDistribution?.requiredFuel ?? null,
-  totalFuel: preliminaryFuelDistribution?.totalFuel ?? null,
-  takeoffFuel: preliminaryFuelDistribution?.takeoffFuel ?? null,
-  destinationRemainingFuel:
-  preliminaryFuelDistribution?.destinationRemainingFuel ?? null,
+  requiredFuel: isB787Preview
+  ? (b787Preview?.requiredFuel ?? null)
+  : (preliminaryFuelDistribution?.requiredFuel ?? null),
 
-alternateRemainingFuel:
-  preliminaryFuelDistribution?.alternateRemainingFuel ?? null,
+totalFuel: isB787Preview
+  ? (b787Preview?.totalFuel ?? null)
+  : (preliminaryFuelDistribution?.totalFuel ?? null),
 
-afterHoldingFuel:
-  preliminaryFuelDistribution?.afterHoldingFuel ?? null,
+takeoffFuel: isB787Preview
+  ? (b787Preview?.takeoffFuel ?? null)
+  : (preliminaryFuelDistribution?.takeoffFuel ?? null),
+
+destinationRemainingFuel: isB787Preview
+  ? (b787Preview?.destinationRemainingFuel ?? null)
+  : (preliminaryFuelDistribution?.destinationRemainingFuel ?? null),
+
+alternateRemainingFuel: isB787Preview
+  ? (b787Preview?.alternateRemainingFuel ?? null)
+  : (preliminaryFuelDistribution?.alternateRemainingFuel ?? null),
+
+afterHoldingFuel: isB787Preview
+  ? (
+      Number.isFinite(b787Preview?.alternateRemainingFuel) &&
+      Number.isFinite(b787Preview?.holdingFuel)
+        ? b787Preview.alternateRemainingFuel - b787Preview.holdingFuel
+        : null
+    )
+  : (preliminaryFuelDistribution?.afterHoldingFuel ?? null),
 };
 // OPERDAT TRAINING — NEW FLIGHT
 const startNewFlight = () => {
@@ -406,7 +545,9 @@ const generateOFP = () => {
     ["Estimated Zero Fuel Weight", zfw],
     ["Cruise Flight Level", cruiseLevel],
     ["Average Wind Component", averageWind],
-    ["Alternate Average Ground Speed", alternateGroundSpeed],
+   ...(routeAircraftCode === 'B789'
+  ? []
+  : [["Alternate Average Ground Speed", alternateGroundSpeed]]),
     ["Alternate Holding Time", alternateHoldingTime],
     ["Taxi / APU Fuel", taxiFuel],
     ["Extra Fuel", extraFuel],
@@ -444,13 +585,21 @@ const generateOFP = () => {
     return;
   }
 
+    const isB787 = routeAircraftCode === 'B789';
+
+  const calculationsReady = isB787
+    ? Boolean(b787FuelPlan)
+    : Boolean(
+        lrcTripResult &&
+        alternateFuelResult &&
+        preliminaryHoldingResult &&
+        preliminaryFuelDistribution
+      );
+
   if (
     !selectedTrainingRoute ||
     !selectedAlternateRoute ||
-    !lrcTripResult ||
-    !alternateFuelResult ||
-    !preliminaryHoldingResult ||
-    !preliminaryFuelDistribution
+    !calculationsReady
   ) {
     alert(
       "OFP CALCULATION INCOMPLETE\n\n" +
@@ -461,7 +610,12 @@ const generateOFP = () => {
   }
 
   const generatedAtUTC = new Date().toISOString();
+  // OPERDAT TRAINING — B787-9 OFP
+  // Use the B787 fuel planning engine when B789 is selected.
 
+  const b787OFP = routeAircraftCode === 'B789'
+    ? b787FuelPlan
+    : null;
 
   const ofpData = {
     generatedAtUTC,
@@ -479,22 +633,53 @@ const generateOFP = () => {
       averageWind === '' ? null : Number(averageWind),
 
     groundDistance:
-      airDistanceResult?.groundDistance ?? null,
-    alternateDistance:
-      alternateFuelResult?.alternateDistance ?? null,
-    airDistance:
-      airDistanceResult?.airDistance ?? null,
-    estimatedTimeHours:
-      airDistanceResult?.estimatedTimeHours ?? null,
+  isB787
+    ? 1330
+    : (airDistanceResult?.groundDistance ?? null),
 
-    tripFuel:
-      lrcTripResult?.referenceTripFuel ?? null,
+alternateDistance:
+  isB787
+    ? 30
+    : (alternateFuelResult?.alternateDistance ?? null),
+
+airDistance:
+  isB787
+    ? (b787OFP?.airDistance ?? null)
+    : (airDistanceResult?.airDistance ?? null),
+
+estimatedTimeHours:
+  isB787
+    ? (
+        Number.isFinite(b787OFP?.estimatedTripTimeMinutes)
+          ? b787OFP.estimatedTripTimeMinutes / 60
+          : null
+      )
+    : (airDistanceResult?.estimatedTimeHours ?? null),
+
+alternateTimeMinutes:
+  isB787
+    ? (b787OFP?.alternateTimeMinutes ?? null)
+    : (alternateFuelResult?.alternateTimeMinutes ?? null),
+
+        tripFuel:
+      b787OFP
+        ? b787OFP.tripFuel
+        : (lrcTripResult?.referenceTripFuel ?? null),
+
     contingencyFuel:
-      preliminaryContingencyResult?.contingencyFuel ?? null,
+      b787OFP
+        ? b787OFP.contingencyFuel
+        : (preliminaryContingencyResult?.contingencyFuel ?? null),
+
     alternateFuel:
-      alternateFuelResult?.alternateFuel ?? null,
+      b787OFP
+        ? b787OFP.alternateFuel
+        : (alternateFuelResult?.alternateFuel ?? null),
+
     holdingFuel:
-      preliminaryHoldingResult?.holdingFuel ?? null,
+      b787OFP
+        ? b787OFP.holdingFuel
+        : (preliminaryHoldingResult?.holdingFuel ?? null),
       holdingTimeMinutes: preliminaryHoldingResult
   ? Number(alternateHoldingTime)
   : null,
@@ -507,19 +692,40 @@ const generateOFP = () => {
 etopsFuel: etopsFuel === '' ? 0 : Number(etopsFuel),
 ballastFuel: ballastFuel === '' ? 0 : Number(ballastFuel),
 policyFuel: policyFuel === '' ? 0 : Number(policyFuel),
-        requiredFuel:
-      preliminaryFuelDistribution?.requiredFuel ?? null,
-    totalFuel:
-      preliminaryFuelDistribution?.totalFuel ?? null,
-    takeoffFuel:
-      preliminaryFuelDistribution?.takeoffFuel ?? null,
+       requiredFuel:
+  isB787
+    ? (b787OFP?.requiredFuel ?? null)
+    : (preliminaryFuelDistribution?.requiredFuel ?? null),
 
-    destinationRemainingFuel:
-      preliminaryFuelDistribution?.destinationRemainingFuel ?? null,
-    alternateRemainingFuel:
-      preliminaryFuelDistribution?.alternateRemainingFuel ?? null,
-    afterHoldingFuel:
-      preliminaryFuelDistribution?.afterHoldingFuel ?? null,
+totalFuel:
+  isB787
+    ? (b787OFP?.totalFuel ?? null)
+    : (preliminaryFuelDistribution?.totalFuel ?? null),
+
+takeoffFuel:
+  isB787
+    ? (b787OFP?.takeoffFuel ?? null)
+    : (preliminaryFuelDistribution?.takeoffFuel ?? null),
+
+   destinationRemainingFuel:
+  isB787
+    ? (b787OFP?.destinationRemainingFuel ?? null)
+    : (preliminaryFuelDistribution?.destinationRemainingFuel ?? null),
+
+alternateRemainingFuel:
+  isB787
+    ? (b787OFP?.alternateRemainingFuel ?? null)
+    : (preliminaryFuelDistribution?.alternateRemainingFuel ?? null),
+
+afterHoldingFuel:
+  isB787
+    ? (
+        Number.isFinite(b787OFP?.alternateRemainingFuel) &&
+        Number.isFinite(b787OFP?.holdingFuel)
+          ? b787OFP.alternateRemainingFuel - b787OFP.holdingFuel
+          : null
+      )
+    : (preliminaryFuelDistribution?.afterHoldingFuel ?? null),
   };
 
   
@@ -938,7 +1144,7 @@ if (
           }}
         >
           <option value="">Select departure airport</option>
-          {getAvailableOrigins('B738').map((icao) => (
+          {getAvailableOrigins(routeAircraftCode).map((icao) => (
             <option key={icao} value={icao}>
               {icao}
             </option>
@@ -966,7 +1172,7 @@ if (
         >
           <option value="">Select destination airport</option>
 
-          {getAvailableDestinations(departure, 'B738').map((icao) => (
+          {getAvailableDestinations(departure, routeAircraftCode).map((icao) => (
             <option key={icao} value={icao}>
               {icao}
             </option>
@@ -993,7 +1199,7 @@ if (
         >
           <option value="">Select alternate airport</option>
 
-          {getAvailableDestinations(destination, 'B738').map((icao) => (
+          {getAvailableDestinations(destination, routeAircraftCode).map((icao) => (
             <option key={icao} value={icao}>
               {icao}
             </option>
@@ -1068,7 +1274,7 @@ readOnly
 {/* OPERDAT TRAINING — ALTERNATE AVAILABILITY WARNING */}
 
 {destination &&
-  getAvailableDestinations(destination, 'B738').length === 0 && (
+  getAvailableDestinations(destination, routeAircraftCode).length === 0 && (
     <div
       role="alert"
       style={{
@@ -1798,24 +2004,55 @@ readOnly
     </div>
 )}
 <FuelPlanningSummary
-  tripFuel={lrcTripResult?.referenceTripFuel ?? null}
-  tripTimeMinutes={lrcTripResult?.referenceTripTimeMinutes ?? null}
+  aircraftCode={routeAircraftCode}
+  tripFuel={
+  routeAircraftCode === 'B789'
+    ? (b787FuelPlan?.tripFuel ?? null)
+    : (lrcTripResult?.referenceTripFuel ?? null)
+}
+ tripTimeMinutes={
+  routeAircraftCode === 'B789'
+    ? (b787FuelPlan?.estimatedTripTimeMinutes ?? null)
+    : (lrcTripResult?.referenceTripTimeMinutes ?? null)
+}
   contingencyFuel={
-    preliminaryContingencyResult?.contingencyFuel ?? null
-  }
-  alternateFuel={alternateFuelResult?.alternateFuel ?? null}
-  alternateTimeMinutes={
-    alternateFuelResult?.alternateTimeMinutes ?? null
-  }
-  holdingFuel={preliminaryHoldingResult?.holdingFuel ?? null}
-  holdingTimeMinutes={
-  preliminaryHoldingResult
-    ? Number(alternateHoldingTime)
+  routeAircraftCode === 'B789'
+    ? (b787FuelPlan?.contingencyFuel ?? null)
+    : (preliminaryContingencyResult?.contingencyFuel ?? null)
+}
+ alternateFuel={
+  routeAircraftCode === 'B789'
+    ? (b787FuelPlan?.alternateFuel ?? null)
+    : (alternateFuelResult?.alternateFuel ?? null)
+}
+finalReserveFuel={
+  routeAircraftCode === 'B789'
+    ? (b787FuelPlan?.finalReserveFuel ?? null)
     : null
 }
+  alternateTimeMinutes={
+  routeAircraftCode === 'B789'
+    ? (b787FuelPlan?.alternateTimeMinutes ?? null)
+    : (alternateFuelResult?.alternateTimeMinutes ?? null)
+}
+  holdingFuel={
+  routeAircraftCode === 'B789'
+    ? (b787HoldingResult?.holdingFuel ?? null)
+    : (preliminaryHoldingResult?.holdingFuel ?? null)
+}
+  holdingTimeMinutes={
+  routeAircraftCode === 'B789'
+    ? (b787HoldingResult?.holdingTimeMinutes ?? null)
+    : (
+        preliminaryHoldingResult
+          ? Number(alternateHoldingTime)
+          : null
+      )
+}
 taxiFuel={
-  taxiFuel !== '' && Number.isFinite(Number(taxiFuel))
-    && Number(taxiFuel) >= 0
+  taxiFuel !== '' &&
+  Number.isFinite(Number(taxiFuel)) &&
+  Number(taxiFuel) >= 0
     ? Number(taxiFuel)
     : null
 }
@@ -1837,14 +2074,20 @@ tankeringFuel={
     : null
 }
 requiredFuel={
-  preliminaryFuelDistribution?.requiredFuel ?? null
+  routeAircraftCode === 'B789'
+    ? (b787FuelPlan?.requiredFuel ?? null)
+    : (preliminaryFuelDistribution?.requiredFuel ?? null)
 }
 
 totalFuel={
-  preliminaryFuelDistribution?.totalFuel ?? null
+  routeAircraftCode === 'B789'
+    ? (b787FuelPlan?.totalFuel ?? null)
+    : (preliminaryFuelDistribution?.totalFuel ?? null)
 }
 takeoffFuel={
-  preliminaryFuelDistribution?.takeoffFuel ?? null
+  routeAircraftCode === 'B789'
+    ? (b787FuelPlan?.takeoffFuel ?? null)
+    : (preliminaryFuelDistribution?.takeoffFuel ?? null)
 }
 />
 

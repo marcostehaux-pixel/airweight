@@ -9,13 +9,15 @@ import React from 'react';
 
 
 export default function FuelPlanningSummary({
+  aircraftCode = null,
   tripFuel = null,
   tripTimeMinutes = null,
   contingencyFuel = null,
   alternateFuel = null,
   alternateTimeMinutes = null,
-  holdingFuel = null,
+    holdingFuel = null,
   holdingTimeMinutes = null,
+  finalReserveFuel = null,
   taxiFuel = null,
   extraFuel = null,
   tankeringFuel = null,
@@ -28,11 +30,12 @@ export default function FuelPlanningSummary({
 }) {
 
   const items = [
-    'TRIP',
-    'ENRTE RSV',
-    'ALTN',
-    'HOLD ALTN',
-    'ETOPS',
+  'TRIP',
+  'ENRTE RSV',
+  'ALTN',
+  'FINAL RESERVE',
+  'HOLD ALTN',
+  'ETOPS',
     'BALLAST',
     'POLICY',
     'STORED',
@@ -77,7 +80,8 @@ export default function FuelPlanningSummary({
     fuel = contingencyFuel;
   } else if (item === 'ALTN') {
     fuel = alternateFuel;
- 
+ } else if (item === 'FINAL RESERVE') {
+  fuel = finalReserveFuel;
 } else if (item === 'HOLD ALTN') {
   fuel = holdingFuel;
 } else if (item === 'ETOPS') {
@@ -234,14 +238,29 @@ export default function FuelPlanningSummary({
           lineHeight: '1.6'
         }}
       >
-        * Preliminary training values.
-        TRIP uses LRC reference fuel without landing
-        weight adjustment. ENRTE RSV currently shows
-        5% of reference TRIP; comparison against
-        5-minute holding fuel is pending.
-        ALTN is a preliminary estimate based on
-        manually entered average ground speed
-        and fuel flow.
+               {aircraftCode === 'B789' ? (
+          <>
+            * B787-9 simulated training values.
+            TRIP fuel and time are estimated using
+            provisional reference parameters, aircraft
+            weight, cruise level and average wind.
+            ALTN fuel and time are provisional values
+            for KMIA-KFLL. Calculations are intended
+            exclusively for training and are not
+            approved for operational use.
+          </>
+        ) : (
+          <>
+            * Preliminary training values.
+            TRIP uses LRC reference fuel without landing
+            weight adjustment. ENRTE RSV currently shows
+            5% of reference TRIP; comparison against
+            5-minute holding fuel is pending.
+            ALTN is a preliminary estimate based on
+            manually entered average ground speed
+            and fuel flow.
+          </>
+        )}
       </p>
     </div>
   );

@@ -847,9 +847,9 @@ source: "GOL G37617 OFP - 17NOV2018 - SAAR/SBGL",
 },
 {
   id: "SKBO-KMIA-01",
-  from: "SKBO",
-  to: "KMIA",
-  aircraft: "B738",
+from: "SKBO",
+to: "KMIA",
+aircraft: "B789",
 
   waypoints: [
     "SKBO",
@@ -880,9 +880,9 @@ source: "GOL G37617 OFP - 17NOV2018 - SAAR/SBGL",
 },
     {
   id: "KMIA-KFLL-01",
-  from: "KMIA",
-  to: "KFLL",
-  aircraft: "B738",
+from: "KMIA",
+to: "KFLL",
+aircraft: "B789",
 
   waypoints: [
     "KMIA",
@@ -906,12 +906,35 @@ source: "GOL G37617 OFP - 17NOV2018 - SAAR/SBGL",
   trainingOnly: true
 },
 ];
+// OPERDAT TRAINING — AIRCRAFT ROUTE GROUPS
 
+function isRouteAvailableForAircraft(route, aircraft) {
+  const selectedType = String(aircraft || 'B738')
+    .trim()
+    .toUpperCase();
+
+  const routeType = String(route.aircraft || '')
+    .trim()
+    .toUpperCase();
+
+  // B737-800 and A320 share the same training routes.
+  if (selectedType === 'B738' || selectedType === 'A320') {
+    return routeType === 'B738' || routeType === 'A320';
+  }
+
+  // B787-9 has its own route library.
+  if (selectedType === 'B789') {
+    return routeType === 'B789';
+  }
+
+  return false;
+}
 
 export function findTrainingRoute(from, to, aircraft) {
   return trainingRoutes.find(route =>
     route.from === from &&
     route.to === to &&
+    isRouteAvailableForAircraft(route, aircraft) &&
     (
       (route.complete === true && route.navigationVerified === true) ||
       route.testEnabled === true
@@ -927,7 +950,8 @@ export function getAvailableDestinations(from, aircraft) {
   return [...new Set(
     trainingRoutes
       .filter(route =>
-        route.from === from &&
+  route.from === from &&
+  isRouteAvailableForAircraft(route, aircraft) &&
         ((route.complete === true && route.navigationVerified === true) ||
           route.testEnabled === true) &&
         Number.isFinite(route.distanceNM) &&
@@ -945,7 +969,8 @@ export function getAvailableOrigins(aircraft = "B738") {
   return [...new Set(
     trainingRoutes
       .filter(route =>
-        ((route.complete === true && route.navigationVerified === true) ||
+  isRouteAvailableForAircraft(route, aircraft) &&
+  ((route.complete === true && route.navigationVerified === true) ||
           route.testEnabled === true) &&
         Number.isFinite(route.distanceNM) &&
         route.distanceNM > 0 &&

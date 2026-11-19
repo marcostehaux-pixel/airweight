@@ -3,6 +3,7 @@ import {
   B737_FUEL_ADJUSTMENTS,
   B737_HOLDING_REFERENCE
 } from './b737TrainingPerformance.js';
+
 /**
  * OPERDAT TRAINING
  * Simulated Flight Planning Engine

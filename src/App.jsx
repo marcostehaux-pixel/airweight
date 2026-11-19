@@ -7817,11 +7817,13 @@ compact={true}
   <input
     type="number"
     min="0"
-    max="3000"
+    max={isB787SeatMap ? 31750 : selectedAircraft?.model?.toUpperCase().includes('A320') ? 3402 : 3558}
     value={forwardCargo === 0 ? '' : forwardCargo}
     onChange={(e) => {
       const value = parseInt(e.target.value, 10) || 0
-      setForwardCargo(Math.max(0, Math.min(value, 3000)))
+      setForwardCargo(Math.max(0, Math.min(value,
+  isB787SeatMap ? 31750 : selectedAircraft?.model?.toUpperCase().includes('A320') ? 3402 : 3558
+)))
     }}
     style={{
       width: '100%',
@@ -7834,6 +7836,21 @@ compact={true}
       color: 'white'
     }}
   />
+  <div style={{
+  marginTop: '6px',
+  fontSize: '11px',
+  color: '#8fa0b7'
+}}>
+  MAX FORWARD: {
+    (
+      isB787SeatMap
+        ? 31750
+        : selectedAircraft?.model?.toUpperCase().includes('A320')
+          ? 3402
+          : 3558
+    ).toLocaleString('es-AR')
+  } KG
+</div>
 </div>
 <div style={{ marginTop: '15px', maxWidth: '250px' }}>
   <label>Aft Cargo (kg)</label>
@@ -7841,11 +7858,13 @@ compact={true}
   <input
     type="number"
     min="0"
-    max="5000"
+    max={isB787SeatMap ? 28390 : selectedAircraft?.model?.toUpperCase().includes('A320') ? 6033 : 4444}
     value={aftCargo === 0 ? '' : aftCargo}
     onChange={(e) => {
       const value = parseInt(e.target.value, 10) || 0
-      setAftCargo(Math.max(0, Math.min(value, 5000)))
+      setAftCargo(Math.max(0, Math.min(value,
+  isB787SeatMap ? 28390 : selectedAircraft?.model?.toUpperCase().includes('A320') ? 6033 : 4444
+)))
     }}
     style={{
       width: '100%',
@@ -7858,6 +7877,21 @@ compact={true}
       color: 'white'
     }}
   />
+  <div style={{
+  marginTop: '6px',
+  fontSize: '11px',
+  color: '#8fa0b7'
+}}>
+  MAX AFT: {
+    (
+      isB787SeatMap
+        ? 28390
+        : selectedAircraft?.model?.toUpperCase().includes('A320')
+          ? 6033
+          : 4444
+    ).toLocaleString('es-AR')
+  } KG
+</div>
 </div>
 </div>
   </div>
